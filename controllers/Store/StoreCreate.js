@@ -29,7 +29,12 @@ exports.getAllStore = async (req, res) => {
 
         storeCategories: {
           select: {
-            name: true,
+            storeCategory: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
 
@@ -91,7 +96,11 @@ exports.getProfile = async (req, res) => {
       include: {
         images: true,
         // ประเภทร้าน เช่น Bakery / Somtum
-        storeCategories: true,
+        storeCategories: {
+          include: {
+            storeCategory: true,
+          },
+        },
 
         // รอบรับออเดอร์
         orderRound: {
@@ -162,7 +171,11 @@ exports.getStore = async (req, res) => {
       },
       include: {
         orderRound: true,
-        storeCategories: true,
+        storeCategories: {
+          include: {
+            storeCategory: true,
+          },
+        },
         images: true,
       },
     });
@@ -296,35 +309,50 @@ exports.updatePassword = async (req, res) => {
 };
 
 exports.updateUsername = async (req, res) => {
-  //จำกัดการเปลี่ยน username ทุก 30 วัน
+  // จำกัดการเปลี่ยน username ทุก 30 วัน
   try {
     const { username } = req.body;
     const storeId = req.store.id;
 
     const currentStore = await prisma.store.findFirst({
       where: {
-        storeId,
+        id: storeId,
       },
     });
+
+    if (!currentStore) {
+      return res.status(404).json({
+        message: "ไม่พบข้อมูลร้าน",
+      });
+    }
+
     if (currentStore.username === username) {
-      return res.status(400).json({ message: "เป็น Username เดิมอยู่แล้ว" });
+      return res.status(400).json({
+        message: "เป็น Username เดิมอยู่แล้ว",
+      });
     }
 
     const chackeUsername = await prisma.store.findFirst({
       where: {
         username,
+        NOT: {
+          id: storeId,
+        },
       },
     });
 
     if (chackeUsername) {
-      return res.status(400).json({ message: "This username already exits!!" });
+      return res.status(400).json({
+        message: "This username already exits!!",
+      });
     }
 
     // เช็คว่าเปลี่ยนได้แล้วหรือยัง
     const DAYS = 30;
+
     const store = await prisma.store.findFirst({
       where: {
-        storeId,
+        id: storeId,
       },
     });
 
@@ -332,33 +360,34 @@ exports.updateUsername = async (req, res) => {
       const daysSinceChange =
         (Date.now() - new Date(store.usernameChangedAt)) /
         (1000 * 60 * 60 * 24);
+
       if (daysSinceChange < DAYS) {
         return res.status(400).json({
-          message: `เปลี่ยน username ได้อีกครั้งใน ${Math.ceil(DAYS - daysSinceChange)} วัน`,
+          message: `เปลี่ยน username ได้อีกครั้งใน ${Math.ceil(
+            DAYS - daysSinceChange
+          )} วัน`,
         });
       }
     }
 
     // อัปเดต username + บันทึกเวลา
-    await prisma.store.update({
-      where: {
-        storeId,
-      },
-      data: { username, usernameChangedAt: new Date() },
-    });
-
     const updateUsername = await prisma.store.update({
       where: {
-        storeId,
+        id: storeId,
       },
       data: {
         username,
+        usernameChangedAt: new Date(),
       },
     });
+
     res.send(updateUsername);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
+    console.log("UPDATE USERNAME ERROR =", error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 };
 
@@ -598,15 +627,18 @@ exports.updateStore = async (req, res) => {
     // =========================================================
 
     if (Array.isArray(storeCategoryIds)) {
-      const categoryIds = storeCategoryIds
-        .map(Number)
-        .filter(
-          (id) => !Number.isNaN(id)
-        );
+      const categoryIds = [
+        ...new Set(
+          storeCategoryIds
+            .map(Number)
+            .filter((id) => !Number.isNaN(id))
+        ),
+      ];
 
       updateData.storeCategories = {
-        set: categoryIds.map((id) => ({
-          id,
+        deleteMany: {},
+        create: categoryIds.map((categoryId) => ({
+          storeCategoryId: categoryId,
         })),
       };
     }
@@ -643,7 +675,11 @@ exports.updateStore = async (req, res) => {
         data: updateData,
 
         include: {
-          storeCategories: true,
+          storeCategories: {
+            include: {
+              storeCategory: true,
+            },
+          },
           images: true,
         },
       });
