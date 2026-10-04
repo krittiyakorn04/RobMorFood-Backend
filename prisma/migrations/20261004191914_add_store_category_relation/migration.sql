@@ -110,6 +110,18 @@ CREATE TABLE `StoreCategory` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `StoreStoreCategory` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `storeId` INTEGER NOT NULL,
+    `storeCategoryId` INTEGER NOT NULL,
+
+    INDEX `StoreStoreCategory_storeId_idx`(`storeId`),
+    INDEX `StoreStoreCategory_storeCategoryId_idx`(`storeCategoryId`),
+    UNIQUE INDEX `StoreStoreCategory_storeId_storeCategoryId_key`(`storeId`, `storeCategoryId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `MenuCategory` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `storeId` INTEGER NOT NULL,
@@ -411,15 +423,6 @@ CREATE TABLE `PushSubscription` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
-CREATE TABLE `_StoreToStoreCategory` (
-    `A` INTEGER NOT NULL,
-    `B` INTEGER NOT NULL,
-
-    UNIQUE INDEX `_StoreToStoreCategory_AB_unique`(`A`, `B`),
-    INDEX `_StoreToStoreCategory_B_index`(`B`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 -- AddForeignKey
 ALTER TABLE `ChatRoom` ADD CONSTRAINT `ChatRoom_customerId_fkey` FOREIGN KEY (`customerId`) REFERENCES `Customer`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -437,6 +440,12 @@ ALTER TABLE `Address` ADD CONSTRAINT `Address_customerId_fkey` FOREIGN KEY (`cus
 
 -- AddForeignKey
 ALTER TABLE `StoreCategory` ADD CONSTRAINT `StoreCategory_adminId_fkey` FOREIGN KEY (`adminId`) REFERENCES `Admin`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `StoreStoreCategory` ADD CONSTRAINT `StoreStoreCategory_storeId_fkey` FOREIGN KEY (`storeId`) REFERENCES `Store`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `StoreStoreCategory` ADD CONSTRAINT `StoreStoreCategory_storeCategoryId_fkey` FOREIGN KEY (`storeCategoryId`) REFERENCES `StoreCategory`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `MenuCategory` ADD CONSTRAINT `MenuCategory_storeId_fkey` FOREIGN KEY (`storeId`) REFERENCES `Store`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -566,9 +575,3 @@ ALTER TABLE `PushSubscription` ADD CONSTRAINT `PushSubscription_storeId_fkey` FO
 
 -- AddForeignKey
 ALTER TABLE `PushSubscription` ADD CONSTRAINT `PushSubscription_deliveryStaffId_fkey` FOREIGN KEY (`deliveryStaffId`) REFERENCES `StoreStaff`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `_StoreToStoreCategory` ADD CONSTRAINT `_StoreToStoreCategory_A_fkey` FOREIGN KEY (`A`) REFERENCES `Store`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `_StoreToStoreCategory` ADD CONSTRAINT `_StoreToStoreCategory_B_fkey` FOREIGN KEY (`B`) REFERENCES `StoreCategory`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

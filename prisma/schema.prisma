@@ -242,7 +242,7 @@ model Store {
   reviews           Review[]
   carts             Cart[]
   images            Image[]
-  storeCategories   StoreCategory[]
+  storeCategories   StoreStoreCategory[]
   notifications     Notification[]
   storeStaffs       StoreStaff[]
   chatRooms         ChatRoom[]
@@ -252,11 +252,24 @@ model Store {
 }
 
 model StoreCategory {
-  id      Int     @id @default(autoincrement())
-  name    String  @unique
-  stores  Store[]
-  admin   Admin?  @relation(fields: [adminId], references: [id])
+  id      Int                  @id @default(autoincrement())
+  name    String               @unique
+  stores  StoreStoreCategory[]
+  admin   Admin?               @relation(fields: [adminId], references: [id])
   adminId Int?
+}
+
+model StoreStoreCategory {
+  id              Int @id @default(autoincrement())
+  storeId         Int
+  storeCategoryId Int
+
+  store         Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeCategory StoreCategory @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, storeCategoryId])
+  @@index([storeId])
+  @@index([storeCategoryId])
 }
 
 // MENU
