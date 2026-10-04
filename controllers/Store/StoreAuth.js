@@ -29,7 +29,6 @@ exports.register = async (req, res) => {
       bankAccount,
       bankAccountName,
 
-      // พิกัด
       lat,
       lng,
     } = req.body;
@@ -80,15 +79,15 @@ exports.register = async (req, res) => {
 
     const storeLat =
       lat !== undefined &&
-      lat !== null &&
-      lat !== ""
+        lat !== null &&
+        lat !== ""
         ? Number(lat)
         : null;
 
     const storeLng =
       lng !== undefined &&
-      lng !== null &&
-      lng !== ""
+        lng !== null &&
+        lng !== ""
         ? Number(lng)
         : null;
 
@@ -103,19 +102,13 @@ exports.register = async (req, res) => {
       });
     }
 
-    if (
-      storeLat < -90 ||
-      storeLat > 90
-    ) {
+    if (storeLat < -90 || storeLat > 90) {
       return res.status(400).json({
         message: "Latitude ไม่ถูกต้อง",
       });
     }
 
-    if (
-      storeLng < -180 ||
-      storeLng > 180
-    ) {
+    if (storeLng < -180 || storeLng > 180) {
       return res.status(400).json({
         message: "Longitude ไม่ถูกต้อง",
       });
@@ -130,8 +123,7 @@ exports.register = async (req, res) => {
       storeCategoryIds.length === 0
     ) {
       return res.status(400).json({
-        message:
-          "กรุณาเลือกประเภทร้านอย่างน้อย 1 ประเภท",
+        message: "กรุณาเลือกประเภทร้านอย่างน้อย 1 ประเภท",
       });
     }
 
@@ -145,30 +137,23 @@ exports.register = async (req, res) => {
       });
     }
 
-    const uniqueCategoryIds = [
-      ...new Set(categoryIds),
-    ];
+    const uniqueCategoryIds = [...new Set(categoryIds)];
 
     // =========================
     // ตรวจ Category ว่ามีจริง
     // =========================
 
-    const categories =
-      await prisma.storeCategory.findMany({
-        where: {
-          id: {
-            in: uniqueCategoryIds,
-          },
+    const categories = await prisma.storeCategory.findMany({
+      where: {
+        id: {
+          in: uniqueCategoryIds,
         },
-      });
+      },
+    });
 
-    if (
-      categories.length !==
-      uniqueCategoryIds.length
-    ) {
+    if (categories.length !== uniqueCategoryIds.length) {
       return res.status(400).json({
-        message:
-          "มีประเภทร้านบางรายการไม่พบในระบบ",
+        message: "มีประเภทร้านบางรายการไม่พบในระบบ",
       });
     }
 
@@ -176,21 +161,19 @@ exports.register = async (req, res) => {
     // เช็ค Customer ซ้ำ
     // =========================
 
-    const user =
-      await prisma.customer.findFirst({
-        where: {
-          OR: [
-            { email },
-            { username },
-            { phone },
-          ],
-        },
-      });
+    const user = await prisma.customer.findFirst({
+      where: {
+        OR: [
+          { email },
+          { username },
+          { phone },
+        ],
+      },
+    });
 
     if (user) {
       return res.status(400).json({
-        message:
-          "ข้อมูลผู้ใช้นี้มีอยู่ในระบบแล้ว",
+        message: "ข้อมูลผู้ใช้นี้มีอยู่ในระบบแล้ว",
       });
     }
 
@@ -198,22 +181,20 @@ exports.register = async (req, res) => {
     // เช็ค Store ซ้ำ
     // =========================
 
-    const store =
-      await prisma.store.findFirst({
-        where: {
-          OR: [
-            { email },
-            { username },
-            { phone },
-            { storeName },
-          ],
-        },
-      });
+    const store = await prisma.store.findFirst({
+      where: {
+        OR: [
+          { email },
+          { username },
+          { phone },
+          { storeName },
+        ],
+      },
+    });
 
     if (store) {
       return res.status(400).json({
-        message:
-          "ข้อมูลร้านนี้มีอยู่ในระบบแล้ว",
+        message: "ข้อมูลร้านนี้มีอยู่ในระบบแล้ว",
       });
     }
 
@@ -221,59 +202,56 @@ exports.register = async (req, res) => {
     // Hash Password
     // =========================
 
-    const hashPassword =
-      await bcrypt.hash(password, 10);
+    const hashPassword = await bcrypt.hash(password, 10);
 
     // =========================
     // สร้าง Store
     // =========================
 
-    const newStore =
-      await prisma.store.create({
-        data: {
-          email,
-          password: hashPassword,
-          username,
-          phone,
+    const newStore = await prisma.store.create({
+      data: {
+        email,
+        password: hashPassword,
+        username,
+        phone,
 
-          Notice,
-          storeName,
-          address,
+        Notice,
+        storeName,
+        address,
 
-          dayOpen: JSON.stringify(
-            dayOpen || ""
-          ),
+        dayOpen: JSON.stringify(dayOpen || ""),
 
-          timeOpen: timeOpen || "",
-          timeClose: timeClose || "",
-          openAuto: Boolean(openAuto),
+        timeOpen: timeOpen || "",
+        timeClose: timeClose || "",
+        openAuto: Boolean(openAuto),
 
+        // =========================
+        // พิกัดร้าน
+        // =========================
 
-          // =========================
-          // พิกัดร้าน
-          // =========================
+        lat: storeLat,
+        lng: storeLng,
 
-          lat: storeLat,
-          lng: storeLng,
+        // =========================
+        // Category
+        // ใช้ relation แบบ explicit
+        // =========================
 
-          // =========================
-          // Category
-          // =========================
+        storeCategories: {
+          create: uniqueCategoryIds.map((categoryId) => ({
+            storeCategoryId: categoryId,
+          })),
+        },
+      },
 
-          storeCategories: {
-            connect:
-              uniqueCategoryIds.map(
-                (id) => ({
-                  id,
-                })
-              ),
+      include: {
+        storeCategories: {
+          include: {
+            storeCategory: true,
           },
         },
-
-        include: {
-          storeCategories: true,
-        },
-      });
+      },
+    });
 
     // =========================
     // JWT Payload
@@ -325,135 +303,135 @@ exports.register = async (req, res) => {
 
 
 exports.login = async (req, res) => {
-try {
-const { username, password } = req.body;
+  try {
+    const { username, password } = req.body;
 
-if (!username || !password) {
-  return res.status(400).json({
-    message: "กรุณากรอก username และ password",
-  });
-}
-
-// =========================
-// 1. Login ร้านค้า
-// =========================
-const store = await prisma.store.findFirst({
-  where: {
-    username,
-  },
-});
-
-if (store) {
-  const checkPassword = await bcrypt.compare(
-    password,
-    store.password
-  );
-
-  if (!checkPassword) {
-    return res.status(400).json({
-      message: "Username หรือ Password ไม่ถูกต้อง",
-    });
-  }
-
-  if (
-    store.accountStatus === "SUSPENDED" ||
-    store.accountStatus === "BANNED"
-  ) {
-    return res.status(403).json({
-      message: "บัญชีร้านค้านี้ไม่สามารถเข้าใช้งานได้",
-    });
-  }
-
-  const payload = {
-    id: store.id,
-    username: store.username,
-    role: "MERCHANT",
-    storeName: store.storeName,
-  };
-
-  const token = jwt.sign(
-    payload,
-    process.env.SECRET,
-    {
-      expiresIn: "7d",
+    if (!username || !password) {
+      return res.status(400).json({
+        message: "กรุณากรอก username และ password",
+      });
     }
-  );
 
-  return res.status(200).json({
-    message: "เข้าสู่ระบบสำเร็จ",
-    token,
-    payload,
-  });
-}
+    // =========================
+    // 1. Login ร้านค้า
+    // =========================
+    const store = await prisma.store.findFirst({
+      where: {
+        username,
+      },
+    });
 
-// =========================
-// 2. Login คนส่ง
-// =========================
-const staff = await prisma.storeStaff.findUnique({
-  where: {
-    username,
-  },
-});
+    if (store) {
+      const checkPassword = await bcrypt.compare(
+        password,
+        store.password
+      );
 
-if (!staff) {
-  return res.status(400).json({
-    message: "Username หรือ Password ไม่ถูกต้อง",
-  });
-}
+      if (!checkPassword) {
+        return res.status(400).json({
+          message: "Username หรือ Password ไม่ถูกต้อง",
+        });
+      }
 
-const checkPassword = await bcrypt.compare(
-  password,
-  staff.password
-);
+      if (
+        store.accountStatus === "SUSPENDED" ||
+        store.accountStatus === "BANNED"
+      ) {
+        return res.status(403).json({
+          message: "บัญชีร้านค้านี้ไม่สามารถเข้าใช้งานได้",
+        });
+      }
 
-if (!checkPassword) {
-  return res.status(400).json({
-    message: "Username หรือ Password ไม่ถูกต้อง",
-  });
-}
+      const payload = {
+        id: store.id,
+        username: store.username,
+        role: "MERCHANT",
+        storeName: store.storeName,
+      };
 
-if (!staff.isActive) {
-  return res.status(403).json({
-    message: "บัญชีคนส่งถูกปิดใช้งาน",
-  });
-}
+      const token = jwt.sign(
+        payload,
+        process.env.SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
 
-const payload = {
-  id: staff.id,
-  username: staff.username,
-  role: "DELIVERY",
-  storeId: staff.storeId,
-  name: staff.name,
-};
+      return res.status(200).json({
+        message: "เข้าสู่ระบบสำเร็จ",
+        token,
+        payload,
+      });
+    }
 
-const token = jwt.sign(
-  payload,
-  process.env.SECRET,
-  {
-    expiresIn: "7d",
+    // =========================
+    // 2. Login คนส่ง
+    // =========================
+    const staff = await prisma.storeStaff.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (!staff) {
+      return res.status(400).json({
+        message: "Username หรือ Password ไม่ถูกต้อง",
+      });
+    }
+
+    const checkPassword = await bcrypt.compare(
+      password,
+      staff.password
+    );
+
+    if (!checkPassword) {
+      return res.status(400).json({
+        message: "Username หรือ Password ไม่ถูกต้อง",
+      });
+    }
+
+    if (!staff.isActive) {
+      return res.status(403).json({
+        message: "บัญชีคนส่งถูกปิดใช้งาน",
+      });
+    }
+
+    const payload = {
+      id: staff.id,
+      username: staff.username,
+      role: "DELIVERY",
+      storeId: staff.storeId,
+      name: staff.name,
+    };
+
+    const token = jwt.sign(
+      payload,
+      process.env.SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    return res.status(200).json({
+      message: "เข้าสู่ระบบสำเร็จ",
+      token,
+      payload,
+    });
+
+  } catch (error) {
+    console.error("loginStore Error =", error);
+    return res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ",
+    });
+
   }
-);
-
-return res.status(200).json({
-  message: "เข้าสู่ระบบสำเร็จ",
-  token,
-  payload,
-});
-
-} catch (error) {
-console.error("loginStore Error =", error);
-return res.status(500).json({
-  message: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ",
-});
-
-}
 };
 
 
 exports.currentRestau = async (req, res) => {
   try {
     const store = await prisma.store.findFirst({
-      where: { id: req.store.id },  
+      where: { id: req.store.id },
       select: {
         id: true,
         email: true,
@@ -471,274 +449,274 @@ exports.currentRestau = async (req, res) => {
 }
 
 exports.createStoreStaff = async (req, res) => {
-try {
-const storeId = req.store.id;
+  try {
+    const storeId = req.store.id;
 
 
-const { username, password, name, phone } = req.body;
+    const { username, password, name, phone } = req.body;
 
-if (!username || !password || !name) {
-  return res.status(400).json({
-    message: "กรุณากรอก Username, Password และชื่อคนส่ง",
-  });
-}
+    if (!username || !password || !name) {
+      return res.status(400).json({
+        message: "กรุณากรอก Username, Password และชื่อคนส่ง",
+      });
+    }
 
-if (username.length < 4) {
-  return res.status(400).json({
-    message: "Username ต้องมีอย่างน้อย 4 ตัวอักษร",
-  });
-}
+    if (username.length < 4) {
+      return res.status(400).json({
+        message: "Username ต้องมีอย่างน้อย 4 ตัวอักษร",
+      });
+    }
 
-if (password.length < 6) {
-  return res.status(400).json({
-    message: "Password ต้องมีอย่างน้อย 6 ตัวอักษร",
-  });
-}
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password ต้องมีอย่างน้อย 6 ตัวอักษร",
+      });
+    }
 
-// ตรวจ Username ซ้ำ
-const existingStaff = await prisma.storeStaff.findUnique({
-  where: {
-    username,
-  },
-});
+    // ตรวจ Username ซ้ำ
+    const existingStaff = await prisma.storeStaff.findUnique({
+      where: {
+        username,
+      },
+    });
 
-if (existingStaff) {
-  return res.status(400).json({
-    message: "Username นี้ถูกใช้งานแล้ว",
-  });
-}
+    if (existingStaff) {
+      return res.status(400).json({
+        message: "Username นี้ถูกใช้งานแล้ว",
+      });
+    }
 
-// เข้ารหัส Password
-const hashedPassword = await bcrypt.hash(password, 10);
+    // เข้ารหัส Password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-const staff = await prisma.storeStaff.create({
-  data: {
-    storeId,
-    username,
-    password: hashedPassword,
-    name,
-    phone: phone || null,
-    role: "DELIVERY",
-    isActive: true,
-  },
-  select: {
-    id: true,
-    storeId: true,
-    username: true,
-    name: true,
-    phone: true,
-    role: true,
-    isActive: true,
-    createdAt: true,
-  },
-});
+    const staff = await prisma.storeStaff.create({
+      data: {
+        storeId,
+        username,
+        password: hashedPassword,
+        name,
+        phone: phone || null,
+        role: "DELIVERY",
+        isActive: true,
+      },
+      select: {
+        id: true,
+        storeId: true,
+        username: true,
+        name: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+      },
+    });
 
-return res.status(201).json({
-  message: "สร้างบัญชีคนส่งสำเร็จ",
-  staff,
-});
-
-
-} catch (error) {
-console.error("createStoreStaff Error =", error);
+    return res.status(201).json({
+      message: "สร้างบัญชีคนส่งสำเร็จ",
+      staff,
+    });
 
 
-return res.status(500).json({
-  message: "เกิดข้อผิดพลาดในการสร้างบัญชีคนส่ง",
-});
+  } catch (error) {
+    console.error("createStoreStaff Error =", error);
 
 
-}
+    return res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการสร้างบัญชีคนส่ง",
+    });
+
+
+  }
 };
 
 exports.getStoreStaff = async (req, res) => {
-try {
-const storeId = req.store.id;
+  try {
+    const storeId = req.store.id;
 
 
-const staff = await prisma.storeStaff.findMany({
-  where: {
-    storeId,
-  },
-  select: {
-    id: true,
-    storeId: true,
-    username: true,
-    name: true,
-    phone: true,
-    role: true,
-    isActive: true,
-    createdAt: true,
-    updatedAt: true,
-  },
-  orderBy: {
-    createdAt: "desc",
-  },
-});
+    const staff = await prisma.storeStaff.findMany({
+      where: {
+        storeId,
+      },
+      select: {
+        id: true,
+        storeId: true,
+        username: true,
+        name: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-return res.status(200).json({
-  staff,
-});
-
-
-} catch (error) {
-console.error("getStoreStaff Error =", error);
+    return res.status(200).json({
+      staff,
+    });
 
 
-return res.status(500).json({
-  message: "เกิดข้อผิดพลาดในการดึงข้อมูลคนส่ง",
-});
+  } catch (error) {
+    console.error("getStoreStaff Error =", error);
 
 
-}
+    return res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการดึงข้อมูลคนส่ง",
+    });
+
+
+  }
 };
 
 exports.changeStoreStaffStatus = async (req, res) => {
-try {
-const storeId = req.store.id;
-const staffId = Number(req.params.id);
+  try {
+    const storeId = req.store.id;
+    const staffId = Number(req.params.id);
 
 
-if (!staffId || Number.isNaN(staffId)) {
-  return res.status(400).json({
-    message: "รหัสคนส่งไม่ถูกต้อง",
-  });
-}
+    if (!staffId || Number.isNaN(staffId)) {
+      return res.status(400).json({
+        message: "รหัสคนส่งไม่ถูกต้อง",
+      });
+    }
 
-const staff = await prisma.storeStaff.findFirst({
-  where: {
-    id: staffId,
-    storeId,
-  },
-});
+    const staff = await prisma.storeStaff.findFirst({
+      where: {
+        id: staffId,
+        storeId,
+      },
+    });
 
-if (!staff) {
-  return res.status(404).json({
-    message: "ไม่พบบัญชีคนส่ง",
-  });
-}
+    if (!staff) {
+      return res.status(404).json({
+        message: "ไม่พบบัญชีคนส่ง",
+      });
+    }
 
-const updatedStaff = await prisma.storeStaff.update({
-  where: {
-    id: staff.id,
-  },
-  data: {
-    isActive: !staff.isActive,
-  },
-  select: {
-    id: true,
-    username: true,
-    name: true,
-    phone: true,
-    role: true,
-    isActive: true,
-  },
-});
+    const updatedStaff = await prisma.storeStaff.update({
+      where: {
+        id: staff.id,
+      },
+      data: {
+        isActive: !staff.isActive,
+      },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        phone: true,
+        role: true,
+        isActive: true,
+      },
+    });
 
-return res.status(200).json({
-  message: updatedStaff.isActive
-    ? "เปิดใช้งานบัญชีคนส่งแล้ว"
-    : "ปิดใช้งานบัญชีคนส่งแล้ว",
-  staff: updatedStaff,
-});
-
-
-} catch (error) {
-console.error("changeStoreStaffStatus Error =", error);
+    return res.status(200).json({
+      message: updatedStaff.isActive
+        ? "เปิดใช้งานบัญชีคนส่งแล้ว"
+        : "ปิดใช้งานบัญชีคนส่งแล้ว",
+      staff: updatedStaff,
+    });
 
 
-return res.status(500).json({
-  message: "เกิดข้อผิดพลาดในการเปลี่ยนสถานะบัญชีคนส่ง",
-});
+  } catch (error) {
+    console.error("changeStoreStaffStatus Error =", error);
 
 
-}
+    return res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการเปลี่ยนสถานะบัญชีคนส่ง",
+    });
+
+
+  }
 };
 
 exports.updateStoreStaff = async (req, res) => {
-try {
-const storeId = req.store.id;
-const staffId = Number(req.params.id);
+  try {
+    const storeId = req.store.id;
+    const staffId = Number(req.params.id);
 
 
-const { name, phone, password } = req.body;
+    const { name, phone, password } = req.body;
 
-if (!staffId || Number.isNaN(staffId)) {
-  return res.status(400).json({
-    message: "รหัสคนส่งไม่ถูกต้อง",
-  });
-}
+    if (!staffId || Number.isNaN(staffId)) {
+      return res.status(400).json({
+        message: "รหัสคนส่งไม่ถูกต้อง",
+      });
+    }
 
-const staff = await prisma.storeStaff.findFirst({
-  where: {
-    id: staffId,
-    storeId,
-  },
-});
-
-if (!staff) {
-  return res.status(404).json({
-    message: "ไม่พบบัญชีคนส่ง",
-  });
-}
-
-const data = {};
-
-if (name !== undefined) {
-  if (!name.trim()) {
-    return res.status(400).json({
-      message: "กรุณาระบุชื่อคนส่ง",
+    const staff = await prisma.storeStaff.findFirst({
+      where: {
+        id: staffId,
+        storeId,
+      },
     });
-  }
 
-  data.name = name.trim();
-}
+    if (!staff) {
+      return res.status(404).json({
+        message: "ไม่พบบัญชีคนส่ง",
+      });
+    }
 
-if (phone !== undefined) {
-  data.phone = phone || null;
-}
+    const data = {};
 
-if (password !== undefined && password !== "") {
-  if (password.length < 6) {
-    return res.status(400).json({
-      message: "Password ต้องมีอย่างน้อย 6 ตัวอักษร",
+    if (name !== undefined) {
+      if (!name.trim()) {
+        return res.status(400).json({
+          message: "กรุณาระบุชื่อคนส่ง",
+        });
+      }
+
+      data.name = name.trim();
+    }
+
+    if (phone !== undefined) {
+      data.phone = phone || null;
+    }
+
+    if (password !== undefined && password !== "") {
+      if (password.length < 6) {
+        return res.status(400).json({
+          message: "Password ต้องมีอย่างน้อย 6 ตัวอักษร",
+        });
+      }
+
+      data.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedStaff = await prisma.storeStaff.update({
+      where: {
+        id: staff.id,
+      },
+      data,
+      select: {
+        id: true,
+        storeId: true,
+        username: true,
+        name: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        updatedAt: true,
+      },
     });
+
+    return res.status(200).json({
+      message: "แก้ไขข้อมูลคนส่งสำเร็จ",
+      staff: updatedStaff,
+    });
+
+
+  } catch (error) {
+    console.error("updateStoreStaff Error =", error);
+
+
+    return res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการแก้ไขข้อมูลคนส่ง",
+    });
+
   }
-
-  data.password = await bcrypt.hash(password, 10);
-}
-
-const updatedStaff = await prisma.storeStaff.update({
-  where: {
-    id: staff.id,
-  },
-  data,
-  select: {
-    id: true,
-    storeId: true,
-    username: true,
-    name: true,
-    phone: true,
-    role: true,
-    isActive: true,
-    updatedAt: true,
-  },
-});
-
-return res.status(200).json({
-  message: "แก้ไขข้อมูลคนส่งสำเร็จ",
-  staff: updatedStaff,
-});
-
-
-} catch (error) {
-console.error("updateStoreStaff Error =", error);
-
-
-return res.status(500).json({
-  message: "เกิดข้อผิดพลาดในการแก้ไขข้อมูลคนส่ง",
-});
-
-}
 };
 
