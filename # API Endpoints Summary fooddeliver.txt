@@ -1,0 +1,73 @@
+# API Endpoints Summary fooddelivery
+
+--Store
+## Authentication
+
+| Endpoint                            | Method | Description        | Body                                                 |
+|-------------------------------------|--------|--------------------|------------------------------------------------------|
+| `/api/store/login`                        | POST   | Login user         | `{ "username,email,social": "Pmkt@gmail.com", "password": "1234" }` |
+| `/api/store/register`                     | POST   | Register user      | `{ "username,email,social": "Pmkt@gmail.com", "password": "1234" }` |                                            
+| `/api/store/current-restau`               | POST   | Get current admin  | None                                                                |
+
+##createStore
+
+| Endpoint                            | Method | Description            | Body                        |
+|-------------------------------------|--------|------------------------|-----------------------------|
+| `/api/store/get-Store/:id`                 | GET    | Get store by ID       | None                        |
+| `/api/store/create-Store`                  | POST   | Create stores         | `{ "storeName": "Test1", "phone":"067xxxxxxx", "Notice":"text", 																					"category":"Test1", "address":"roi-et", "dayOpen":"["MON","TUE","WED"]", 																				"timeOpen":"08:00", "timeClose":"20:00", "promptpayNumber":"067xxxxxxx"}`, 																				"bankName":"Test1", "bankAccount":"Test1", "bankAccountName":"Test1" |
+| `/api/store/update-Store`                  | POST   | Update stores         | `{ "storeName": "Test1", "phone":"067xxxxxxx", "Notice":"text", 																					"category":"Test1", "address":"roi-et", "dayOpen":"["MON","TUE","WED"]", 																				"timeOpen":"08:00", "timeClose":"20:00", "promptpayNumber":"067xxxxxxx"}`, 																				"bankName":"Test1", "bankAccount":"Test1", "bankAccountName":"Test1" |
+| `/api/store/:id`                           | DELETE | Delete store by ID    | None                        |
+
+## MenuCategory
+
+| Endpoint                            | Method | Description            | Body                        |
+|-------------------------------------|--------|------------------------|-----------------------------|
+| `/api/category`                   GET    | Get categoriesby ID     | `{ "category": [{ "id": 1, "storeId": 2, "name": 100 }, { "id": 1, "storeId": 2, "name": 100 }] }`  |
+| `/api/category`                     | POST   | Create category         | `{ "name": "Test1" }`       |
+| `/api/category`                     | PUT    | Update                  | None                        |
+| `/api/category/:id`                 | DELETE | Delete category by ID   | None                        |
+
+
+
+
+
+
+
+## Category
+
+| Endpoint                            | Method | Description            | Body                        |
+|-------------------------------------|--------|------------------------|-----------------------------|
+| `/api/category`                     | POST   | Create category         | `{ "name": "Test1" }`       |
+| `/api/category`                     | GET    | Get categories          | None                        |
+| `/api/category/:id`                 | DELETE | Delete category by ID   | None                        |
+
+## Menu
+
+| Endpoint                            | Method | Description            | Body                                                                                  |
+|-------------------------------------|--------|------------------------|---------------------------------------------------------------------------------------|
+| `/api/menu`                         | POST   | Create menu            | `{ "title": "TEST", "description": "test", "price": 10000, "quantity": 20, "categoryId": 2, "images": [] }` |
+| `/api/menu/:id`                     | GET    | Get menu by ID         | None                                                                                  |
+| `/api/menu/:id`                     | DELETE | Delete menu by ID      | None                                                                                  |
+| `/api/menuby`                       | POST   | Get menus by filters   | `{ "sort": "price", "order": "asc", "limit": 2 }` or `{ "sort": "quantity", "order": "desc", "limit": 2 }` |
+| `/api/search/filters`               | POST   | Search with filters    | `{ "query": "mouse" }`, `{ "price": [100, 600] }`, or `{ "category": [1, 2] }`        |
+
+## User Management
+
+| Endpoint                            | Method | Description               | Body                                                       |
+|-------------------------------------|--------|---------------------------|------------------------------------------------------------|
+| `/api/users`                        | GET    | Get all users             | None                                                       |
+| `/api/change-status`                | POST   | Change user status        | `{ "id": 1, "enabled": false }`                            |
+| `/api/change-role`                  | POST   | Change user role          | `{ "id": 1, "role": "user" }`                              |
+| `/api/user/cart`                    | POST   | Add to cart               | `{ "cart": [{ "id": 1, "count": 2, "price": 100 }, { "id": 5, "count": 1, "price": 200 }] }` |
+| `/api/user/cart`                    | GET    | Get cart                  | None                                                       |
+| `/api/user/cart`                    | DELETE | Delete cart               | None                                                       |
+| `/api/user/address`                 | POST   | Add user address          | `{ "address": "korat" }`                                   |
+| `/api/user/order`                   | POST   | Place an order            | None                                                       |
+| `/api/user/order`                   | GET    | Get user orders           | None                                                       |
+
+## Admin
+
+| Endpoint                            | Method | Description               | Body                              |
+|-------------------------------------|--------|---------------------------|-----------------------------------|
+| `/api/user/order`                   | PUT    | Update order status        | `{ "orderId": 35, "orderStatus": "Completed" }` |
+| `/api/admin/orders`                 | GET    | Get all orders             | None                              |

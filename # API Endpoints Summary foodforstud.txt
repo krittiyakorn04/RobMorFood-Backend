@@ -1,0 +1,43 @@
+# API Endpoints Summary foodforstudent
+
+#User
+
+## Authentication
+
+| Endpoint                            | Method | Description        | Body                                                 |
+|-------------------------------------|--------|--------------------|------------------------------------------------------|
+| `/api/login`                        | POST   | Login user         | `{ "email": "tam@tam", "password": "1234" }`         |
+| `/api/register`                     | POST   | Register user      | `{ "email": "tam@tam", "password": "1234" }` /        |                                                 |
+| `/api/current-user`                 | POST   | Get current user  | None                                                 |  
+
+## Ordering Management
+
+| Endpoint                            | Method | Description        | Body                                               
+|-------------------------------------|--------|--------------------|------------------------------------------------------
+| `/api/user/cart`                    | POST   | Add to cart               | `{ "cart": [{ "id": 1, "count": 2, "price": 100 }, { "id": 5, "count": 1, "price": 200 }] }`/ |
+| `/api/user/cart`                    | GET    | Get cart                  | None                                                       |
+| `/api/user/cart`                    | DELETE | Delete cart               | None  
+| `/api/user/order`                   | POST   | Place an order            | None                                                       |
+| `/api/user/order`                   | GET    | Get user orders           | None     
+| `/api/user/slip`                    | POST   | โฮนเงิน                              | None
+ 
+## User Management
+
+#Restaurant
+
+## Authentication 
+
+| Endpoint                            | Method | Description        | Body                                                 |
+|-------------------------------------|--------|--------------------|------------------------------------------------------|
+| `/api/login`                        | POST   | Login user         | `{ "email": "tam@tam", "password": "1234" }`         |
+| `/api/register`                     | POST   | Register user      | `{ "email": "tam@tam", "password": "1234" }`         |                                                 |
+| `/api/current-restaurant`           | POST   | Get current restaurant  | None                                                 |
+
+## Category
+
+| Endpoint                            | Method | Description            | Body                        |
+|-------------------------------------|--------|------------------------|-----------------------------|
+| `/api/category`                     | POST   | Create category         | `{ "name": "Test1" }`       |
+| `/api/category`                     | GET    | Get categories          | None                        |
+| `/api/category/:id`                 | DELETE | Delete category by ID   | None                        |
+               
