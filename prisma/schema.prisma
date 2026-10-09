@@ -260,11 +260,11 @@ model StoreCategory {
 }
 
 model StoreStoreCategory {
-  id              Int @id @default(autoincrement())
-  storeId         Int
+  id             Int @id @default(autoincrement())
+  storeId        Int
   storeCategoryId Int
 
-  store         Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  store        Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
   storeCategory StoreCategory @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
 
   @@unique([storeId, storeCategoryId])

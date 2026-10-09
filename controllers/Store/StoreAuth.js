@@ -5,30 +5,22 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 
+
 exports.register = async (req, res) => {
   try {
     const {
-      email,
       password,
       username,
       phone,
-
+      email,
       storeCategoryIds,
-
       Notice,
       storeName,
       address,
-
       dayOpen,
       timeOpen,
       timeClose,
       openAuto,
-
-      promptpayNumber,
-      bankName,
-      bankAccount,
-      bankAccountName,
-
       lat,
       lng,
     } = req.body;
@@ -37,65 +29,96 @@ exports.register = async (req, res) => {
     // ตรวจข้อมูลพื้นฐาน
     // =========================
 
-    if (!username) {
+    const cleanUsername =
+      typeof username === "string" ? username.trim() : "";
+
+    const cleanEmail =
+      typeof email === "string" ? email.trim().toLowerCase() : "";
+
+    const cleanStoreName =
+      typeof storeName === "string" ? storeName.trim() : "";
+
+    const cleanAddress =
+      typeof address === "string" ? address.trim() : "";
+
+    if (!cleanUsername) {
       return res.status(400).json({
         message: "กรุณากรอก Username",
       });
     }
 
-    if (!email) {
-      return res.status(400).json({
-        message: "กรุณากรอก Email",
-      });
-    }
-
-    if (!password) {
+    if (typeof password !== "string" || !password) {
       return res.status(400).json({
         message: "กรุณากรอก Password",
       });
     }
 
-    if (!phone) {
+    if (typeof phone !== "string" || !/^0\d{9}$/.test(phone)) {
       return res.status(400).json({
-        message: "กรุณากรอกเบอร์โทรศัพท์",
+        message: "กรุณากรอกเบอร์โทรศัพท์ 10 หลัก โดยขึ้นต้นด้วย 0",
       });
     }
 
-    if (!storeName) {
+    // ตรวจสอบอีเมล
+    if (
+      !cleanEmail ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
+    ) {
+      return res.status(400).json({
+        message: "กรุณากรอกอีเมลให้ถูกต้อง",
+      });
+    }
+
+    if (!cleanStoreName) {
       return res.status(400).json({
         message: "กรุณากรอกชื่อร้าน",
       });
     }
 
-    if (!address) {
+    if (!cleanAddress) {
       return res.status(400).json({
         message: "กรุณากรอกที่อยู่ร้าน",
       });
     }
 
     // =========================
-    // ตรวจพิกัด
+    // ตรวจรหัสผ่าน
+    // =========================
+
+    if (
+      password.length < 8 ||
+      password.length > 64 ||
+      /\s/.test(password) ||
+      !/[a-z]/.test(password) ||
+      !/[A-Z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[^A-Za-z0-9\s]/.test(password)
+    ) {
+      return res.status(400).json({
+        message:
+          "รหัสผ่านต้องมี 8-64 ตัวอักษร มีตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษ โดยไม่มีช่องว่าง",
+      });
+    }
+
+    // =========================
+    // ตรวจพิกัดร้าน
     // =========================
 
     const storeLat =
-      lat !== undefined &&
-        lat !== null &&
-        lat !== ""
+      lat !== undefined && lat !== null && lat !== ""
         ? Number(lat)
         : null;
 
     const storeLng =
-      lng !== undefined &&
-        lng !== null &&
-        lng !== ""
+      lng !== undefined && lng !== null && lng !== ""
         ? Number(lng)
         : null;
 
     if (
       storeLat === null ||
       storeLng === null ||
-      Number.isNaN(storeLat) ||
-      Number.isNaN(storeLng)
+      !Number.isFinite(storeLat) ||
+      !Number.isFinite(storeLng)
     ) {
       return res.status(400).json({
         message: "กรุณาระบุพิกัดร้าน",
@@ -127,17 +150,35 @@ exports.register = async (req, res) => {
       });
     }
 
-    const categoryIds = storeCategoryIds
-      .map((id) => Number(id))
-      .filter((id) => !Number.isNaN(id));
+    if (storeCategoryIds.length > 3) {
+      return res.status(400).json({
+        message: "เลือกประเภทร้านได้ไม่เกิน 3 ประเภท",
+      });
+    }
 
-    if (categoryIds.length === 0) {
+    const categoryIds = storeCategoryIds.map((id) => {
+      const categoryId = Number(id);
+
+      if (!Number.isInteger(categoryId) || categoryId <= 0) {
+        return null;
+      }
+
+      return categoryId;
+    });
+
+    if (categoryIds.some((id) => id === null)) {
       return res.status(400).json({
         message: "ประเภทของร้านไม่ถูกต้อง",
       });
     }
 
     const uniqueCategoryIds = [...new Set(categoryIds)];
+
+    if (uniqueCategoryIds.length !== categoryIds.length) {
+      return res.status(400).json({
+        message: "มีประเภทร้านซ้ำกัน กรุณาเลือกใหม่",
+      });
+    }
 
     // =========================
     // ตรวจ Category ว่ามีจริง
@@ -148,6 +189,9 @@ exports.register = async (req, res) => {
         id: {
           in: uniqueCategoryIds,
         },
+      },
+      select: {
+        id: true,
       },
     });
 
@@ -164,16 +208,16 @@ exports.register = async (req, res) => {
     const user = await prisma.customer.findFirst({
       where: {
         OR: [
-          { email },
-          { username },
+          { username: cleanUsername },
           { phone },
+          { email: cleanEmail },
         ],
       },
     });
 
     if (user) {
       return res.status(400).json({
-        message: "ข้อมูลผู้ใช้นี้มีอยู่ในระบบแล้ว",
+        message: "ชื่อผู้ใช้ เบอร์โทรศัพท์ หรืออีเมลนี้ถูกใช้งานแล้ว",
       });
     }
 
@@ -184,17 +228,18 @@ exports.register = async (req, res) => {
     const store = await prisma.store.findFirst({
       where: {
         OR: [
-          { email },
-          { username },
+          { username: cleanUsername },
           { phone },
-          { storeName },
+          { email: cleanEmail },
+          { storeName: cleanStoreName },
         ],
       },
     });
 
     if (store) {
       return res.status(400).json({
-        message: "ข้อมูลร้านนี้มีอยู่ในระบบแล้ว",
+        message:
+          "ชื่อผู้ใช้ เบอร์โทรศัพท์ อีเมล หรือชื่อร้านนี้ถูกใช้งานแล้ว",
       });
     }
 
@@ -210,32 +255,21 @@ exports.register = async (req, res) => {
 
     const newStore = await prisma.store.create({
       data: {
-        email,
         password: hashPassword,
-        username,
+        username: cleanUsername,
         phone,
-
+        email: cleanEmail,
         Notice,
-        storeName,
-        address,
+        storeName: cleanStoreName,
+        address: cleanAddress,
 
         dayOpen: JSON.stringify(dayOpen || ""),
-
         timeOpen: timeOpen || "",
         timeClose: timeClose || "",
         openAuto: Boolean(openAuto),
 
-        // =========================
-        // พิกัดร้าน
-        // =========================
-
         lat: storeLat,
         lng: storeLng,
-
-        // =========================
-        // Category
-        // ใช้ relation แบบ explicit
-        // =========================
 
         storeCategories: {
           create: uniqueCategoryIds.map((categoryId) => ({
@@ -280,7 +314,7 @@ exports.register = async (req, res) => {
           });
         }
 
-        return res.json({
+        return res.status(201).json({
           payload,
           token,
           store: newStore,
@@ -288,11 +322,8 @@ exports.register = async (req, res) => {
       }
     );
   } catch (error) {
-    console.log(
-      "REGISTER STORE ERROR ================="
-    );
-
-    console.log(error);
+    console.error("REGISTER STORE ERROR =================");
+    console.error(error);
 
     return res.status(500).json({
       message: "Server Error",
@@ -434,7 +465,7 @@ exports.currentRestau = async (req, res) => {
       where: { id: req.store.id },
       select: {
         id: true,
-        email: true,
+
         username: true,
         storeName: true,
         role: true,

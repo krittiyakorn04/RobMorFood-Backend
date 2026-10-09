@@ -3,67 +3,176 @@ const prisma = new PrismaClient();
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { token } = require("morgan");
 
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, username, phone } = req.body;
+    const { password, username, phone, email } = req.body;
 
-    // เช็คว่ากรอกหรือยัง
-    if (!username) {
-      return res.status(400).json({ message: "Email is require!!!" });
+    // =========================
+    // ตรวจข้อมูลพื้นฐาน
+    // =========================
+
+    const cleanUsername =
+      typeof username === "string" ? username.trim() : "";
+
+    const cleanEmail =
+      typeof email === "string" ? email.trim().toLowerCase() : "";
+
+    if (!cleanUsername) {
+      return res.status(400).json({
+        message: "กรุณากรอกชื่อผู้ใช้",
+      });
     }
-    if (!password) {
-      return res.status(400).json({ message: "password is require!!!" });
+
+    if (typeof password !== "string" || !password) {
+      return res.status(400).json({
+        message: "กรุณากรอกรหัสผ่าน",
+      });
     }
+
+    // =========================
+    // ตรวจรหัสผ่าน
+    // =========================
+
+    if (password.length < 8 || password.length > 64) {
+      return res.status(400).json({
+        message: "รหัสผ่านต้องมีความยาว 8-64 ตัวอักษร",
+      });
+    }
+
+    if (/\s/.test(password)) {
+      return res.status(400).json({
+        message: "รหัสผ่านต้องไม่มีช่องว่าง",
+      });
+    }
+
+    if (!/[a-z]/.test(password)) {
+      return res.status(400).json({
+        message:
+          "รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษตัวพิมพ์เล็กอย่างน้อย 1 ตัว",
+      });
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      return res.status(400).json({
+        message:
+          "รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว",
+      });
+    }
+
+    if (!/[0-9]/.test(password)) {
+      return res.status(400).json({
+        message: "รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว",
+      });
+    }
+
+    if (!/[^A-Za-z0-9\s]/.test(password)) {
+      return res.status(400).json({
+        message:
+          "รหัสผ่านต้องมีอักขระพิเศษอย่างน้อย 1 ตัว เช่น @ หรือ !",
+      });
+    }
+
+    // =========================
+    // ตรวจเบอร์โทรศัพท์
+    // =========================
+
+    if (typeof phone !== "string" || !/^0\d{9}$/.test(phone)) {
+      return res.status(400).json({
+        message:
+          "กรุณากรอกเบอร์โทรศัพท์ 10 หลัก และต้องขึ้นต้นด้วย 0",
+      });
+    }
+
+    // =========================
+    // ตรวจสอบอีเมล
+    // =========================
+
+    if (
+      !cleanEmail ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
+    ) {
+      return res.status(400).json({
+        message: "กรุณากรอกอีเมลให้ถูกต้อง",
+      });
+    }
+
+    // =========================
+    // ตรวจสอบข้อมูลซ้ำในร้านค้า
+    // =========================
 
     const store = await prisma.store.findFirst({
-      where: { 
+      where: {
         OR: [
-            { email }, 
-            { username }, 
-            { phone }
-        ] 
-    },
+          { username: cleanUsername },
+          { phone },
+          { email: cleanEmail },
+        ],
+      },
     });
+
     if (store) {
-      return res.status(400).json({ message: "This store already exits!!" });
+      return res.status(400).json({
+        message:
+          "ชื่อผู้ใช้ เบอร์โทรศัพท์ หรืออีเมลนี้ถูกใช้งานแล้ว",
+      });
     }
 
-    // เช็คใน DB ว่ามีมั้ย ซ้ำหรือเปล่า (เดี๋ยวเพิ่ม error เช็คซ้ำ)
+    // =========================
+    // ตรวจสอบข้อมูลซ้ำในลูกค้า
+    // =========================
+
     const user = await prisma.customer.findFirst({
-      where: { 
+      where: {
         OR: [
-            { email }, 
-            { username }, 
-            { phone }]
-
-    },
+          { username: cleanUsername },
+          { phone },
+          { email: cleanEmail },
+        ],
+      },
     });
+
     if (user) {
-      return res.status(400).json({ message: "This user already exits!!" });
+      return res.status(400).json({
+        message:
+          "ชื่อผู้ใช้ เบอร์โทรศัพท์ หรืออีเมลนี้ถูกใช้งานแล้ว",
+      });
     }
+
+    // =========================
+    // Hash Password
+    // =========================
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    //ไม่ซ้ำก็ลงเลย
+    // =========================
+    // สร้าง Customer
+    // =========================
+
     const newuser = await prisma.customer.create({
       data: {
-        email,
+        username: cleanUsername,
         password: hashPassword,
-        username,
         phone,
+        email: cleanEmail,
       },
     });
-    //สร้าง Payload
+
+    // =========================
+    // JWT Payload
+    // =========================
+
     const payload = {
       id: newuser.id,
       username: newuser.username,
       role: newuser.role,
     };
 
-    //generate token
+    // =========================
+    // Generate Token
+    // =========================
+
     jwt.sign(
       payload,
       process.env.SECRET,
@@ -72,17 +181,27 @@ exports.register = async (req, res) => {
       },
       (err, token) => {
         if (err) {
-          return res.status(500).json({ message: "Server Error" });
+          return res.status(500).json({
+            message: "เกิดข้อผิดพลาดในการสร้าง Token",
+          });
         }
-        res.json({ payload, token });
-      },
-    );
 
+        return res.status(201).json({
+          payload,
+          token,
+        });
+      }
+    );
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
+    console.error("REGISTER CUSTOMER ERROR =================");
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
   }
 };
+
 
 exports.login = async (req, res) => {
   try {
@@ -138,10 +257,9 @@ exports.login = async (req, res) => {
 exports.currentUser = async (req, res) => {
   try {
     const currentUser = await prisma.customer.findFirst({
-      where: { id: req.user.id },  
+      where: { id: req.user.id },
       select: {
         id: true,
-        email: true,
         username: true,
         role: true,
         status: true
