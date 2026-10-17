@@ -1,47 +1,11 @@
 const prisma = require("../../config/prisma");
-<<<<<<< HEAD
-=======
 const { createNotification } = require("../notificationController");
 const cloudinary = require('cloudinary').v2;
 
->>>>>>> origin/main
 
 
 
 exports.getOrder = async (req, res) => {
-<<<<<<< HEAD
-    try {
-        const userId = req.user.id;
-
-        const getOrder = await prisma.order.findMany({
-            where: {
-                customerId: userId,
-                status: {
-                    in: ["PENDING" ,"CONFIRMED" ,"PREPARING" ]
-                },
-            },
-            include: {
-                store: true,
-                delivery: true,
-                menu: {
-                    include: {
-                        menu: true,
-                    },
-                },
-            },
-            orderBy: {
-                createdAt: "desc",
-            },
-        });
-
-        res.send(getOrder);
-
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: "Server Error" })
-    }
-}
-=======
   try {
     const userId = req.user.id;
 
@@ -92,10 +56,10 @@ exports.getOrder = async (req, res) => {
   }
 };
 
+
 exports.getOrderDetail = async (req, res) => {
   try {
     const userId = req.user.id;
-
     const orderId = Number(req.params.id);
 
     const order = await prisma.order.findFirst({
@@ -103,14 +67,13 @@ exports.getOrderDetail = async (req, res) => {
         id: orderId,
         customerId: userId,
       },
-
       include: {
-        store: true,
+        store: {
+          include: {
+            images: true,
+          },
+        },
 
-
-        // =========================
-        // ORDER ROUND
-        // =========================
         orderRound: true,
 
         delivery: {
@@ -127,7 +90,6 @@ exports.getOrderDetail = async (req, res) => {
                 isDefault: true,
               },
             },
-
             images: true,
           },
         },
@@ -165,17 +127,14 @@ exports.getOrderDetail = async (req, res) => {
     });
   }
 };
->>>>>>> origin/main
+
+
+
+
 
 exports.createOrder = async (req, res) => {
   try {
     const { cartId, addressId, note } = req.body;
-<<<<<<< HEAD
-    const userId = req.user.id;
-
-    // 1. หาตะกร้า
-=======
-
     const userId = req.user.id;
 
     if (!cartId) {
@@ -190,7 +149,6 @@ exports.createOrder = async (req, res) => {
       });
     }
 
->>>>>>> origin/main
     const cart = await prisma.cart.findFirst({
       where: {
         id: Number(cartId),
@@ -203,29 +161,17 @@ exports.createOrder = async (req, res) => {
     });
 
     if (!cart) {
-<<<<<<< HEAD
-      return res.status(404).json({ message: "Cart not found" });
-    }
-
-    // 2. เช็คว่าตะกร้าว่างหรือไม่
-    if (cart.menu.length === 0) {
-      return res.status(400).json({ message: "Cart is empty" });
-    }
-
-    // 3. เช็คที่อยู่
-=======
       return res.status(404).json({
         message: "ไม่พบตะกร้า",
       });
     }
 
-    if (cart.menu.length === 0) {
+    if (!cart.menu || cart.menu.length === 0) {
       return res.status(400).json({
         message: "ตะกร้าว่าง",
       });
     }
 
->>>>>>> origin/main
     const address = await prisma.address.findFirst({
       where: {
         id: Number(addressId),
@@ -234,108 +180,51 @@ exports.createOrder = async (req, res) => {
     });
 
     if (!address) {
-<<<<<<< HEAD
-      return res.status(404).json({ message: "Address not found" });
-    }
-
-    let orderRoundId = null;
-
-    // 4. ถ้าร้านรับเป็นรอบ
-    if (cart.store.orderMode === "ROUND") {
-      const round = await prisma.orderRound.findFirst({
-        where: {
-          storeId: cart.store.id,
-          status: "OPEN",
-        },
-      });
-
-      if (!round) {
-        return res.status(400).json({
-          message: "ร้านยังไม่เปิดรับออเดอร์ในขณะนี้",
-        });
-      }
-
-      orderRoundId = round.id;
-    }
-
-    // 5. สร้าง Delivery
-    const delivery = await prisma.delivery.create({
-      data: {
-        storeId: cart.store.id,
-        orderRoundId,
-      },
-    });
-
-    // 6. สร้าง Order
-    const order = await prisma.order.create({
-      data: {
-        customerId: userId,
-        storeId: cart.store.id,
-        deliveryId: delivery.id,
-        orderRoundId,
-        totalPrice: cart.cartTotal,
-        note,
-      },
-    });
-
-    // 7. ย้ายสินค้าในตะกร้าไป Order
-    await prisma.menuOnCart.updateMany({
-      where: {
-        cartId: cart.id,
-      },
-      data: {
-        orderId: order.id,
-      },
-    });
-
-    // 8. ลบตะกร้า (หรือจะลบหลังชำระเงินก็ได้)
-    await prisma.cart.delete({
-      where: {
-        id: cart.id,
-      },
-    });
-
-    res.send(order);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-exports.uploadSlip =  (req, res) => {
-    try {
-        res.send('Hello upload Slip')
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: "Server Error" })
-    }
-}
-=======
       return res.status(404).json({
         message: "ไม่พบที่อยู่",
       });
     }
 
     let orderRoundId = null;
-    let currentRound = null;
 
     if (cart.store.orderMode === "ROUND") {
-      const now = new Date();
+      // เวลาประเทศไทย HH:mm
+      const thaiTime = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Bangkok",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+      }).format(new Date());
+
+      const [currentHour, currentMinute] = thaiTime
+        .split(":")
+        .map(Number);
 
       const currentMinutes =
-        now.getHours() * 60 + now.getMinutes();
+        currentHour * 60 + currentMinute;
 
+      // ใน Prisma schema startTime/endTime เป็น String
       const timeToMinutes = (time) => {
-        if (!time) return null;
+        if (typeof time !== "string") {
+          return null;
+        }
 
-        const [hour, minute] = String(time)
-          .slice(0, 5)
-          .split(":")
-          .map(Number);
+        const match = time.trim().match(/^(\d{1,2}):(\d{2})/);
+
+        if (!match) {
+          return null;
+        }
+
+        const hour = Number(match[1]);
+        const minute = Number(match[2]);
 
         if (
-          Number.isNaN(hour) ||
-          Number.isNaN(minute)
+          !Number.isInteger(hour) ||
+          !Number.isInteger(minute) ||
+          hour < 0 ||
+          hour > 23 ||
+          minute < 0 ||
+          minute > 59
         ) {
           return null;
         }
@@ -352,38 +241,82 @@ exports.uploadSlip =  (req, res) => {
         },
       });
 
-      currentRound = rounds.find((round) => {
+      console.log("========== CREATE ORDER ==========");
+      console.log("Store ID:", cart.store.id);
+      console.log("Order mode:", cart.store.orderMode);
+      console.log("เวลาไทย:", thaiTime);
+      console.log("นาทีปัจจุบัน:", currentMinutes);
+      console.log(
+        "รอบที่มีในฐานข้อมูล:",
+        rounds.map((round) => ({
+          id: round.id,
+          roundNumber: round.roundNumber,
+          startTime: round.startTime,
+          endTime: round.endTime,
+          status: round.status,
+          startMinutes: timeToMinutes(round.startTime),
+          endMinutes: timeToMinutes(round.endTime),
+        }))
+      );
+
+      const currentRound = rounds.find((round) => {
         const start = timeToMinutes(round.startTime);
         const end = timeToMinutes(round.endTime);
 
-        if (start === null || end === null) {
+        if (
+          start === null ||
+          end === null ||
+          start === end
+        ) {
           return false;
         }
 
+        // รอบปกติ เช่น 09:00–11:00
+        if (start < end) {
+          return (
+            currentMinutes >= start &&
+            currentMinutes < end
+          );
+        }
+
+        // รอบข้ามเที่ยงคืน เช่น 22:00–02:00
         return (
-          currentMinutes >= start &&
+          currentMinutes >= start ||
           currentMinutes < end
         );
       });
 
       if (!currentRound) {
         return res.status(400).json({
-          message:
-            "ขณะนี้ไม่อยู่ในช่วงเวลารับออเดอร์ของร้าน",
+          message: "ขณะนี้ไม่อยู่ในช่วงเวลารับออเดอร์ของร้าน",
+          debug: {
+            thaiTime,
+            currentMinutes,
+            rounds: rounds.map((round) => ({
+              roundNumber: round.roundNumber,
+              startTime: round.startTime,
+              endTime: round.endTime,
+              startMinutes: timeToMinutes(round.startTime),
+              endMinutes: timeToMinutes(round.endTime),
+            })),
+          },
         });
       }
 
-      if (currentRound.status !== "OPEN") {
-        return res.status(400).json({
-          message: "รอบนี้ปิดรับออเดอร์แล้ว",
-        });
-      }
+      console.log("เลือกรอบได้:", {
+        id: currentRound.id,
+        roundNumber: currentRound.roundNumber,
+        startTime: currentRound.startTime,
+        endTime: currentRound.endTime,
+        status: currentRound.status,
+      });
 
+      // ไม่ใช้ status เป็นตัวบล็อก เพราะหน้า Checkout
+      // ตัดสินช่วงรับออเดอร์จากเวลา
       if (
         currentRound.hasOrderLimit &&
         currentRound.maxOrders !== null &&
-        currentRound.currentOrders >=
-        currentRound.maxOrders
+        currentRound.currentOrders >= currentRound.maxOrders
       ) {
         return res.status(400).json({
           message: "รอบนี้มีออเดอร์เต็มแล้ว",
@@ -394,58 +327,47 @@ exports.uploadSlip =  (req, res) => {
     }
 
     const foodTotal = cart.menu.reduce(
-      (total, item) => {
-        return (
-          total +
-          Number(item.price) *
-          Number(item.count)
-        );
-      },
-      0,
+      (total, item) =>
+        total + Number(item.price) * Number(item.count),
+      0
     );
 
-    const deliveryFee = Number(
-      cart.store.deliveryFee || 0,
-    );
-
+    const deliveryFee = Number(cart.store.deliveryFee || 0);
     const totalPrice = foodTotal + deliveryFee;
 
     const result = await prisma.$transaction(
       async (tx) => {
-        const delivery =
-          await tx.delivery.create({
-            data: {
-              storeId: cart.store.id,
-              orderRoundId,
-              deliveryStaffId: null,
-              status: "PENDING",
-            },
-          });
+        const delivery = await tx.delivery.create({
+          data: {
+            storeId: cart.store.id,
+            orderRoundId,
+            deliveryStaffId: null,
+            status: "PENDING",
+          },
+        });
 
-        const newOrder =
-          await tx.order.create({
-            data: {
-              customerId: userId,
-              storeId: cart.store.id,
-              deliveryId: delivery.id,
-              orderRoundId,
-              status: "PENDING",
-              totalPrice,
-              note: note || "",
-            },
-          });
+        const newOrder = await tx.order.create({
+          data: {
+            customerId: userId,
+            storeId: cart.store.id,
+            deliveryId: delivery.id,
+            orderRoundId,
+            status: "PENDING",
+            totalPrice,
+            note: note || "",
+          },
+        });
 
-        const payment =
-          await tx.payment.create({
-            data: {
-              orderId: newOrder.id,
-              method: "PROMPTPAY",
-              status: "PENDING",
-              amount: totalPrice,
-              slipImageUrl: null,
-              confirmedAt: null,
-            },
-          });
+        const payment = await tx.payment.create({
+          data: {
+            orderId: newOrder.id,
+            method: "PROMPTPAY",
+            status: "PENDING",
+            amount: totalPrice,
+            slipImageUrl: null,
+            confirmedAt: null,
+          },
+        });
 
         await tx.menuOnCart.updateMany({
           where: {
@@ -457,7 +379,7 @@ exports.uploadSlip =  (req, res) => {
           },
         });
 
-        if (orderRoundId) {
+        if (orderRoundId !== null) {
           await tx.orderRound.update({
             where: {
               id: orderRoundId,
@@ -484,7 +406,7 @@ exports.uploadSlip =  (req, res) => {
       },
       {
         timeout: 10000,
-      },
+      }
     );
 
     await createNotification({
@@ -513,6 +435,7 @@ exports.uploadSlip =  (req, res) => {
     });
   }
 };
+
 
 
 
@@ -906,4 +829,3 @@ exports.removeSlip = async (req, res) => {
   }
 };
 
->>>>>>> origin/main
