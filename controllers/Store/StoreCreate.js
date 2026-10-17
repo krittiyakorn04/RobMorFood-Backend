@@ -1,32 +1,10 @@
 const prisma = require("../../config/prisma");
-<<<<<<< HEAD
-=======
 const cloudinary = require('cloudinary').v2;
->>>>>>> origin/main
 
 const bcrypt = require("bcryptjs");
 
 //ยังไม่สมบูรณ์ รอแก้
 //หน้าร้าน เอาไปไว้user
-<<<<<<< HEAD
-exports.getallStores = async (req, res) => {
-  try {
-    const store = await prisma.store.findMany({
-      where: {
-        accountStatus: "ACTIVE",
-        status: "OPEN",
-      },
-      select: {
-        storeName: true,
-        category: true,
-      },
-    });
-
-    res.send(store);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
 exports.getAllStore = async (req, res) => {
   try {
     const stores = await prisma.store.findMany({
@@ -97,43 +75,11 @@ exports.getAllStore = async (req, res) => {
     res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
 exports.getProfile = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const store = await prisma.store.findFirst({
-      where: {
-        id: Number(req.params.id),
-      },
-    });
-
-    res.send(store);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-exports.getStore = async (req, res) => {
-  try {
-    const store = await prisma.store.findFirst({
-      where: {
-        id: req.store.id,
-      },
-      include: {
-        nameZone: true,
-        fee: true,
-      },
-    });
-
-    res.send(store);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
     const storeId = Number(req.params.id);
 
     if (!storeId || Number.isNaN(storeId)) {
@@ -286,7 +232,6 @@ exports.getStore = async (req, res) => {
       message: "Server Error",
       error: error.message,
     });
->>>>>>> origin/main
   }
 };
 
@@ -329,59 +274,89 @@ exports.updateEmail = async (req, res) => {
   }
 };
 
+
 exports.updatePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     const storeId = req.store.id;
 
-    const store = await prisma.store.findFirst({
-      where: {
-        id: storeId,
-      },
-    });
-
-    // ต้องเช็ค password เก่าก่อน
-    const valid = await bcrypt.compare(oldPassword, store.password);
-    if (!valid) {
-      return res.status(400).json({ message: "รหัสผ่านเก่าไม่ถูกต้อง" });
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({
+        message: "กรุณากรอกรหัสผ่านให้ครบ",
+      });
     }
 
-    // ค่อยเปลี่ยนใหม่
+    // ตรวจรหัสผ่านใหม่ให้เหมือนตอนสมัครร้านค้า
+    if (
+      typeof newPassword !== "string" ||
+      newPassword.length < 8 ||
+      newPassword.length > 64 ||
+      /\s/.test(newPassword) ||
+      !/[a-z]/.test(newPassword) ||
+      !/[A-Z]/.test(newPassword) ||
+      !/[0-9]/.test(newPassword) ||
+      !/[^A-Za-z0-9\s]/.test(newPassword)
+    ) {
+      return res.status(400).json({
+        message:
+          "รหัสผ่านต้องมี 8-64 ตัวอักษร มีตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษ โดยไม่มีช่องว่าง",
+      });
+    }
+
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+    });
+
+    if (!store) {
+      return res.status(404).json({
+        message: "ไม่พบข้อมูลร้านค้า",
+      });
+    }
+
+    const valid = await bcrypt.compare(
+      oldPassword,
+      store.password
+    );
+
+    if (!valid) {
+      return res.status(400).json({
+        message: "รหัสผ่านปัจจุบันไม่ถูกต้อง",
+      });
+    }
+
+    // ห้ามใช้รหัสผ่านเดิมซ้ำ
+    if (oldPassword === newPassword) {
+      return res.status(400).json({
+        message: "รหัสผ่านใหม่ต้องแตกต่างจากรหัสผ่านเดิม",
+      });
+    }
+
     const hashPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.store.update({
-      where: {
-        id: storeId,
-      },
+      where: { id: storeId },
       data: { password: hashPassword },
     });
 
-    res.send({ message: "เปลี่ยนรหัสผ่านสำเร็จ" });
+    return res.status(200).json({
+      message: "เปลี่ยนรหัสผ่านสำเร็จ",
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
+    console.error("UPDATE STORE PASSWORD ERROR =", error);
+
+    return res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน",
+    });
   }
 };
-
 exports.updateUsername = async (req, res) => {
-<<<<<<< HEAD
-  //จำกัดการเปลี่ยน username ทุก 30 วัน
-=======
   // จำกัดการเปลี่ยน username ทุก 30 วัน
->>>>>>> origin/main
   try {
     const { username } = req.body;
     const storeId = req.store.id;
 
     const currentStore = await prisma.store.findFirst({
       where: {
-<<<<<<< HEAD
-        storeId,
-      },
-    });
-    if (currentStore.username === username) {
-      return res.status(400).json({ message: "เป็น Username เดิมอยู่แล้ว" });
-=======
         id: storeId,
       },
     });
@@ -396,43 +371,29 @@ exports.updateUsername = async (req, res) => {
       return res.status(400).json({
         message: "เป็น Username เดิมอยู่แล้ว",
       });
->>>>>>> origin/main
     }
 
     const chackeUsername = await prisma.store.findFirst({
       where: {
         username,
-<<<<<<< HEAD
-=======
         NOT: {
           id: storeId,
         },
->>>>>>> origin/main
       },
     });
 
     if (chackeUsername) {
-<<<<<<< HEAD
-      return res.status(400).json({ message: "This username already exits!!" });
-=======
       return res.status(400).json({
         message: "This username already exits!!",
       });
->>>>>>> origin/main
     }
 
     // เช็คว่าเปลี่ยนได้แล้วหรือยัง
     const DAYS = 30;
-<<<<<<< HEAD
-    const store = await prisma.store.findFirst({
-      where: {
-        storeId,
-=======
 
     const store = await prisma.store.findFirst({
       where: {
         id: storeId,
->>>>>>> origin/main
       },
     });
 
@@ -440,44 +401,17 @@ exports.updateUsername = async (req, res) => {
       const daysSinceChange =
         (Date.now() - new Date(store.usernameChangedAt)) /
         (1000 * 60 * 60 * 24);
-<<<<<<< HEAD
-      if (daysSinceChange < DAYS) {
-        return res.status(400).json({
-          message: `เปลี่ยน username ได้อีกครั้งใน ${Math.ceil(DAYS - daysSinceChange)} วัน`,
-=======
 
       if (daysSinceChange < DAYS) {
         return res.status(400).json({
           message: `เปลี่ยน username ได้อีกครั้งใน ${Math.ceil(
             DAYS - daysSinceChange
           )} วัน`,
->>>>>>> origin/main
         });
       }
     }
 
     // อัปเดต username + บันทึกเวลา
-<<<<<<< HEAD
-    await prisma.store.update({
-      where: {
-        storeId,
-      },
-      data: { username, usernameChangedAt: new Date() },
-    });
-
-    const updateUsername = await prisma.store.update({
-      where: {
-        storeId,
-      },
-      data: {
-        username,
-      },
-    });
-    res.send(updateUsername);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
     const updateUsername = await prisma.store.update({
       where: {
         id: storeId,
@@ -495,7 +429,6 @@ exports.updateUsername = async (req, res) => {
     res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
@@ -503,55 +436,16 @@ exports.updateUsername = async (req, res) => {
 exports.updateStore = async (req, res) => {
   try {
     const {
-<<<<<<< HEAD
-      Notice,
-      storeName,
-      category,
-=======
       username,
       Notice,
       phone,
       storeName,
       storeCategoryIds,
->>>>>>> origin/main
       address,
       dayOpen,
       timeOpen,
       timeClose,
       openAuto,
-<<<<<<< HEAD
-      promptpayNumber,
-      bankName,
-      bankAccount,
-      bankAccountName,
-    } = req.body;
-    const { id } = req.store;
-
-    const store = await prisma.store.update({
-      where: {
-        id: req.store.id,
-      },
-      data: {
-        Notice,
-        storeName,
-        category,
-        address,
-        dayOpen,
-        timeOpen,
-        timeClose,
-        openAuto,
-        promptpayNumber,
-        bankName,
-        bankAccount,
-        bankAccountName,
-      },
-    });
-
-    res.send(store);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
       lat,
       lng,
       deliveryFee,
@@ -903,7 +797,6 @@ exports.updateStore = async (req, res) => {
       message: "Server Error",
       error: error.message,
     });
->>>>>>> origin/main
   }
 };
 
@@ -933,9 +826,6 @@ exports.changeStoreStatus = async (req, res) => {
     const { status } = req.body;
     const storeId = req.store.id;
 
-<<<<<<< HEAD
-    // ดึงข้อมูลร้านก่อน
-=======
     const allowedStatus = ["OPEN", "CLOSED", "BUSY", "DELETED"];
 
     if (!allowedStatus.includes(status)) {
@@ -944,32 +834,11 @@ exports.changeStoreStatus = async (req, res) => {
       });
     }
 
->>>>>>> origin/main
     const store = await prisma.store.findUnique({
       where: {
         id: storeId,
       },
       include: {
-<<<<<<< HEAD
-        deliveryZones: true,
-      },
-    });
-
-    // ถ้าจะเปิดร้าน ให้ตรวจข้อมูลก่อน
-    if (status === "OPEN") {
-      const missingFields = [];
-
-      if (!store.storeName) missingFields.push("storeName");
-      if (!store.phone) missingFields.push("phone");
-      if (!store.address) missingFields.push("address");
-      if (!store.timeOpen) missingFields.push("timeOpen");
-      if (!store.timeClose) missingFields.push("timeClose");
-      if (!store.promptpayNumber) missingFields.push("promptpayNumber");
-
-      // ต้องมีพื้นที่จัดส่งอย่างน้อย 1 จุด
-      if (!store.deliveryZones || store.deliveryZones.length === 0) {
-        missingFields.push("deliveryZones");
-=======
         images: true,
       },
     });
@@ -1025,7 +894,6 @@ exports.changeStoreStatus = async (req, res) => {
 
       if (!qrImage) {
         missingFields.push("QR ร้าน");
->>>>>>> origin/main
       }
 
       if (missingFields.length > 0) {
@@ -1036,25 +904,6 @@ exports.changeStoreStatus = async (req, res) => {
       }
     }
 
-<<<<<<< HEAD
-    // อัปเดตสถานะ
-    const storeStatus = await prisma.store.update({
-      where: { 
-        id: storeId 
-      },
-      data: { 
-        status 
-      },
-    });
-
-    res.json(storeStatus);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-=======
     // ==========================================
     // เปลี่ยนสถานะร้าน
     // ==========================================
@@ -1090,7 +939,6 @@ exports.changeStoreStatus = async (req, res) => {
 };
 
 
->>>>>>> origin/main
 exports.changeOrderMode = async (req, res) => {
   try {
     const { orderMode } = req.body;
@@ -1128,8 +976,6 @@ exports.changeOrderMode = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-=======
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -1730,4 +1576,3 @@ exports.getCategories = async (req, res) => {
     res.status(500).json({ message: "Server Error" })
   }
 }
->>>>>>> origin/main
