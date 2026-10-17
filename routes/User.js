@@ -15,11 +15,8 @@ const {
   userCart,
   updateUserCart,
   removeUserCart,
-<<<<<<< HEAD
-=======
   readCart,
   getAllUserCarts,
->>>>>>> origin/main
 } = require("../controllers/User/UserCart");
 const {
   createOrder,
@@ -27,23 +24,18 @@ const {
 
   uploadSlip,
   changePaymentMethod,
-<<<<<<< HEAD
-=======
   getOrderDetail,
   removeSlip,
   confirmReceived,
   cancelOrder,
->>>>>>> origin/main
 } = require("../controllers/User/UserOrder");
 const {
   profileUser,
   updateProfileUser,
-<<<<<<< HEAD
-=======
   userImages,
   userRemoveImages,
   readMenu,
->>>>>>> origin/main
+  updatePassword,
 } = require("../controllers/User/UserProfile");
 const {
   getDelivery,
@@ -54,18 +46,6 @@ const {
   getReview,
   removeReview,
   updateReview,
-<<<<<<< HEAD
-} = require("../controllers/User/UserReview");
-const { getallStores, getProfile } = require("../controllers/Store/StoreCreate");
-const { authUser, userCheck } = require("../middlewares/auth");
-
-const router = express.Router();
-
-//Authen
-router.post("/user/register", register);
-router.post("/user/login", login);
-router.post("/user/current-user",authUser,userCheck, currentUser); 
-=======
   createReview,
   getStoreReviews,
 } = require("../controllers/User/UserReview");
@@ -82,37 +62,10 @@ const router = express.Router();
 router.post("/user/register", register); //fb
 router.post("/user/login", login); //fb
 router.post("/user/current-user", authUser, userCheck, currentUser);  //fb
->>>>>>> origin/main
 
 
 
 //ลูกค้าเข้าดูร้าน
-<<<<<<< HEAD
-router.get("/store/listprofile", getallStores); //
-router.get("/store/profile/:id", getProfile); //หน่าร้าน
-
-
-//Address
-router.get("/user/address",authUser, listAddress);
-router.post("/user/address",authUser, addAddress);
-router.put("/user/address/:id",authUser, updateAddress);
-router.delete("/user/address/:id",authUser, removeAddress);
-
-//Profile
-router.get("/user/profile",authUser, profileUser);
-router.put("/user/profile",authUser, updateProfileUser);
-
-//Cart
-router.get("/user/cart", getUserCart);
-router.post("/user/cart", userCart);
-router.put("/user/cart/:id", updateUserCart);
-router.delete("/user/cart/:id", removeUserCart);
-
-//Order
-router.get("/user/order", getOrder);
-router.post("/user/order", createOrder);
-router.post("/user/payment/:id", uploadSlip);
-=======
 // router.get("/store/listprofile", getallStores); //
 router.get("/store/profile/:id", authUser, userCheck, getProfile); //หน่าร้าน //fb
 router.get("/store/profile-public/:id", getProfile);
@@ -128,7 +81,8 @@ router.delete("/user/address/:id", authUser, userCheck, removeAddress);//fb
 
 //Profile
 router.get("/user/profile", authUser, userCheck, profileUser); //fb
-router.put("/user/profile", authUser, userCheck, updateProfileUser); 
+router.put("/user/profile", authUser, userCheck, updateProfileUser);
+router.patch("/user/change-password", authUser,userCheck, updatePassword); 
 
 router.post("/user/image", authUser, userCheck, userImages);
 router.post("/user/removeImage", authUser, userCheck, userRemoveImages);
@@ -150,18 +104,11 @@ router.post("/user/order/:orderId/slip", authUser, userCheck, uploadSlip);
 router.delete("/userorder/:orderId/slip", authUser, userCheck, removeSlip);
 
 
->>>>>>> origin/main
 
 //Delivery
 router.get("/user/delivery", getDelivery);
 router.get("/user/delivery/:id", readUserDelivery);
 
-<<<<<<< HEAD
-//Review
-router.get("/user/review/:id", getReview);
-router.post("/user/review/:id", updateReview);
-router.delete("/user/review/:id", removeReview);
-=======
 router.get("/user/notification",authUser,userCheck,getNotifications);
 router.patch("/user/notification/:id/read",authUser,userCheck,readNotification);
 router.patch("/user/notification/read-all",authUser,userCheck,readAllNotifications);
@@ -172,6 +119,5 @@ router.get("/user/review/:id",authUser,userCheck, getReview);
 router.post("/user/review/:orderId", authUser, createReview);
 router.post("/user/review/:id",authUser,userCheck, updateReview);
 router.delete("/user/review/:id",authUser,userCheck, removeReview);
->>>>>>> origin/main
 
 module.exports = router;
