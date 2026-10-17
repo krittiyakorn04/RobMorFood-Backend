@@ -1,27 +1,3 @@
-<<<<<<< HEAD
-
-
-
-exports.register = (req,res)=>{
-    try {
-        res.send('Hello Admin register')
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: "Server Error" })
-    }
-}
-
-exports.login = (req,res)=>{
-    try {
-        res.send('Hello Admin login')
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: "Server Error" })
-    }
-}
-
-exports.currentAdmin = (req,res)=>{
-=======
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const prisma = require("../../config/prisma");
@@ -141,7 +117,6 @@ exports.login = async (req, res) => {
 
 
 exports.currentAdmin = (req, res) => {
->>>>>>> origin/main
     try {
         res.send('Hello current Admin')
     } catch (error) {
