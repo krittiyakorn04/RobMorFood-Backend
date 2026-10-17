@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 const prisma = require("../../config/prisma");
 
 //DeliveryZone
