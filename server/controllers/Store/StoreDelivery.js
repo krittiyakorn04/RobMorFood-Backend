@@ -208,6 +208,7 @@ exports.readDelivery = async (req, res) => {
           },
           select: {
             id: true,
+            createdAt: true,
             deliveryType: true,
             status: true,
             totalPrice: true,
@@ -1405,16 +1406,20 @@ exports.startDelivery = async (req, res) => {
     // ==========================================
 
     for (const order of delivery.orders) {
-      await prisma.notification.create({
-        data: {
+      try {
+        await createNotification({
           title: "กำลังจัดส่งอาหาร",
-          message: `ออเดอร์ #${order.id} กำลังเดินทางไปหาคุณ กรุณารอรับอาหาร`,
+          message: `ออเดอร์ #ORD00${order.id} กำลังเดินทางไปหาคุณ กรุณารอรับอาหาร`,
           type: "DELIVERY_STARTED",
-
           customerId: order.customerId,
           orderId: order.id,
-        },
-      });
+        });
+      } catch (notificationError) {
+        console.error(
+          "สร้าง Notification DELIVERY_STARTED ไม่สำเร็จ =",
+          notificationError
+        );
+      }
     }
 
     return res.status(200).json({
@@ -1429,6 +1434,7 @@ exports.startDelivery = async (req, res) => {
     });
   }
 };
+
 
 exports.markDelivered = async (req, res) => {
   try {
@@ -1447,12 +1453,13 @@ exports.markDelivered = async (req, res) => {
         storeId: staff.storeId,
         deliveryStaffId: staff.id,
       },
-
       include: {
+        images: true,
         orders: {
           select: {
             id: true,
             customerId: true,
+            status: true,
           },
         },
       },
@@ -1470,46 +1477,88 @@ exports.markDelivered = async (req, res) => {
       });
     }
 
-    const updatedDelivery = await prisma.delivery.update({
-      where: {
-        id: deliveryId,
-      },
+    // ต้องมีรูปหลักฐาน PRIMARY ก่อนจบงาน
+    const primaryProof = delivery.images?.find(
+      (image) => image.proofType === "PRIMARY"
+    );
 
-      data: {
-        status: "COMPLETED",
-      },
-
-      include: {
-        deliveryStaff: {
-          select: {
-            id: true,
-            name: true,
-            phone: true,
-          },
-        },
-      },
-    });
-
-    // ==========================================
-    // แจ้งเตือนลูกค้า
-    // ==========================================
-
-    for (const order of delivery.orders) {
-      await prisma.notification.create({
-        data: {
-          title: "จัดส่งอาหารสำเร็จ",
-          message: `ออเดอร์ #ORD00${order.id} จัดส่งถึงคุณแล้ว ขอบคุณที่ใช้บริการ RobMorFood`,
-          type: "DELIVERY_COMPLETED",
-
-          customerId: order.customerId,
-          orderId: order.id,
-        },
+    if (!primaryProof) {
+      return res.status(400).json({
+        message: "กรุณาอัปโหลดรูปหลักฐานการส่งก่อนจัดส่งสำเร็จ",
       });
     }
 
+    // อัปเดตสถานะงานส่งและออเดอร์พร้อมกัน
+
+    const result = await prisma.$transaction(async (tx) => {
+      // เปลี่ยนสถานะงานส่ง
+      const updatedDelivery = await tx.delivery.update({
+        where: {
+          id: deliveryId,
+        },
+        data: {
+          status: "COMPLETED",
+        },
+        include: {
+          images: true,
+          deliveryStaff: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+            },
+          },
+        },
+      });
+
+      // ใช้ ID ออเดอร์จากงานส่งนี้โดยตรง
+      const orderIds = delivery.orders
+        .filter((order) => order.status === "READY")
+        .map((order) => order.id);
+
+      let updatedOrders = { count: 0 };
+
+      if (orderIds.length > 0) {
+        updatedOrders = await tx.order.updateMany({
+          where: {
+            id: {
+              in: orderIds,
+            },
+            status: "READY",
+          },
+          data: {
+            status: "COMPLETED",
+            customerReceived: true,
+            receivedAt: new Date(),
+          },
+        });
+      }
+
+      return updatedDelivery;
+    });
+
+
+    // แจ้งเตือนลูกค้าเมื่อจัดส่งสำเร็จ
+    for (const order of delivery.orders) {
+      try {
+        await createNotification({
+          title: "จัดส่งอาหารสำเร็จ",
+          message: `ออเดอร์ #ORD00${order.id} จัดส่งถึงคุณแล้ว ขอบคุณที่ใช้บริการ RobMorFood`,
+          type: "DELIVERY_COMPLETED",
+          customerId: order.customerId,
+          orderId: order.id,
+        });
+      } catch (notificationError) {
+        console.error(
+          "สร้าง Notification DELIVERY_COMPLETED ไม่สำเร็จ =",
+          notificationError
+        );
+      }
+    }
+
     return res.status(200).json({
-      message: "ส่งอาหารถึงลูกค้าแล้ว",
-      delivery: updatedDelivery,
+      message: "ส่งอาหารถึงลูกค้าแล้ว และอัปเดตสถานะออเดอร์เรียบร้อย",
+      delivery: result,
     });
   } catch (error) {
     console.error("markDelivered Error =", error);
@@ -1519,6 +1568,7 @@ exports.markDelivered = async (req, res) => {
     });
   }
 };
+
 
 
 exports.readDeliveryStaff = async (req, res) => {

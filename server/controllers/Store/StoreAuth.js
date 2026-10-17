@@ -11,7 +11,6 @@ exports.register = async (req, res) => {
       password,
       username,
       phone,
-      email,
       storeCategoryIds,
       Notice,
       storeName,
@@ -30,9 +29,6 @@ exports.register = async (req, res) => {
 
     const cleanUsername =
       typeof username === "string" ? username.trim() : "";
-
-    const cleanEmail =
-      typeof email === "string" ? email.trim().toLowerCase() : "";
 
     const cleanStoreName =
       typeof storeName === "string" ? storeName.trim() : "";
@@ -58,15 +54,6 @@ exports.register = async (req, res) => {
       });
     }
 
-    // ตรวจสอบอีเมล
-    if (
-      !cleanEmail ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
-    ) {
-      return res.status(400).json({
-        message: "กรุณากรอกอีเมลให้ถูกต้อง",
-      });
-    }
 
     if (!cleanStoreName) {
       return res.status(400).json({
@@ -209,7 +196,6 @@ exports.register = async (req, res) => {
         OR: [
           { username: cleanUsername },
           { phone },
-          { email: cleanEmail },
         ],
       },
     });
@@ -229,7 +215,6 @@ exports.register = async (req, res) => {
         OR: [
           { username: cleanUsername },
           { phone },
-          { email: cleanEmail },
           { storeName: cleanStoreName },
         ],
       },
@@ -257,7 +242,6 @@ exports.register = async (req, res) => {
         password: hashPassword,
         username: cleanUsername,
         phone,
-        email: cleanEmail,
         Notice,
         storeName: cleanStoreName,
         address: cleanAddress,
