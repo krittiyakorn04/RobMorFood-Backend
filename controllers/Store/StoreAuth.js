@@ -3,188 +3,22 @@ const prisma = new PrismaClient();
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-<<<<<<< HEAD
-const { token } = require("morgan");
-=======
 
-
->>>>>>> origin/main
 
 exports.register = async (req, res) => {
   try {
     const {
-<<<<<<< HEAD
-      email,
       password,
       username,
       phone,
-      
-      Notice,    
-      storeName,
-      category,
-=======
-      password,
-      username,
-      phone,
-      email,
       storeCategoryIds,
       Notice,
       storeName,
->>>>>>> origin/main
       address,
       dayOpen,
       timeOpen,
       timeClose,
       openAuto,
-<<<<<<< HEAD
-      promptpayNumber,
-      bankName,
-      bankAccount,
-      bankAccountName,
-      
-    } = req.body;
-
-    // เช็คว่ากรอกหรือยัง
-    if (!username) {
-      return res.status(400).json({ message: "Email is require!!!" });
-    }
-    if (!password) {
-      return res.status(400).json({ message: "password is require!!!" });
-    }
-
-    const user = await prisma.customer.findFirst({
-      where: { OR: 
-        [
-          {email}, 
-          {username}, 
-          {phone}
-      ] 
-      },
-    });
-    if (user) {
-      return res.status(400).json({ message: "This user already exits!!" });
-    } 
-            
-
-    // เช็คใน DB ว่ามีมั้ย ซ้ำหรือเปล่า (เดี๋ยวเพิ่ม error เช็คซ้ำ)
-    const store = await prisma.store.findFirst({
-      where: { OR: 
-        [
-        {email}, 
-        {username}, 
-        {phone}
-      ] 
-      },
-    });
-    if (store) {
-      return res.status(400).json({ message: "This store already exits!!" });
-    } 
-
-    const hashPassword = await bcrypt.hash(password, 10);
-    
-    //ไม่ซ้ำก็ลงเลย 
-    const newStore = await prisma.store.create({
-      data: {
-        email,
-        password: hashPassword,
-        username,
-        phone,
-        
-        Notice, 
-        storeName,
-        category,
-        address,
-        dayOpen: JSON.stringify(dayOpen),
-        timeOpen,
-        timeClose,
-        openAuto,
-
-        promptpayNumber,
-        bankName,
-        bankAccount,
-        bankAccountName,
-      },
-    });
-   //สร้าง Payload
-    const payload = {
-      id: newStore.id,
-      username: newStore.username,
-      role: newStore.role
-    }
-
-    //generate token
-    jwt.sign(payload,process.env.SECRET,{
-      expiresIn:'1d'
-    },(err,token)=>{
-      if(err){
-        return res.status(500).json({ message:"Server Error" })
-      }
-      res.json({payload,token})
-    })
-    
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" }); //@unique ต้องเขียนด้วย
-  }
-};
-
-exports.login = async (req, res) => {
-  try {
-    const {username,password} = req.body
-
-    //เช็คว่ามีมั้ย
-    const store = await prisma.store.findFirst({
-      where:{
-        username
-      }
-    })
-    console.log(store)
-    if(!username){
-      return res.status(400).json({ message: "User NOT found or NOT Enabled" })
-    }
-    if(store.accountStatus === "SUSPENDED" || store.accountStatus === "BANNED"){
-      return res.status(400).json({ message: "Account not approved yet" })
-    }
-
-    //เช็คว่าตรงมั้ย
-    const isMatch = await bcrypt.compare(password,store.password)
-    if(!isMatch){
-      return res.status(500).json({ message:"Password Invalid!!!" })
-    }
-
-    //สร้าง Payload
-    const payload = {
-      id: store.id,
-      username: store.username,
-      role: store.role
-    }
-
-    //generate token
-    jwt.sign(payload,process.env.SECRET,{
-      expiresIn:'1d'
-    },(err,token)=>{
-      if(err){
-        return res.status(500).json({ message:"Server Error" })
-      }
-      res.json({payload,token})
-    })
-
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-exports.currentRestau = async (req, res) => {
-  try {
-    const store = await prisma.store.findFirst({
-      where: { id: req.store.id },  
-      select: {
-        id: true,
-        email: true,
-=======
       lat,
       lng,
     } = req.body;
@@ -195,9 +29,6 @@ exports.currentRestau = async (req, res) => {
 
     const cleanUsername =
       typeof username === "string" ? username.trim() : "";
-
-    const cleanEmail =
-      typeof email === "string" ? email.trim().toLowerCase() : "";
 
     const cleanStoreName =
       typeof storeName === "string" ? storeName.trim() : "";
@@ -223,15 +54,6 @@ exports.currentRestau = async (req, res) => {
       });
     }
 
-    // ตรวจสอบอีเมล
-    if (
-      !cleanEmail ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
-    ) {
-      return res.status(400).json({
-        message: "กรุณากรอกอีเมลให้ถูกต้อง",
-      });
-    }
 
     if (!cleanStoreName) {
       return res.status(400).json({
@@ -374,7 +196,6 @@ exports.currentRestau = async (req, res) => {
         OR: [
           { username: cleanUsername },
           { phone },
-          { email: cleanEmail },
         ],
       },
     });
@@ -394,7 +215,6 @@ exports.currentRestau = async (req, res) => {
         OR: [
           { username: cleanUsername },
           { phone },
-          { email: cleanEmail },
           { storeName: cleanStoreName },
         ],
       },
@@ -422,7 +242,6 @@ exports.currentRestau = async (req, res) => {
         password: hashPassword,
         username: cleanUsername,
         phone,
-        email: cleanEmail,
         Notice,
         storeName: cleanStoreName,
         address: cleanAddress,
@@ -630,7 +449,6 @@ exports.currentRestau = async (req, res) => {
       select: {
         id: true,
 
->>>>>>> origin/main
         username: true,
         storeName: true,
         role: true,
@@ -644,8 +462,6 @@ exports.currentRestau = async (req, res) => {
   }
 }
 
-<<<<<<< HEAD
-=======
 exports.createStoreStaff = async (req, res) => {
   try {
     const storeId = req.store.id;
@@ -831,6 +647,59 @@ exports.changeStoreStaffStatus = async (req, res) => {
   }
 };
 
+exports.deleteStoreStaff = async (req, res) => {
+  try {
+    const storeId = req.store.id;
+    const staffId = Number(req.params.id);
+
+    if (!Number.isInteger(staffId) || staffId <= 0) {
+      return res.status(400).json({
+        message: "รหัสคนส่งไม่ถูกต้อง",
+      });
+    }
+
+    const staff = await prisma.storeStaff.findFirst({
+      where: {
+        id: staffId,
+        storeId,
+      },
+    });
+
+    if (!staff) {
+      return res.status(404).json({
+        message: "ไม่พบบัญชีคนส่ง",
+      });
+    }
+
+    await prisma.storeStaff.delete({
+      where: {
+        id: staff.id,
+      },
+    });
+
+    return res.status(200).json({
+      message: "ลบบัญชีคนส่งสำเร็จ",
+    });
+  } catch (error) {
+    console.error("deleteStoreStaff Error =", error);
+
+    // Foreign key constraint: บัญชีอาจมีประวัติหรือข้อมูลที่เชื่อมโยงอยู่
+    if (
+      error.code === "P2003" ||
+      error.code === "P2014"
+    ) {
+      return res.status(409).json({
+        message:
+          "ไม่สามารถลบบัญชีนี้ได้ เนื่องจากมีประวัติการจัดส่งหรือข้อมูลที่เกี่ยวข้อง แนะนำให้ปิดใช้งานบัญชีแทน",
+      });
+    }
+
+    return res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการลบบัญชีคนส่ง",
+    });
+  }
+};
+
 exports.updateStoreStaff = async (req, res) => {
   try {
     const storeId = req.store.id;
@@ -918,4 +787,3 @@ exports.updateStoreStaff = async (req, res) => {
   }
 };
 
->>>>>>> origin/main
