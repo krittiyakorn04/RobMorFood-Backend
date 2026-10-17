@@ -3,65 +3,10 @@ const prisma = new PrismaClient();
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-<<<<<<< HEAD
-const { token } = require("morgan");
-=======
->>>>>>> origin/main
 
 
 exports.register = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { email, password, username, phone } = req.body;
-
-    // เช็คว่ากรอกหรือยัง
-    if (!username) {
-      return res.status(400).json({ message: "Email is require!!!" });
-    }
-    if (!password) {
-      return res.status(400).json({ message: "password is require!!!" });
-    }
-
-    const store = await prisma.store.findFirst({
-      where: { 
-        OR: [
-            { email }, 
-            { username }, 
-            { phone }
-        ] 
-    },
-    });
-    if (store) {
-      return res.status(400).json({ message: "This store already exits!!" });
-    }
-
-    // เช็คใน DB ว่ามีมั้ย ซ้ำหรือเปล่า (เดี๋ยวเพิ่ม error เช็คซ้ำ)
-    const user = await prisma.customer.findFirst({
-      where: { 
-        OR: [
-            { email }, 
-            { username }, 
-            { phone }]
-
-    },
-    });
-    if (user) {
-      return res.status(400).json({ message: "This user already exits!!" });
-    }
-
-    const hashPassword = await bcrypt.hash(password, 10);
-
-    //ไม่ซ้ำก็ลงเลย
-    const newuser = await prisma.customer.create({
-      data: {
-        email,
-        password: hashPassword,
-        username,
-        phone,
-      },
-    });
-    //สร้าง Payload
-=======
     const { password, username, phone, email } = req.body;
 
     // =========================
@@ -218,43 +163,24 @@ exports.register = async (req, res) => {
     // JWT Payload
     // =========================
 
->>>>>>> origin/main
     const payload = {
       id: newuser.id,
       username: newuser.username,
       role: newuser.role,
     };
 
-<<<<<<< HEAD
-    //generate token
-=======
     // =========================
     // Generate Token
     // =========================
 
->>>>>>> origin/main
     jwt.sign(
       payload,
       process.env.SECRET,
       {
-        expiresIn: "1d",
+        expiresIn: "365d",
       },
       (err, token) => {
         if (err) {
-<<<<<<< HEAD
-          return res.status(500).json({ message: "Server Error" });
-        }
-        res.json({ payload, token });
-      },
-    );
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-=======
           return res.status(500).json({
             message: "เกิดข้อผิดพลาดในการสร้าง Token",
           });
@@ -277,7 +203,6 @@ exports.register = async (req, res) => {
 };
 
 
->>>>>>> origin/main
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -291,11 +216,7 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User NOT found or NOT Enabled" });
     }
-<<<<<<< HEAD
-    if ( user.customerStatus === "BANNED") {
-=======
     if (user.status === "BANNED") {
->>>>>>> origin/main
       return res.status(400).json({ message: "Account not approved yet" });
     }
 
@@ -317,7 +238,7 @@ exports.login = async (req, res) => {
       payload,
       process.env.SECRET,
       {
-        expiresIn: "1d",
+        expiresIn: "365d",
       },
       (err, token) => {
         if (err) {
@@ -336,16 +257,9 @@ exports.login = async (req, res) => {
 exports.currentUser = async (req, res) => {
   try {
     const currentUser = await prisma.customer.findFirst({
-<<<<<<< HEAD
-      where: { id: req.user.id },  
-      select: {
-        id: true,
-        email: true,
-=======
       where: { id: req.user.id },
       select: {
         id: true,
->>>>>>> origin/main
         username: true,
         role: true,
         status: true
@@ -358,10 +272,6 @@ exports.currentUser = async (req, res) => {
   }
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 exports.userCheck = async (req, res, next) => {
   try {
     const { username } = req.user;
