@@ -4,20 +4,6 @@ exports.listAddress = async (req, res) => {
   try {
     const userId = req.user.id;
 
-<<<<<<< HEAD
-    const user = await prisma.customer.findFirst({
-      where: {
-        customerId: userId,
-      },
-      include: {
-        addresses: true,
-      },
-    });
-    res.send(user);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
     const addresses = await prisma.address.findMany({
       where: {
         customerId: userId,
@@ -38,18 +24,12 @@ exports.listAddress = async (req, res) => {
     res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
 //เพิ่มdefaul ชื่อ เบอร์
 exports.addAddress = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { label, address } = req.body;
-    const userId = req.user.id;
-
-=======
     const { label, address, lat, lng, isDefault, } = req.body;
     const userId = req.user.id;
 
@@ -72,20 +52,10 @@ exports.addAddress = async (req, res) => {
       });
     }
 
->>>>>>> origin/main
     const newAddress = await prisma.address.create({
       data: {
         label,
         address,
-<<<<<<< HEAD
-        customerId: userId,
-      },
-    });
-    res.send(newAddress);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
         lat,
         lng,
         isDefault: Boolean(isDefault),
@@ -100,20 +70,11 @@ exports.addAddress = async (req, res) => {
     res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
 exports.updateAddress = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { label, address } = req.body;
-    const userId = req.user.id;
-
-    const user = await prisma.address.update({
-      where: {
-        id: Number(req.params.id),
-=======
     const { label, address, lat, lng, isDefault } = req.body;
     const userId = req.user.id;
     const addressId = Number(req.params.id);
@@ -150,19 +111,10 @@ exports.updateAddress = async (req, res) => {
     const updatedAddress = await prisma.address.update({
       where: {
         id: addressId,
->>>>>>> origin/main
       },
       data: {
         label,
         address,
-<<<<<<< HEAD
-      },
-    });
-    res.send(user);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
         lat: lat === "" || lat == null ? null : Number(lat),
         lng: lng === "" || lng == null ? null : Number(lng),
         isDefault: Boolean(isDefault),
@@ -176,7 +128,6 @@ exports.updateAddress = async (req, res) => {
     res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
