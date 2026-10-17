@@ -1,183 +1,3 @@
-
-const prisma = require("../../config/prisma");
-
-//DeliveryZone
-exports.addDeliveryZone = async (req, res) => {
-  try {
-    //ระยะทาง
-    const { nameZone, fee } = req.body;
-    const storeId = req.store.id;
-
-    if (!nameZone) {
-      return res.status(400).json({
-        message: "กรุณาระบุชื่อพื้นที่",
-      });
-    }
-
-    if (fee == null || fee < 0) {
-      return res.status(400).json({
-        message: "ค่าจัดส่งไม่ถูกต้อง",
-      });
-    }
-
-    const checkDeliveryZone = await prisma.deliveryZone.findFirst({
-      where: {
-        storeId,
-        nameZone,
-      },
-    });
-    if (checkDeliveryZone) {
-      return res
-        .status(400)
-        .json({ message: "This DeliveryZone already exits!!" });
-    }
-
-    const deliveryZone = await prisma.deliveryZone.create({
-      data: {
-        storeId,
-        nameZone,
-        fee,
-      },
-    });
-
-    res.send(deliveryZone);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-exports.updateDeliveryZone = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { nameZone, fee } = req.body;
-    const storeId = req.store.id;
-
-    if (!nameZone) {
-      return res.status(400).json({
-        message: "กรุณาระบุชื่อพื้นที่",
-      });
-    }
-
-    if (fee == null || fee < 0) {
-      return res.status(400).json({
-        message: "ค่าจัดส่งไม่ถูกต้อง",
-      });
-    }
-
-    // เช็กว่าโซนนี้เป็นของร้านนี้
-    const deliveryZone = await prisma.deliveryZone.findFirst({
-      where: {
-        id: Number(id),
-        storeId,
-      },
-    });
-
-    if (!deliveryZone) {
-      return res.status(404).json({
-        message: "ไม่พบพื้นที่จัดส่ง",
-      });
-    }
-
-    const result = await prisma.deliveryZone.update({
-      where: {
-        id: Number(id),
-      },
-      data: {
-        nameZone,
-        fee,
-      },
-    });
-
-    res.send(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-exports.removeDeliveryZone = async (req, res) => {
-  try {
-    const { id } = req.params
-    const storeId = req.store.id;
-
-    const deliveryZone = await prisma.deliveryZone.findFirst({
-      where: {
-        storeId,
-        id: Number(id)
-      },
-    });
-
-    if (!deliveryZone) {
-      return res.status(404).json({ message: "deliveryZone not found!" });
-    }
-
-    const remove = await prisma.deliveryZone.delete({
-      where:{
-        id: Number(req.params.id),
-      }
-    })
-    res.send("ลบสำเร็จ");
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-exports.changeRainSurcharge = async (req, res) => {
-  try {
-    const { rainSurchargeActive, rainSurcharge } = req.body
-    const storeId = req.store.id
-
-    const store = await prisma.store.update({
-      where: { id: storeId },
-      data: { 
-        rainSurchargeActive,
-        rainSurcharge  // อัปเดตค่าพร้อมกันเลย
-      }
-    })
-
-    res.send(store)
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ message: "Server Error" })
-  }
-}
-
-//Delivery
-exports.listDelivery = async (req, res) => {
-  const storeId = req.store.id;
-
-  const delivery = await prisma.delivery.findMany({
-    where: {
-      storeId,
-    },
-    include: {
-      orderRound: {
-        select: {
-          roundNumber: true,
-          startTime: true,
-          endTime: true, //ก่อน cutoffMinutes
-        },
-      },
-      orders: {
-        select: {
-          deliveryType: true,
-          status: true,
-          totalPrice: true,
-          note: true,
-          outOfStock: true,
-        },
-      },
-    },
-  });
-
-  try {
-    res.send(delivery);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
 const cloudinary = require('cloudinary').v2;
 const prisma = require("../../config/prisma");
 const { createNotification } = require("../notificationController");
@@ -331,20 +151,11 @@ exports.listDelivery = async (req, res) => {
     return res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
 exports.readDelivery = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { id } = req.params;
-    const delivery = await prisma.delivery.findFirst({
-      where: {
-        id: Number(id),
-      },
-      include: {
-=======
     const deliveryId = Number(req.params.id);
     const storeId = Number(req.store?.id);
 
@@ -383,18 +194,10 @@ exports.readDelivery = async (req, res) => {
             isActive: true,
           },
         },
->>>>>>> origin/main
         orderRound: {
           select: {
             roundNumber: true,
             startTime: true,
-<<<<<<< HEAD
-            endTime: true, //ก่อน cutoffMinutes
-          },
-        },
-        orders: {
-          select: {
-=======
             endTime: true,
           },
         },
@@ -405,14 +208,12 @@ exports.readDelivery = async (req, res) => {
           },
           select: {
             id: true,
->>>>>>> origin/main
+            createdAt: true,
             deliveryType: true,
             status: true,
             totalPrice: true,
             note: true,
             outOfStock: true,
-<<<<<<< HEAD
-=======
             customerReceived: true,
             receivedAt: true,
             customer: {
@@ -451,19 +252,11 @@ exports.readDelivery = async (req, res) => {
                 },
               },
             },
->>>>>>> origin/main
           },
         },
       },
     });
 
-<<<<<<< HEAD
-    res.send(products);
-    res.send("Hello read Delivery");
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
     if (!delivery) {
       return res.status(404).json({
         message: "ไม่พบข้อมูลการจัดส่ง",
@@ -521,32 +314,11 @@ exports.readDelivery = async (req, res) => {
     return res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
 exports.changeStatusDelivery = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { status } = req.body;
-    const storeId = req.store.id;
-
-    const deliveryStatus = await prisma.delivery.update({
-      where: {
-        id: storeId,
-      },
-      data: {
-        deliveryStatus,
-      },
-    });
-
-    res.send("Hello change Status Delivery");
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-=======
     const { id } = req.params;
     const { status } = req.body;
 
@@ -1634,16 +1406,20 @@ exports.startDelivery = async (req, res) => {
     // ==========================================
 
     for (const order of delivery.orders) {
-      await prisma.notification.create({
-        data: {
+      try {
+        await createNotification({
           title: "กำลังจัดส่งอาหาร",
-          message: `ออเดอร์ #${order.id} กำลังเดินทางไปหาคุณ กรุณารอรับอาหาร`,
+          message: `ออเดอร์ #ORD00${order.id} กำลังเดินทางไปหาคุณ กรุณารอรับอาหาร`,
           type: "DELIVERY_STARTED",
-
           customerId: order.customerId,
           orderId: order.id,
-        },
-      });
+        });
+      } catch (notificationError) {
+        console.error(
+          "สร้าง Notification DELIVERY_STARTED ไม่สำเร็จ =",
+          notificationError
+        );
+      }
     }
 
     return res.status(200).json({
@@ -1658,6 +1434,7 @@ exports.startDelivery = async (req, res) => {
     });
   }
 };
+
 
 exports.markDelivered = async (req, res) => {
   try {
@@ -1676,12 +1453,13 @@ exports.markDelivered = async (req, res) => {
         storeId: staff.storeId,
         deliveryStaffId: staff.id,
       },
-
       include: {
+        images: true,
         orders: {
           select: {
             id: true,
             customerId: true,
+            status: true,
           },
         },
       },
@@ -1699,46 +1477,88 @@ exports.markDelivered = async (req, res) => {
       });
     }
 
-    const updatedDelivery = await prisma.delivery.update({
-      where: {
-        id: deliveryId,
-      },
+    // ต้องมีรูปหลักฐาน PRIMARY ก่อนจบงาน
+    const primaryProof = delivery.images?.find(
+      (image) => image.proofType === "PRIMARY"
+    );
 
-      data: {
-        status: "COMPLETED",
-      },
-
-      include: {
-        deliveryStaff: {
-          select: {
-            id: true,
-            name: true,
-            phone: true,
-          },
-        },
-      },
-    });
-
-    // ==========================================
-    // แจ้งเตือนลูกค้า
-    // ==========================================
-
-    for (const order of delivery.orders) {
-      await prisma.notification.create({
-        data: {
-          title: "จัดส่งอาหารสำเร็จ",
-          message: `ออเดอร์ #${order.id} จัดส่งถึงคุณแล้ว ขอบคุณที่ใช้บริการ RobMorFood`,
-          type: "DELIVERY_COMPLETED",
-
-          customerId: order.customerId,
-          orderId: order.id,
-        },
+    if (!primaryProof) {
+      return res.status(400).json({
+        message: "กรุณาอัปโหลดรูปหลักฐานการส่งก่อนจัดส่งสำเร็จ",
       });
     }
 
+    // อัปเดตสถานะงานส่งและออเดอร์พร้อมกัน
+
+    const result = await prisma.$transaction(async (tx) => {
+      // เปลี่ยนสถานะงานส่ง
+      const updatedDelivery = await tx.delivery.update({
+        where: {
+          id: deliveryId,
+        },
+        data: {
+          status: "COMPLETED",
+        },
+        include: {
+          images: true,
+          deliveryStaff: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+            },
+          },
+        },
+      });
+
+      // ใช้ ID ออเดอร์จากงานส่งนี้โดยตรง
+      const orderIds = delivery.orders
+        .filter((order) => order.status === "READY")
+        .map((order) => order.id);
+
+      let updatedOrders = { count: 0 };
+
+      if (orderIds.length > 0) {
+        updatedOrders = await tx.order.updateMany({
+          where: {
+            id: {
+              in: orderIds,
+            },
+            status: "READY",
+          },
+          data: {
+            status: "COMPLETED",
+            customerReceived: true,
+            receivedAt: new Date(),
+          },
+        });
+      }
+
+      return updatedDelivery;
+    });
+
+
+    // แจ้งเตือนลูกค้าเมื่อจัดส่งสำเร็จ
+    for (const order of delivery.orders) {
+      try {
+        await createNotification({
+          title: "จัดส่งอาหารสำเร็จ",
+          message: `ออเดอร์ #ORD00${order.id} จัดส่งถึงคุณแล้ว ขอบคุณที่ใช้บริการ RobMorFood`,
+          type: "DELIVERY_COMPLETED",
+          customerId: order.customerId,
+          orderId: order.id,
+        });
+      } catch (notificationError) {
+        console.error(
+          "สร้าง Notification DELIVERY_COMPLETED ไม่สำเร็จ =",
+          notificationError
+        );
+      }
+    }
+
     return res.status(200).json({
-      message: "ส่งอาหารถึงลูกค้าแล้ว",
-      delivery: updatedDelivery,
+      message: "ส่งอาหารถึงลูกค้าแล้ว และอัปเดตสถานะออเดอร์เรียบร้อย",
+      delivery: result,
     });
   } catch (error) {
     console.error("markDelivered Error =", error);
@@ -1748,6 +1568,7 @@ exports.markDelivered = async (req, res) => {
     });
   }
 };
+
 
 
 exports.readDeliveryStaff = async (req, res) => {
@@ -1959,4 +1780,3 @@ exports.deleteDeliveryProofStaff = async (req, res) => {
     });
   }
 };
->>>>>>> origin/main
