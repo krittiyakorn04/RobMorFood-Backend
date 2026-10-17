@@ -74,11 +74,7 @@ exports.storeCheck = async (req, res, next) => {
       },
     });
     if (!storeUser || storeUser.role !== "MERCHANT") {
-<<<<<<< HEAD
-       return res.status(403).json({ message: "Acess Denied : MERCHANT Only" });
-=======
       return res.status(403).json({ message: "Acess Denied : MERCHANT Only" });
->>>>>>> origin/main
     }
 
     next();
@@ -107,8 +103,6 @@ exports.userCheck = async (req, res, next) => {
     res.status(500).json({ message: "CUSTOMER access denied" });
   }
 };
-<<<<<<< HEAD
-=======
 
 exports.authStaff = async (req, res, next) => {
   try {
@@ -333,4 +327,3 @@ exports.authPush = async (req, res, next) => {
     });
   }
 };
->>>>>>> origin/main
