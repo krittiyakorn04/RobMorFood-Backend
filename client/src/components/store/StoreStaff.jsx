@@ -155,6 +155,18 @@ const StoreStaff = () => {
         return;
       }
 
+      if (form.phone && !/^0[689]\d{8}$/.test(form.phone)) {
+        Swal.fire({
+          icon: "warning",
+          title: "เบอร์โทรศัพท์ไม่ถูกต้อง",
+          text: "กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก โดยขึ้นต้นด้วย 06, 08 หรือ 09",
+          confirmButtonText: "ตกลง",
+          confirmButtonColor: "#FF6B35",
+        });
+
+        return;
+      }
+
       if (!form.password) {
         Swal.fire({
           icon: "warning",
@@ -320,6 +332,7 @@ const StoreStaff = () => {
       });
     } catch (error) {
       console.error("handleDeleteStaff Error =", error);
+      
 
       Swal.fire({
         icon: "error",
@@ -334,7 +347,7 @@ const StoreStaff = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0] px-4 py-6">
+    <div className="min-h-screen bg-[#FFF8F0] px-4 py-6 pb-20">
       <div className="mx-auto max-w-6xl">
         <button
           type="button"
@@ -585,11 +598,40 @@ const StoreStaff = () => {
                       type="tel"
                       name="phone"
                       value={form.phone}
-                      onChange={handleChange}
+                      inputMode="numeric"
+                      maxLength={10}
+                      onChange={(e) => {
+                        const phone = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 10);
+                        setForm((prev) => ({ ...prev, phone }));
+                      }}
                       placeholder="เช่น 0812345678"
-                      className="w-full rounded-2xl border border-gray-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#FF6B35] focus:ring-2 focus:ring-orange-100"
+                      className={`w-full rounded-2xl border bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:ring-2 ${
+                        !form.phone
+                          ? "border-gray-200 focus:border-[#FF6B35] focus:ring-orange-100"
+                          : /^0[689]\d{8}$/.test(form.phone)
+                            ? "border-green-400 focus:border-green-400 focus:ring-green-100"
+                            : "border-red-300 focus:border-red-400 focus:ring-red-100"
+                      }`}
                     />
                   </div>
+
+                  {form.phone && (
+                    <p
+                      className={`mt-1.5 text-xs ${
+                        /^0[689]\d{8}$/.test(form.phone)
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {/^0[689]\d{8}$/.test(form.phone)
+                        ? "✓ รูปแบบเบอร์โทรศัพท์ถูกต้อง"
+                        : form.phone.length < 10
+                          ? `กรอกอีก ${10 - form.phone.length} หลัก`
+                          : "เบอร์โทรต้องมี 10 หลัก และขึ้นต้นด้วย 06, 08 หรือ 09"}
+                    </p>
+                  )}
                 </div>
 
                 <div>

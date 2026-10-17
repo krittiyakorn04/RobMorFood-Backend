@@ -299,9 +299,9 @@ const FormEditStore = () => {
   // RETURN
   // =========================
 
-  return (
-    <div className="min-h-screen bg-[#FFF8F0]">
-      <div className="mx-auto max-w-6xl px-4 py-6 md:px-6 lg:py-8">
+return (
+  <div className="min-h-screen bg-[#FFF8F0] pb-12">
+    <div className="mx-auto max-w-6xl px-4 py-6 pb-12 md:px-6 lg:py-8">
         {/* =========================
             PAGE HEADER
         ========================= */}

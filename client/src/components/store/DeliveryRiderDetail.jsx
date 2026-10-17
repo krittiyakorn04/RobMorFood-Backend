@@ -617,7 +617,10 @@ const DeliveryRiderDetail = () => {
               รายละเอียดงานจัดส่ง
             </h1>
 
-            <p className="text-sm text-gray-500">งานส่ง #{delivery.id}</p>
+            <p className="text-sm text-gray-500">
+              งานส่ง #ORD
+              {String(delivery.id).padStart(4, "0")}
+            </p>
           </div>
 
           <div

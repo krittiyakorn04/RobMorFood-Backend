@@ -188,7 +188,7 @@ const FormMenuCategory = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFCF8] px-4 py-5 pb-24 sm:px-6 sm:py-7">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-5xl pb-24">
         {/* ปุ่มกลับและหัวข้อ */}
         <div className="mb-6">
           <button

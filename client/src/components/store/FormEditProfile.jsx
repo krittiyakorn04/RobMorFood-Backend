@@ -1277,6 +1277,7 @@ const FormEditProfile = () => {
               </div>
 
               {/* Phone */}
+
               <div className="mb-5">
                 <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-600">
                   <Phone size={14} className="text-orange-500" />
@@ -1284,13 +1285,48 @@ const FormEditProfile = () => {
                 </label>
 
                 <input
-                  type="text"
+                  type="tel"
                   name="phone"
                   value={editForm.phone}
-                  onChange={handleOnChange}
+                  onChange={(e) => {
+                    const digits = e.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 10);
+
+                    handleOnChange({
+                      target: {
+                        name: "phone",
+                        value: digits,
+                      },
+                    });
+                  }}
                   placeholder="089xxxxxxx"
-                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  inputMode="numeric"
+                  maxLength={10}
+                  className={`w-full rounded-2xl border bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:bg-white focus:ring-2 ${
+                    editForm.phone.length === 0
+                      ? "border-gray-200 focus:border-orange-300 focus:ring-orange-100"
+                      : /^0[689]\d{8}$/.test(editForm.phone)
+                        ? "border-green-400 focus:border-green-400 focus:ring-green-100"
+                        : "border-red-300 focus:border-red-400 focus:ring-red-100"
+                  }`}
                 />
+
+                {editForm.phone.length > 0 && (
+                  <p
+                    className={`mt-2 text-xs ${
+                      /^0[689]\d{8}$/.test(editForm.phone)
+                        ? "text-green-600"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {/^0[689]\d{8}$/.test(editForm.phone)
+                      ? "✓ รูปแบบเบอร์โทรศัพท์ถูกต้อง"
+                      : editForm.phone.length < 10
+                        ? `กรอกอีก ${10 - editForm.phone.length} หลัก`
+                        : "เบอร์ต้องมี 10 หลัก และขึ้นต้นด้วย 06, 08 หรือ 09"}
+                  </p>
+                )}
               </div>
 
               {/* Delivery Fee */}

@@ -359,7 +359,6 @@ const DeliveryPage = () => {
     );
   }, [staffList]);
 
-
   // ==========================================
   // RIDER COUNT
   // ==========================================
@@ -1027,43 +1026,47 @@ const DeliveryPage = () => {
     <div className="dv-root">
       <style>{`
 
-        .dv-root {
-          --cream: #FFF8F0;
-          --peach: #FFE4C4;
-          --orange: #FF6B35;
-          --coral: #E8491D;
-          --charcoal: #2A1B12;
-          --cocoa: #8A6A54;
+.dv-root {
+  --cream: #FFF8F0;
+  --peach: #FFE4C4;
+  --orange: #FF6B35;
+  --coral: #E8491D;
+  --charcoal: #2A1B12;
+  --cocoa: #8A6A54;
 
-          min-height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
 
-          background:
-            linear-gradient(
-              180deg,
-              #FFFCF7 0%,
-              #FFF3E4 25%,
-              #FFF8F0 100%
-            );
+  background: linear-gradient(
+    180deg,
+    #FFFCF7 0%,
+    #FFF3E4 25%,
+    #FFF8F0 100%
+  );
 
-          font-family:
-            'Noto Sans Thai',
-            sans-serif;
+  font-family: 'Noto Sans Thai', sans-serif;
+  color: var(--charcoal);
 
-          color:
-            var(--charcoal);
+  /* เผื่อพื้นที่ด้านล่างให้แถบนำทาง */
+  padding: 24px 16px calc(100px + env(safe-area-inset-bottom));
 
-          padding:
-            24px 16px 60px;
-        }
+  box-sizing: border-box;
+  overflow: visible;
+}
 
-        .dv-root * {
-          box-sizing: border-box;
-        }
+.dv-root *,
+.dv-root *::before,
+.dv-root *::after {
+  box-sizing: border-box;
+}
 
-        .dv-wrap {
-          max-width: 1152px;
-          margin: 0 auto;
-        }
+.dv-wrap {
+  width: 100%;
+  max-width: 1152px;
+  margin: 0 auto;
+  min-width: 0;
+}
 
         .dv-header {
           margin-bottom: 22px;

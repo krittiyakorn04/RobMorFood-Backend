@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import usefoodDelivery from "../../globalState/fooddeliveryStore";
-import { User, Phone, Mail, ArrowLeft, Save } from "lucide-react";
+import { User, Phone, Mail, ArrowLeft, Save, Circle, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { updateUserProfile } from "../../api/UserProfile";
@@ -13,7 +13,6 @@ const FormEditUserProfile = () => {
   const getUser = usefoodDelivery((state) => state.getUser);
   const users = usefoodDelivery((state) => state.users);
 
- 
   const [editForm, setEditForm] = useState({
     username: "",
     email: "",
@@ -192,25 +191,73 @@ const FormEditUserProfile = () => {
 
           {/* PHONE */}
           <div className="mb-7">
-            <label className="block text-sm font-semibold text-[#5F4638] mb-2">
+            <label className="mb-2 block text-sm font-semibold text-[#5F4638]">
               เบอร์โทรศัพท์
             </label>
 
             <div className="relative">
               <Phone
                 size={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#B99B87] pointer-events-none"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#B99B87]"
               />
 
               <input
-                type="text"
+                type="tel"
                 name="phone"
-                value={editForm.phone}
-                onChange={handleOnChacng}
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={10}
+                value={editForm.phone || ""}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+
+                  handleOnChacng({
+                    target: {
+                      name: "phone",
+                      value,
+                    },
+                  });
+                }}
                 placeholder="089xxxxxxx"
-                className="w-full rounded-2xl border border-orange-100 bg-[#FFF8F0] pl-11 pr-4 py-3.5 text-sm sm:text-base text-[#2A1B12] placeholder:text-[#BBA89A] outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100 focus:bg-white"
+                className="w-full rounded-2xl border border-orange-100 bg-[#FFF8F0] py-3.5 pl-11 pr-4 text-sm text-[#2A1B12] outline-none transition placeholder:text-[#BBA89A] focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
               />
             </div>
+
+            {/* ตรวจสอบเบอร์โทรศัพท์ */}
+            {editForm.phone &&
+              (() => {
+                const phone = editForm.phone;
+                const validPrefix = /^0[689]/.test(phone);
+                const completePhone = /^0[689]\d{8}$/.test(phone);
+
+                return (
+                  <div className="mt-2 flex items-start gap-2 text-sm">
+                    {completePhone ? (
+                      <CheckCircle
+                        size={17}
+                        className="mt-0.5 shrink-0 text-green-600"
+                      />
+                    ) : (
+                      <Circle
+                        size={17}
+                        className="mt-0.5 shrink-0 text-orange-500"
+                      />
+                    )}
+
+                    <p
+                      className={
+                        completePhone ? "text-green-600" : "text-orange-600"
+                      }
+                    >
+                      {!validPrefix
+                        ? "เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 06, 08 หรือ 09"
+                        : phone.length < 10
+                          ? `กรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก (ตอนนี้ ${phone.length}/10 หลัก)`
+                          : "เบอร์โทรศัพท์ถูกต้อง"}
+                    </p>
+                  </div>
+                );
+              })()}
           </div>
 
           {/* BUTTONS */}
@@ -232,7 +279,6 @@ const FormEditUserProfile = () => {
             </button>
           </div>
         </form>
-
       </div>
     </div>
   );

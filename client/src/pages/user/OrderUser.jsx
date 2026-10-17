@@ -1205,7 +1205,7 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen mb-10 bg-[#FFF8F0]">
+    <div className="min-h-screen mb-6 pb-12 bg-[#FFF8F0]">
       {" "}
       <div
         className="
@@ -1213,7 +1213,7 @@ const CheckoutPage = () => {
        mx-auto
        p-4
        sm:p-6
-       pb-32
+       pb-4
      "
       >
         {/* =========================

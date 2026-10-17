@@ -155,7 +155,7 @@ export const updateStoreStaff = async (token, id, data) => {
 };
 
 export const deleteStoreStaff = (token, id) => {
-  return axios.delete(`${API}/store-staff/${id}`, {
+  return axios.delete(`${API}/store/staff/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

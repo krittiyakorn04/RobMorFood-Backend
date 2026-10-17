@@ -519,13 +519,6 @@ const FormEditMenu = () => {
   // UI
   // =====================================================
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FFFCF8]">
-        <p className="text-sm text-[#8B8179]">กำลังโหลดข้อมูลเมนู...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#FFFCF8] pb-20">

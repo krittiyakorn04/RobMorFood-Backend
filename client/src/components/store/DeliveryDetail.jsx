@@ -195,6 +195,7 @@ const getOrderStatus = (status) => {
   }
 };
 
+
 // ======================================================
 // COMPONENT
 // ======================================================
@@ -223,8 +224,6 @@ const DeliveryDetail = () => {
   });
 
   const [proofUploading, setProofUploading] = useState(false);
-
-  
 
   // ====================================================
   // LOAD DELIVERY
@@ -360,99 +359,40 @@ const DeliveryDetail = () => {
   // PROOF CHANGE
   // ====================================================
 
-const handleProofChange = async (proofType, event) => {
-  const file = event.target.files?.[0];
-  event.target.value = "";
+  const handleProofChange = async (proofType, event) => {
+    const input = event.target;
+    const file = input.files?.[0];
 
-  if (!file) return;
+    // เลือกไฟล์เดิมซ้ำได้
+    input.value = "";
 
-  if (!file.type.startsWith("image/")) {
-    await Swal.fire({
-      icon: "warning",
-      title: "กรุณาเลือกรูปภาพ",
-      confirmButtonColor: "#f97316",
-    });
-    return;
-  }
+    if (!file) return;
 
-  if (!delivery || proofUploading) return;
+    if (!file.type.startsWith("image/")) {
+      await Swal.fire({
+        icon: "warning",
+        title: "กรุณาเลือกรูปภาพ",
+        confirmButtonColor: "#f97316",
+      });
+      return;
+    }
 
-  const preview = URL.createObjectURL(file);
+    if (!delivery || proofUploading) return;
 
-  setProofFiles((prev) => ({
-    ...prev,
-    [proofType]: file,
-  }));
+    // สร้างตัวอย่างรูปเท่านั้น ยังไม่อัปโหลด
+    const preview = URL.createObjectURL(file);
 
-  setProofPreviews((prev) => ({
-    ...prev,
-    [proofType]: preview,
-  }));
-
-  try {
-    setProofUploading(true);
-
-    // ปรับขนาดรูปก่อนอัปโหลด
-    const resizedImage = await resizeProofImage(file);
-
-    // อัปโหลดทันที ไม่ต้องกดบันทึก
-    await uploadDeliveryProof(
-      token,
-      delivery.id,
-      resizedImage,
-      proofType,
-    );
-
-    // ล้างรูปพรีวิวหลังอัปโหลดสำเร็จ
     setProofFiles((prev) => ({
       ...prev,
-      [proofType]: null,
+      [proofType]: file,
     }));
 
     setProofPreviews((prev) => ({
       ...prev,
-      [proofType]: null,
+      [proofType]: preview,
     }));
+  };
 
-    await loadDelivery();
-
-    await Swal.fire({
-      icon: "success",
-      title: "อัปโหลดรูปสำเร็จ",
-      text:
-        proofType === "PRIMARY"
-          ? "บันทึกหลักฐานการจัดส่งเรียบร้อยแล้ว"
-          : "บันทึกรูปหลักฐานเพิ่มเติมเรียบร้อยแล้ว",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  } catch (error) {
-    console.error("Upload Delivery Proof Error =", error);
-
-    setProofFiles((prev) => ({
-      ...prev,
-      [proofType]: null,
-    }));
-
-    setProofPreviews((prev) => ({
-      ...prev,
-      [proofType]: null,
-    }));
-
-    await Swal.fire({
-      icon: "error",
-      title: "อัปโหลดรูปไม่สำเร็จ",
-      text:
-        error?.response?.data?.message ||
-        "ไม่สามารถบันทึกรูปหลักฐานได้ กรุณาลองอีกครั้ง",
-      confirmButtonText: "ตกลง",
-      confirmButtonColor: "#f97316",
-    });
-  } finally {
-    URL.revokeObjectURL(preview);
-    setProofUploading(false);
-  }
-};
   // ====================================================
   // REMOVE PREVIEW
   // ====================================================
@@ -577,7 +517,6 @@ const handleProofChange = async (proofType, event) => {
         ADDITIONAL: null,
       });
 
-      await loadDelivery();
 
       return true;
     } catch (error) {
@@ -1180,8 +1119,6 @@ const handleProofChange = async (proofType, event) => {
                     )}
                   </div>
 
-                  
-
                   {/* ADDRESS */}
 
                   <div className="flex items-start gap-3">
@@ -1204,10 +1141,7 @@ const handleProofChange = async (proofType, event) => {
                     </div>
                   </div>
 
-                  
-
                   {/* MAP */}
-                  
 
                   {hasCoordinates ? (
                     <div className="mt-5">
