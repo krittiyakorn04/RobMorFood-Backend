@@ -5,11 +5,7 @@ const prisma = require("../../config/prisma");
 exports.listOrderRound = async (req, res) => {
   try {
     const storeId = req.store.id;
-<<<<<<< HEAD
-    const orderRound = await prisma.orderRound.findFirst({
-=======
     const orderRound = await prisma.orderRound.findMany({
->>>>>>> origin/main
       where: {
         storeId,
       },
@@ -17,12 +13,8 @@ exports.listOrderRound = async (req, res) => {
         id: "asc",
       },
     });
-<<<<<<< HEAD
-
-=======
     console.log(orderRound);
     console.log(Array.isArray(orderRound));
->>>>>>> origin/main
     res.send(orderRound);
   } catch (error) {
     console.log(error);
@@ -30,20 +22,14 @@ exports.listOrderRound = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/main
 //เปลี่ยน เวลาเป็นนาที
 const timeToMinutes = (time) => {
   const [hour, minute] = time.split(":").map(Number);
   return hour * 60 + minute;
 };
-<<<<<<< HEAD
-=======
 
 const DELIVERY_BUFFER_MINUTES = 20;
->>>>>>> origin/main
 //
 const minuteToTime = (minutes) => {
   const hour = Math.floor(minutes / 60)
@@ -68,13 +54,9 @@ exports.addOrderRound = async (req, res) => {
 
     const storeId = req.store.id;
 
-<<<<<<< HEAD
-    // ===== Validation =====
-=======
     // =====================================================
     // Validation
     // =====================================================
->>>>>>> origin/main
 
     // Manual
     if (isManual && (!startTime || !endTime)) {
@@ -84,55 +66,35 @@ exports.addOrderRound = async (req, res) => {
     }
 
     // Auto
-<<<<<<< HEAD
-    if (!isManual && (!durationMinutes || durationMinutes <= 0)) {
-=======
     if (
       !isManual &&
       (!durationMinutes || Number(durationMinutes) <= 0)
     ) {
->>>>>>> origin/main
       return res.status(400).json({
         message: "กรุณาระบุระยะเวลาของแต่ละรอบ",
       });
     }
 
     // จำกัดจำนวนออเดอร์
-<<<<<<< HEAD
-    if (hasOrderLimit && (!maxOrders || maxOrders <= 0)) {
-=======
     if (
       hasOrderLimit &&
       (!maxOrders || Number(maxOrders) <= 0)
     ) {
->>>>>>> origin/main
       return res.status(400).json({
         message: "กรุณาระบุจำนวนออเดอร์สูงสุด",
       });
     }
 
     // Cutoff
-<<<<<<< HEAD
-    if (cutoffMinutes < 0) {
-=======
     if (
       cutoffMinutes !== undefined &&
       Number(cutoffMinutes) < 0
     ) {
->>>>>>> origin/main
       return res.status(400).json({
         message: "cutoffMinutes ไม่ถูกต้อง",
       });
     }
 
-<<<<<<< HEAD
-    // ==========================
-    // Manual
-    // ==========================
-    if (isManual) {
-      // เวลาเริ่มต้องน้อยกว่าสิ้นสุด
-      if (timeToMinutes(startTime) >= timeToMinutes(endTime)) {
-=======
     // =====================================================
     // MANUAL
     // =====================================================
@@ -143,42 +105,11 @@ exports.addOrderRound = async (req, res) => {
 
       // เวลาเริ่มต้องน้อยกว่าสิ้นสุด
       if (start >= end) {
->>>>>>> origin/main
         return res.status(400).json({
           message: "เวลาเริ่มต้องน้อยกว่าเวลาสิ้นสุด",
         });
       }
 
-<<<<<<< HEAD
-      // เช็กรอบซ้ำ
-      const duplicate = await prisma.orderRound.findFirst({
-        where: {
-          storeId,
-          startTime,
-          endTime,
-          isManual: true,
-        },
-      });
-
-      if (duplicate) {
-        return res.status(400).json({
-          message: "มีรอบนี้อยู่แล้ว",
-        });
-      }
-
-      const orderRound = await prisma.orderRound.create({
-        data: {
-          storeId,
-          roundNumber,
-          startTime,
-          endTime,
-          durationMinutes:
-            timeToMinutes(endTime) - timeToMinutes(startTime),
-          isManual: true,
-          hasOrderLimit: hasOrderLimit ?? false,
-          maxOrders: hasOrderLimit ? maxOrders : null,
-          cutoffMinutes,
-=======
       const duration = end - start;
 
       // cutoff ต้องน้อยกว่าระยะเวลารอบ
@@ -252,22 +183,15 @@ exports.addOrderRound = async (req, res) => {
             cutoffMinutes !== undefined
               ? Number(cutoffMinutes)
               : 0,
->>>>>>> origin/main
         },
       });
 
       return res.send(orderRound);
     }
 
-<<<<<<< HEAD
-    // ==========================
-    // Auto
-    // ==========================
-=======
     // =====================================================
     // AUTO
     // =====================================================
->>>>>>> origin/main
 
     // มีรอบ Auto อยู่แล้วหรือไม่
     const exists = await prisma.orderRound.findFirst({
@@ -283,76 +207,28 @@ exports.addOrderRound = async (req, res) => {
       });
     }
 
-<<<<<<< HEAD
-    // ดึงเวลาเปิด-ปิดร้าน
-=======
     // =====================================================
     // ดึงเวลาเปิด-ปิดร้าน
     // =====================================================
 
->>>>>>> origin/main
     const store = await prisma.store.findFirst({
       where: {
         id: storeId,
       },
     });
 
-<<<<<<< HEAD
-=======
     if (!store) {
       return res.status(404).json({
         message: "ไม่พบข้อมูลร้าน",
       });
     }
 
->>>>>>> origin/main
     if (!store.timeOpen || !store.timeClose) {
       return res.status(400).json({
         message: "กรุณาตั้งค่าเวลาเปิด-ปิดร้านก่อน",
       });
     }
 
-<<<<<<< HEAD
-    const rounds = [];
-    let open = timeToMinutes(store.timeOpen);
-    const end = timeToMinutes(store.timeClose);
-    let roundNum = 1;
-
-    while (open + durationMinutes <= end) {
-      rounds.push({
-        storeId,
-        roundNumber: roundNum,
-        startTime: minuteToTime(open),
-        endTime: minuteToTime(open + durationMinutes),
-        durationMinutes,
-        isManual: false,
-        hasOrderLimit: hasOrderLimit ?? false,
-        maxOrders: hasOrderLimit ? maxOrders : null,
-        cutoffMinutes,
-      });
-
-      open += durationMinutes;
-      roundNum++;
-    }
-
-    // รอบสุดท้าย
-    const remaining = end - open;
-
-    if (remaining > 0) {
-      rounds.push({
-        storeId,
-        roundNumber: roundNum,
-        startTime: minuteToTime(open),
-        endTime: minuteToTime(end),
-        durationMinutes: remaining,
-        isManual: false,
-        hasOrderLimit: hasOrderLimit ?? false,
-        maxOrders: hasOrderLimit ? maxOrders : null,
-        cutoffMinutes,
-      });
-    }
-
-=======
     // =====================================================
     // สร้างรอบ Auto
     // =====================================================
@@ -442,7 +318,6 @@ exports.addOrderRound = async (req, res) => {
     // บันทึกทั้งหมด
     // =====================================================
 
->>>>>>> origin/main
     await prisma.orderRound.createMany({
       data: rounds,
     });
@@ -450,12 +325,8 @@ exports.addOrderRound = async (req, res) => {
     return res.send(rounds);
   } catch (error) {
     console.log(error);
-<<<<<<< HEAD
-    res.status(500).json({
-=======
 
     return res.status(500).json({
->>>>>>> origin/main
       message: "Server Error",
     });
   }
@@ -464,10 +335,6 @@ exports.addOrderRound = async (req, res) => {
 exports.updateOrderRound = async (req, res) => {
   try {
     const { roundId } = req.params;
-<<<<<<< HEAD
-    const storeId = req.store.id;
-
-=======
 
     const storeId = req.store.id;
 
@@ -483,7 +350,6 @@ exports.updateOrderRound = async (req, res) => {
     // ค้นหารอบ
     // =====================================================
 
->>>>>>> origin/main
     const round = await prisma.orderRound.findFirst({
       where: {
         id: Number(roundId),
@@ -497,36 +363,6 @@ exports.updateOrderRound = async (req, res) => {
       });
     }
 
-<<<<<<< HEAD
-    const now = new Date();
-    const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-    let status = round.status;
-
-    // ยังไม่ถึงเวลาเปิด
-    if (nowMinutes < timeToMinutes(round.startTime)) {
-      status = "CLOSED";
-    }
-
-    // ถึงเวลาเปิด
-    if (
-      nowMinutes >= timeToMinutes(round.startTime) &&
-      nowMinutes < timeToMinutes(round.endTime)
-    ) {
-      status = "OPEN";
-    }
-
-    // หมดเวลา
-    if (nowMinutes >= timeToMinutes(round.endTime)) {
-      status = "CLOSED";
-    }
-
-    // เต็มจำนวน
-    if (round.hasOrderLimit && round.currentOrders >= round.maxOrders) {
-      status = "CLOSED";
-    }
-
-=======
     // =====================================================
     // นับจำนวนออเดอร์ในรอบ
     // =====================================================
@@ -691,22 +527,10 @@ exports.updateOrderRound = async (req, res) => {
     // อัปเดต
     // =====================================================
 
->>>>>>> origin/main
     const result = await prisma.orderRound.update({
       where: {
         id: round.id,
       },
-<<<<<<< HEAD
-      data: {
-        status,
-      },
-    });
-
-    res.json(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-=======
 
       data: {
         startTime: newStartTime,
@@ -742,15 +566,10 @@ exports.updateOrderRound = async (req, res) => {
     console.log(error);
 
     return res.status(500).json({
->>>>>>> origin/main
       message: "Server Error",
     });
   }
 };
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 exports.removeOrderRound = async (req, res) => {
   try {
     const { roundId } = req.params;
@@ -771,19 +590,11 @@ exports.removeOrderRound = async (req, res) => {
     }
 
     // ห้ามลบถ้ารอบกำลังเปิด
-<<<<<<< HEAD
-    if (round.status === "OPEN") {
-      return res.status(400).json({
-        message: "ไม่สามารถลบรอบที่กำลังเปิดอยู่ได้",
-      });
-    }
-=======
     // if (round.status === "OPEN") {
     //   return res.status(400).json({
     //     message: "ไม่สามารถลบรอบที่กำลังเปิดอยู่ได้",
     //   });
     // }
->>>>>>> origin/main
 
     // เช็กว่ามีออเดอร์ในรอบหรือไม่
     const orderCount = await prisma.order.count({
@@ -816,10 +627,7 @@ exports.removeOrderRound = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/main
 exports.changePattern = async (req, res) => {
   try {
     const { patternManual } = req.body;
@@ -870,8 +678,6 @@ exports.changeRoundStatus = (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-<<<<<<< HEAD
-=======
 
 exports.removeAllOrderRound = async (req, res) => {
   try {
@@ -917,4 +723,3 @@ exports.removeAllOrderRound = async (req, res) => {
     });
   }
 };
->>>>>>> origin/main
