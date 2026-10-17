@@ -3,26 +3,23 @@ const app = express()
 const cors = require('cors')
 const morgan = require('morgan')
 const { readdirSync } = require("fs");
-<<<<<<< HEAD
-=======
+
 const http = require("http");
 const {
   updateOrderRoundStatus,
 } = require("./services/orderRoundService");
->>>>>>> origin/main
+
 
 
 //middlewere
 app.use(cors())
 app.use(morgan('dev'))
-<<<<<<< HEAD
 app.use(express.json())
 
 // @ENDPOINT
 readdirSync('./routes')
 .map((item)=> app.use('/api', require('./routes/'+item)
-))
-=======
+
 app.use(express.json({ limit: '20mb' }))
 
 const { Server } = require("socket.io");
@@ -84,15 +81,12 @@ setInterval(() => {
   updateOrderRoundStatus();
 }, 10000);
 
->>>>>>> origin/main
 
 
 
 const PORT = 5000;
-<<<<<<< HEAD
 app.listen(5000, () => console.log(`server is running on port ${PORT}`));
-=======
 server.listen(5000, () => {
   console.log("server is running on port 5000");
 });
->>>>>>> origin/main
+
