@@ -45,9 +45,15 @@ enum deliveryType {
 }
 
 enum deliveryStatus {
+<<<<<<< HEAD
   PENDING //พร้อมแล้ว (รอรับ/ส่ง)
   DELIVERING // กำลังส่ง
   COMPLETED // เสร็จสิ้น
+=======
+  PENDING // พร้อมจัดส่ง
+  DELIVERING // กำลังจัดส่ง
+  COMPLETED // รอบจัดส่งเสร็จสิ้น
+>>>>>>> origin/main
 }
 
 enum orderMode {
@@ -57,8 +63,15 @@ enum orderMode {
 
 enum orderStatus {
   PENDING // รอร้านยืนยัน
+<<<<<<< HEAD
   CONFIRMED // ร้านยืนยันแล้ว
   PREPARING // กำลังทำอาหาร
+=======
+  WAITING_PAYMENT // ร้านยืนยันแล้ว รอลูกค้าชำระเงิน
+  CONFIRMED // ชำระเงินแล้ว ร้านยืนยันการชำระเงิน
+  PREPARING // กำลังทำอาหาร
+  READY // ทำอาหารเสร็จ
+>>>>>>> origin/main
   COMPLETED // เสร็จสิ้น
   CANCELLED // ยกเลิก
 }
@@ -81,6 +94,7 @@ enum roundStatus {
   CLOSED // ปิดรับแล้ว
 }
 
+<<<<<<< HEAD
 enum deliveryZone {
   ThaKhonYang
   KhamRiang
@@ -89,6 +103,8 @@ enum deliveryZone {
   BanDonna
 }
 
+=======
+>>>>>>> origin/main
 enum CategoryStore {
   BAKERY
   SOMTUM
@@ -99,6 +115,7 @@ enum OutOfStock {
   EXCHANGE
 }
 
+<<<<<<< HEAD
 // User
 
 model Customer {
@@ -110,14 +127,102 @@ model Customer {
   picture  String?
   role     memberRole     @default(CUSTOMER)
   status   customerStatus @default(ACTIVE)
+=======
+enum StoreStaffRole {
+  DELIVERY
+}
+
+enum deliveryProofType {
+  PRIMARY
+  ADDITIONAL
+}
+
+enum chatRoomType {
+  STORE_CUSTOMER
+  DELIVERY
+}
+
+enum chatSenderType {
+  CUSTOMER
+  STORE
+  DELIVERY
+}
+
+model ChatRoom {
+  id Int @id @default(autoincrement())
+
+  type chatRoomType
+
+  customerId Int?
+  storeId    Int?
+  deliveryId Int?
+>>>>>>> origin/main
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+<<<<<<< HEAD
   addresses Address[]
   orders    Order[]
   reviews   Review[]
   cart      Cart[]
+=======
+  customer Customer? @relation(fields: [customerId], references: [id])
+  store    Store?    @relation(fields: [storeId], references: [id])
+  delivery Delivery? @relation(fields: [deliveryId], references: [id])
+
+  messages ChatMessage[]
+
+  @@index([customerId])
+  @@index([storeId])
+  @@index([deliveryId])
+}
+
+model ChatMessage {
+  id Int @id @default(autoincrement())
+
+  roomId Int
+
+  senderType chatSenderType
+  senderId   Int
+
+  message String @db.Text
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  room ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([createdAt])
+}
+
+// User
+
+model Customer {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  email    String  @unique
+  phone    String  @unique
+  password String?
+
+  role   memberRole     @default(CUSTOMER)
+  status customerStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  addresses         Address[]
+  orders            Order[]
+  reviews           Review[]
+  cart              Cart[]
+  images            Image[]
+  notifications     Notification[]
+  chatRooms         ChatRoom[]
+  orderReports      OrderReport[]
+  pushSubscriptions PushSubscription[]
+>>>>>>> origin/main
 }
 
 model Address {
@@ -141,6 +246,7 @@ model Store {
   email    String  @unique
   phone    String  @unique
   password String?
+<<<<<<< HEAD
 
   picture    String? //
   storeName  String        @unique
@@ -150,6 +256,22 @@ model Store {
   address    String
   lat        Float? //
   lng        Float? //
+=======
+  googleId String? @unique
+
+  storeName String  @unique
+  Notice    String? @db.Text //ติดไว้ก่อน
+
+  address     String
+  lat         Float? //
+  lng         Float? //
+  deliveryFee Float  @default(20)
+
+  facebookUrl  String? @db.VarChar(500)
+  instagramUrl String? @db.VarChar(500)
+  tiktokUrl    String? @db.VarChar(500)
+  lineUrl      String? @db.VarChar(500)
+>>>>>>> origin/main
 
   role          memberRole     @default(MERCHANT)
   accountStatus merchantStatus @default(PENDING)
@@ -162,6 +284,7 @@ model Store {
   timeOpen  String
   timeClose String
 
+<<<<<<< HEAD
   // Payment
   promptpayNumber String?
 
@@ -169,11 +292,14 @@ model Store {
   bankAccount     String?
   bankAccountName String?
 
+=======
+>>>>>>> origin/main
   usernameChangedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+<<<<<<< HEAD
   menuCategories MenuCategory[]
   menus          Menu[]
   orderRound     OrderRound[]
@@ -194,6 +320,44 @@ model DeliveryZone {
   rainSurchargeActive Boolean      @default(false) //ร้านเปิดสวิตช์
 
   store Store @relation(fields: [storeId], references: [id])
+=======
+  menuCategories    MenuCategory[]
+  menus             Menu[]
+  orderRound        OrderRound[]
+  deliveryRounds    Delivery[]
+  orders            Order[]
+  reviews           Review[]
+  carts             Cart[]
+  images            Image[]
+  storeCategories   StoreStoreCategory[]
+  notifications     Notification[]
+  storeStaffs       StoreStaff[]
+  chatRooms         ChatRoom[]
+  optionFormats     OptionFormat[]
+  orderReports      OrderReport[]
+  pushSubscriptions PushSubscription[]
+}
+
+model StoreCategory {
+  id      Int                  @id @default(autoincrement())
+  name    String               @unique
+  stores  StoreStoreCategory[]
+  admin   Admin?               @relation(fields: [adminId], references: [id])
+  adminId Int?
+}
+
+model StoreStoreCategory {
+  id             Int @id @default(autoincrement())
+  storeId        Int
+  storeCategoryId Int
+
+  store        Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeCategory StoreCategory @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, storeCategoryId])
+  @@index([storeId])
+  @@index([storeCategoryId])
+>>>>>>> origin/main
 }
 
 // MENU
@@ -203,17 +367,29 @@ model MenuCategory {
   storeId  Int
   nameCate String
 
+<<<<<<< HEAD
   store Store  @relation(fields: [storeId], references: [id])
   menus Menu[]
 }
 
 model Menu {
   id          Int      @id @default(autoincrement())
+=======
+  store   Store  @relation(fields: [storeId], references: [id])
+  menus   Menu[]
+  admin   Admin? @relation(fields: [adminId], references: [id])
+  adminId Int?
+}
+
+model Menu {
+  id          Int     @id @default(autoincrement())
+>>>>>>> origin/main
   storeId     Int
   categoryId  Int?
   menuItem    String
   description String?
   price       Float
+<<<<<<< HEAD
   imageUrl    String
   isAvailable Boolean  @default(true)
   sold        Int      @default(0)
@@ -225,6 +401,20 @@ model Menu {
   options   MenuOption[]
   menuItems MenuOnCart[]
   images    Image[]
+=======
+  isAvailable Boolean @default(true)
+  sold        Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category          MenuCategory?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  store             Store              @relation(fields: [storeId], references: [id])
+  options           MenuOption[]
+  menuItems         MenuOnCart[]
+  images            Image[]
+  menuOptionFormats MenuOptionFormat[]
+>>>>>>> origin/main
 }
 
 model MenuOption {
@@ -263,7 +453,11 @@ model OrderRound {
   currentOrders   Int     @default(0)
   cutoffMinutes   Int     @default(20)
 
+<<<<<<< HEAD
   status   roundStatus @default(OPEN)
+=======
+  status   roundStatus @default(PENDING)
+>>>>>>> origin/main
   isManual Boolean     @default(false)
 
   createdAt DateTime @default(now())
@@ -275,17 +469,26 @@ model OrderRound {
 }
 
 model Order {
+<<<<<<< HEAD
   id           Int          @id @default(autoincrement())
+=======
+  id           Int  @id @default(autoincrement())
+>>>>>>> origin/main
   customerId   Int
   storeId      Int
   orderRoundId Int? // เชื่อม OrderRound 
   deliveryId   Int
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
   deliveryType deliveryType @default(DELIVERY)
   status       orderStatus  @default(PENDING)
   totalPrice   Float
   note         String?      @db.Text
   outOfStock   OutOfStock   @default(INFORM)
 
+<<<<<<< HEAD
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -308,6 +511,40 @@ model Delivery {
   store      Store       @relation(fields: [storeId], references: [id])
   orderRound OrderRound? @relation(fields: [orderRoundId], references: [id])
   orders     Order[]
+=======
+  customerReceived Boolean   @default(false)
+  receivedAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer      Customer       @relation(fields: [customerId], references: [id])
+  store         Store          @relation(fields: [storeId], references: [id])
+  orderRound    OrderRound?    @relation(fields: [orderRoundId], references: [id])
+  delivery      Delivery       @relation(fields: [deliveryId], references: [id])
+  payment       Payment?
+  review        Review?
+  menu          MenuOnCart[]
+  notifications Notification[]
+  orderReports  OrderReport[]
+}
+
+model Delivery {
+  id              Int  @id @default(autoincrement())
+  storeId         Int
+  orderRoundId    Int?
+  deliveryStaffId Int?
+
+  status    deliveryStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+
+  store         Store       @relation(fields: [storeId], references: [id])
+  orderRound    OrderRound? @relation(fields: [orderRoundId], references: [id])
+  deliveryStaff StoreStaff? @relation(fields: [deliveryStaffId], references: [id])
+  orders        Order[]
+  images        Image[]
+  chatRooms     ChatRoom[]
+>>>>>>> origin/main
 }
 
 model Cart {
@@ -319,18 +556,35 @@ model Cart {
   customer Customer     @relation(fields: [orderById], references: [id])
   store    Store        @relation(fields: [storeId], references: [id])
   menu     MenuOnCart[]
+<<<<<<< HEAD
 }
 
 model MenuOnCart {
   id      Int    @id @default(autoincrement())
   cartId  Int
+=======
+
+  @@unique([orderById, storeId])
+}
+
+model MenuOnCart {
+  id      Int     @id @default(autoincrement())
+  cartId  Int?
+>>>>>>> origin/main
   menuId  Int
   orderId Int?
   count   Int
   price   Float
+<<<<<<< HEAD
   options String @db.Text
 
   cart  Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+=======
+  options String  @db.Text
+  note    String? @db.Text
+
+  cart  Cart?  @relation(fields: [cartId], references: [id], onDelete: SetNull)
+>>>>>>> origin/main
   menu  Menu   @relation(fields: [menuId], references: [id], onDelete: Cascade)
   order Order? @relation(fields: [orderId], references: [id])
 }
@@ -343,13 +597,25 @@ model Payment {
   method         PaymentMethod
   status         paymentStatus @default(PENDING)
   amount         Float
+<<<<<<< HEAD
   slipImageUrl   String
   confirmedAt    DateTime
+=======
+  // ตอนสร้าง Payment ยังไม่มีสลิป
+  slipImageUrl   String?       @db.VarChar(500)
+  // จะมีค่าเมื่อร้านยืนยันการชำระเงิน
+  confirmedAt    DateTime?
+>>>>>>> origin/main
   rejectedReason String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
+<<<<<<< HEAD
   order Order @relation(fields: [orderId], references: [id])
+=======
+  order  Order   @relation(fields: [orderId], references: [id])
+  images Image[]
+>>>>>>> origin/main
 }
 
 // REVIEW
@@ -369,12 +635,23 @@ model Review {
 }
 
 model Admin {
+<<<<<<< HEAD
   id        Int        @id @default(autoincrement())
   email     String     @unique
   password  String
   name      String
   role      memberRole @default(ADMIN)
   createdAt DateTime   @default(now())
+=======
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  password       String
+  name           String
+  role           memberRole      @default(ADMIN)
+  createdAt      DateTime        @default(now())
+  menuCategories MenuCategory[]
+  StoreCategoies StoreCategory[]
+>>>>>>> origin/main
 }
 
 model Image {
@@ -388,4 +665,176 @@ model Image {
 
   menu   Menu? @relation(fields: [menuId], references: [id])
   menuId Int?
+<<<<<<< HEAD
+=======
+
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId Int?
+  store      Store?    @relation(fields: [storeId], references: [id])
+  storeId    Int?
+  payment    Payment?  @relation(fields: [paymentId], references: [id])
+  paymentId  Int?
+
+  delivery   Delivery? @relation(fields: [deliveryId], references: [id])
+  deliveryId Int?
+
+  proofType deliveryProofType?
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  title   String
+  message String
+  type    String
+
+  isRead Boolean @default(false)
+
+  customerId      Int?
+  storeId         Int?
+  deliveryStaffId Int?
+  deliveryId      Int?
+  orderId         Int?
+
+  createdAt DateTime @default(now())
+
+  customer      Customer?   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  store         Store?      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  deliveryStaff StoreStaff? @relation(fields: [deliveryStaffId], references: [id], onDelete: Cascade)
+  order         Order?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([storeId])
+  @@index([deliveryStaffId])
+  @@index([orderId])
+  @@index([isRead])
+}
+
+model StoreStaff {
+  id      Int @id @default(autoincrement())
+  storeId Int
+
+  username String @unique
+  password String
+
+  name  String
+  phone String?
+
+  role StoreStaffRole @default(DELIVERY)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store             Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  notifications     Notification[]
+  deliveries        Delivery[]
+  pushSubscriptions PushSubscription[]
+}
+
+model OptionFormat {
+  id         Int     @id @default(autoincrement())
+  storeId    Int
+  name       String
+  required   Boolean @default(false)
+  maxRequire Int     @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store   Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  choices OptionFormatChoice[]
+  menus   MenuOptionFormat[]
+
+  @@index([storeId])
+}
+
+model OptionFormatChoice {
+  id         Int    @id @default(autoincrement())
+  formatId   Int
+  name       String
+  extraPrice Float  @default(0)
+  sortOrder  Int    @default(0)
+
+  format OptionFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
+
+  @@index([formatId])
+}
+
+model MenuOptionFormat {
+  id       Int @id @default(autoincrement())
+  menuId   Int
+  formatId Int
+
+  menu   Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  format OptionFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
+
+  @@unique([menuId, formatId])
+  @@index([formatId])
+}
+
+enum reportStatus {
+  PENDING
+  REVIEWING
+  RESOLVED
+  REJECTED
+}
+
+enum reportType {
+  ORDER_NOT_DELIVERED
+  ORDER_NOT_ACCEPTED
+  WRONG_ORDER
+  MISSING_ITEM
+  OTHER
+}
+
+model OrderReport {
+  id Int @id @default(autoincrement())
+
+  orderId    Int
+  customerId Int
+  storeId    Int
+
+  type   reportType
+  detail String?      @db.Text
+  status reportStatus @default(PENDING)
+
+  adminNote String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order    Order    @relation(fields: [orderId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+  store    Store    @relation(fields: [storeId], references: [id])
+
+  @@index([orderId])
+  @@index([customerId])
+  @@index([storeId])
+  @@index([status])
+}
+
+model PushSubscription {
+  id Int @id @default(autoincrement())
+
+  endpoint String @db.Text
+  p256dh   String @db.Text
+  auth     String @db.Text
+
+  customerId      Int?
+  storeId         Int?
+  deliveryStaffId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer      Customer?   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  store         Store?      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  deliveryStaff StoreStaff? @relation(fields: [deliveryStaffId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([storeId])
+  @@index([deliveryStaffId])
+>>>>>>> origin/main
 }

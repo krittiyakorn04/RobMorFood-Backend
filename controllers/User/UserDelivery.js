@@ -11,7 +11,11 @@ exports.getDelivery = async (req, res) => {
                 customerId: userId,
                 delivery: {
                     status: {
+<<<<<<< HEAD
                         in: ["PENDING","DELIVERING" ],
+=======
+                        in: ["PENDING","DELIVERING,COMPLETED" ],
+>>>>>>> origin/main
                     },
                 },
             },

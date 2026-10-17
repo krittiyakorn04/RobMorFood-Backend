@@ -4,6 +4,7 @@ exports.listAddress = async (req, res) => {
   try {
     const userId = req.user.id;
 
+<<<<<<< HEAD
     const user = await prisma.customer.findFirst({
       where: {
         customerId: userId,
@@ -16,19 +17,67 @@ exports.listAddress = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
+=======
+    const addresses = await prisma.address.findMany({
+      where: {
+        customerId: userId,
+      },
+      orderBy: [
+        {
+          isDefault: "desc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
+    });
+
+    res.send(addresses);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Server Error",
+    });
+>>>>>>> origin/main
   }
 };
 
 //เพิ่มdefaul ชื่อ เบอร์
 exports.addAddress = async (req, res) => {
   try {
+<<<<<<< HEAD
     const { label, address } = req.body;
     const userId = req.user.id;
 
+=======
+    const { label, address, lat, lng, isDefault, } = req.body;
+    const userId = req.user.id;
+
+    if (!label || !address) {
+      return res.status(400).json({
+        message: "กรุณากรอกชื่อที่อยู่และรายละเอียดที่อยู่",
+      });
+    }
+
+    // ถ้าเลือกเป็นที่อยู่เริ่มต้น
+    if (isDefault) {
+      await prisma.address.updateMany({
+        where: {
+          customerId: userId,
+          isDefault: true,
+        },
+        data: {
+          isDefault: false,
+        },
+      });
+    }
+
+>>>>>>> origin/main
     const newAddress = await prisma.address.create({
       data: {
         label,
         address,
+<<<<<<< HEAD
         customerId: userId,
       },
     });
@@ -36,27 +85,98 @@ exports.addAddress = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
+=======
+        lat,
+        lng,
+        isDefault: Boolean(isDefault),
+        customerId: userId,
+      },
+    });
+
+    res.send(newAddress);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Server Error",
+    });
+>>>>>>> origin/main
   }
 };
 
 exports.updateAddress = async (req, res) => {
   try {
+<<<<<<< HEAD
     const { label, address } = req.body;
     const userId = req.user.id;
 
     const user = await prisma.address.update({
       where: {
         id: Number(req.params.id),
+=======
+    const { label, address, lat, lng, isDefault } = req.body;
+    const userId = req.user.id;
+    const addressId = Number(req.params.id);
+
+    // ตรวจสอบว่าที่อยู่นี้เป็นของ user คนนี้จริง
+    const findAddress = await prisma.address.findFirst({
+      where: {
+        id: addressId,
+        customerId: userId,
+      },
+    });
+
+    if (!findAddress) {
+      return res.status(404).json({
+        message: "address not found!",
+      });
+    }
+
+    // ถ้าตั้งเป็นที่อยู่เริ่มต้น
+    if (isDefault === true) {
+      await prisma.address.updateMany({
+        where: {
+          customerId: userId,
+          id: {
+            not: addressId,
+          },
+        },
+        data: {
+          isDefault: false,
+        },
+      });
+    }
+
+    const updatedAddress = await prisma.address.update({
+      where: {
+        id: addressId,
+>>>>>>> origin/main
       },
       data: {
         label,
         address,
+<<<<<<< HEAD
       },
     });
     res.send(user);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
+=======
+        lat: lat === "" || lat == null ? null : Number(lat),
+        lng: lng === "" || lng == null ? null : Number(lng),
+        isDefault: Boolean(isDefault),
+      },
+    });
+
+    res.send(updatedAddress);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+>>>>>>> origin/main
   }
 };
 

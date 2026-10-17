@@ -5,7 +5,11 @@ const prisma = require("../../config/prisma");
 exports.listOrderRound = async (req, res) => {
   try {
     const storeId = req.store.id;
+<<<<<<< HEAD
     const orderRound = await prisma.orderRound.findFirst({
+=======
+    const orderRound = await prisma.orderRound.findMany({
+>>>>>>> origin/main
       where: {
         storeId,
       },
@@ -13,7 +17,12 @@ exports.listOrderRound = async (req, res) => {
         id: "asc",
       },
     });
+<<<<<<< HEAD
 
+=======
+    console.log(orderRound);
+    console.log(Array.isArray(orderRound));
+>>>>>>> origin/main
     res.send(orderRound);
   } catch (error) {
     console.log(error);
@@ -21,11 +30,20 @@ exports.listOrderRound = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 //เปลี่ยน เวลาเป็นนาที
 const timeToMinutes = (time) => {
   const [hour, minute] = time.split(":").map(Number);
   return hour * 60 + minute;
 };
+<<<<<<< HEAD
+=======
+
+const DELIVERY_BUFFER_MINUTES = 20;
+>>>>>>> origin/main
 //
 const minuteToTime = (minutes) => {
   const hour = Math.floor(minutes / 60)
@@ -50,7 +68,13 @@ exports.addOrderRound = async (req, res) => {
 
     const storeId = req.store.id;
 
+<<<<<<< HEAD
     // ===== Validation =====
+=======
+    // =====================================================
+    // Validation
+    // =====================================================
+>>>>>>> origin/main
 
     // Manual
     if (isManual && (!startTime || !endTime)) {
@@ -60,37 +84,72 @@ exports.addOrderRound = async (req, res) => {
     }
 
     // Auto
+<<<<<<< HEAD
     if (!isManual && (!durationMinutes || durationMinutes <= 0)) {
+=======
+    if (
+      !isManual &&
+      (!durationMinutes || Number(durationMinutes) <= 0)
+    ) {
+>>>>>>> origin/main
       return res.status(400).json({
         message: "กรุณาระบุระยะเวลาของแต่ละรอบ",
       });
     }
 
     // จำกัดจำนวนออเดอร์
+<<<<<<< HEAD
     if (hasOrderLimit && (!maxOrders || maxOrders <= 0)) {
+=======
+    if (
+      hasOrderLimit &&
+      (!maxOrders || Number(maxOrders) <= 0)
+    ) {
+>>>>>>> origin/main
       return res.status(400).json({
         message: "กรุณาระบุจำนวนออเดอร์สูงสุด",
       });
     }
 
     // Cutoff
+<<<<<<< HEAD
     if (cutoffMinutes < 0) {
+=======
+    if (
+      cutoffMinutes !== undefined &&
+      Number(cutoffMinutes) < 0
+    ) {
+>>>>>>> origin/main
       return res.status(400).json({
         message: "cutoffMinutes ไม่ถูกต้อง",
       });
     }
 
+<<<<<<< HEAD
     // ==========================
     // Manual
     // ==========================
     if (isManual) {
       // เวลาเริ่มต้องน้อยกว่าสิ้นสุด
       if (timeToMinutes(startTime) >= timeToMinutes(endTime)) {
+=======
+    // =====================================================
+    // MANUAL
+    // =====================================================
+
+    if (isManual) {
+      const start = timeToMinutes(startTime);
+      const end = timeToMinutes(endTime);
+
+      // เวลาเริ่มต้องน้อยกว่าสิ้นสุด
+      if (start >= end) {
+>>>>>>> origin/main
         return res.status(400).json({
           message: "เวลาเริ่มต้องน้อยกว่าเวลาสิ้นสุด",
         });
       }
 
+<<<<<<< HEAD
       // เช็กรอบซ้ำ
       const duplicate = await prisma.orderRound.findFirst({
         where: {
@@ -119,15 +178,96 @@ exports.addOrderRound = async (req, res) => {
           hasOrderLimit: hasOrderLimit ?? false,
           maxOrders: hasOrderLimit ? maxOrders : null,
           cutoffMinutes,
+=======
+      const duration = end - start;
+
+      // cutoff ต้องน้อยกว่าระยะเวลารอบ
+      if (
+        cutoffMinutes !== undefined &&
+        Number(cutoffMinutes) >= duration
+      ) {
+        return res.status(400).json({
+          message:
+            "เวลาปิดรับออเดอร์ต้องน้อยกว่าระยะเวลาของรอบ",
+        });
+      }
+
+      // =====================================================
+      // เช็กรอบเดิม
+      // รวมเวลาส่ง 20 นาที
+      // =====================================================
+
+      const existingRounds = await prisma.orderRound.findMany({
+        where: {
+          storeId,
+        },
+      });
+
+      for (const existing of existingRounds) {
+        const existingStart = timeToMinutes(
+          existing.startTime,
+        );
+
+        const existingEnd =
+          timeToMinutes(existing.endTime) +
+          DELIVERY_BUFFER_MINUTES;
+
+        // รอบใหม่ต้องไม่ทับกับ
+        // เวลารับออเดอร์ + เวลาส่ง 20 นาที
+        if (
+          start < existingEnd &&
+          end > existingStart
+        ) {
+          return res.status(400).json({
+            message: `เวลารอบใหม่ทับกับรอบที่ ${existing.roundNumber} หรือช่วงเวลาส่งอาหาร 20 นาที`,
+          });
+        }
+      }
+
+      // =====================================================
+      // สร้างรอบ Manual
+      // =====================================================
+
+      const orderRound = await prisma.orderRound.create({
+        data: {
+          storeId,
+
+          roundNumber,
+
+          startTime,
+
+          endTime,
+
+          durationMinutes: duration,
+
+          isManual: true,
+
+          hasOrderLimit: hasOrderLimit ?? false,
+
+          maxOrders: hasOrderLimit
+            ? Number(maxOrders)
+            : null,
+
+          cutoffMinutes:
+            cutoffMinutes !== undefined
+              ? Number(cutoffMinutes)
+              : 0,
+>>>>>>> origin/main
         },
       });
 
       return res.send(orderRound);
     }
 
+<<<<<<< HEAD
     // ==========================
     // Auto
     // ==========================
+=======
+    // =====================================================
+    // AUTO
+    // =====================================================
+>>>>>>> origin/main
 
     // มีรอบ Auto อยู่แล้วหรือไม่
     const exists = await prisma.orderRound.findFirst({
@@ -143,19 +283,36 @@ exports.addOrderRound = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     // ดึงเวลาเปิด-ปิดร้าน
+=======
+    // =====================================================
+    // ดึงเวลาเปิด-ปิดร้าน
+    // =====================================================
+
+>>>>>>> origin/main
     const store = await prisma.store.findFirst({
       where: {
         id: storeId,
       },
     });
 
+<<<<<<< HEAD
+=======
+    if (!store) {
+      return res.status(404).json({
+        message: "ไม่พบข้อมูลร้าน",
+      });
+    }
+
+>>>>>>> origin/main
     if (!store.timeOpen || !store.timeClose) {
       return res.status(400).json({
         message: "กรุณาตั้งค่าเวลาเปิด-ปิดร้านก่อน",
       });
     }
 
+<<<<<<< HEAD
     const rounds = [];
     let open = timeToMinutes(store.timeOpen);
     const end = timeToMinutes(store.timeClose);
@@ -195,6 +352,97 @@ exports.addOrderRound = async (req, res) => {
       });
     }
 
+=======
+    // =====================================================
+    // สร้างรอบ Auto
+    // =====================================================
+
+    const rounds = [];
+
+    let open = timeToMinutes(store.timeOpen);
+
+    const end = timeToMinutes(store.timeClose);
+
+    let roundNum = 1;
+
+    const duration = Number(durationMinutes);
+
+    const limitEnabled = hasOrderLimit ?? false;
+
+    const limit =
+      limitEnabled && maxOrders
+        ? Number(maxOrders)
+        : null;
+
+    const cutoff =
+      cutoffMinutes !== undefined
+        ? Number(cutoffMinutes)
+        : 0;
+
+    while (open < end) {
+      // เวลาจบรอบ
+      const roundEnd = Math.min(
+        open + duration,
+        end,
+      );
+
+      const actualDuration = roundEnd - open;
+
+      if (actualDuration <= 0) {
+        break;
+      }
+
+      // cutoff ต้องไม่เกินระยะเวลารอบ
+      const actualCutoff = Math.min(
+        cutoff,
+        Math.max(actualDuration - 1, 0),
+      );
+
+      rounds.push({
+        storeId,
+
+        roundNumber: roundNum,
+
+        startTime: minuteToTime(open),
+
+        endTime: minuteToTime(roundEnd),
+
+        durationMinutes: actualDuration,
+
+        isManual: false,
+
+        hasOrderLimit: limitEnabled,
+
+        maxOrders: limit,
+
+        cutoffMinutes: actualCutoff,
+      });
+
+      // ===================================================
+      // สำคัญ
+      //
+      // รอบต่อไปเริ่มหลังจาก
+      // จบรอบ + เวลาส่ง 20 นาที
+      // ===================================================
+
+      open =
+        roundEnd +
+        DELIVERY_BUFFER_MINUTES;
+
+      roundNum++;
+    }
+
+    if (rounds.length === 0) {
+      return res.status(400).json({
+        message: "ไม่สามารถสร้างรอบรับออเดอร์ได้",
+      });
+    }
+
+    // =====================================================
+    // บันทึกทั้งหมด
+    // =====================================================
+
+>>>>>>> origin/main
     await prisma.orderRound.createMany({
       data: rounds,
     });
@@ -202,7 +450,12 @@ exports.addOrderRound = async (req, res) => {
     return res.send(rounds);
   } catch (error) {
     console.log(error);
+<<<<<<< HEAD
     res.status(500).json({
+=======
+
+    return res.status(500).json({
+>>>>>>> origin/main
       message: "Server Error",
     });
   }
@@ -211,8 +464,26 @@ exports.addOrderRound = async (req, res) => {
 exports.updateOrderRound = async (req, res) => {
   try {
     const { roundId } = req.params;
+<<<<<<< HEAD
     const storeId = req.store.id;
 
+=======
+
+    const storeId = req.store.id;
+
+    const {
+      startTime,
+      endTime,
+      hasOrderLimit,
+      maxOrders,
+      cutoffMinutes,
+    } = req.body;
+
+    // =====================================================
+    // ค้นหารอบ
+    // =====================================================
+
+>>>>>>> origin/main
     const round = await prisma.orderRound.findFirst({
       where: {
         id: Number(roundId),
@@ -226,6 +497,7 @@ exports.updateOrderRound = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     const now = new Date();
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
@@ -254,10 +526,177 @@ exports.updateOrderRound = async (req, res) => {
       status = "CLOSED";
     }
 
+=======
+    // =====================================================
+    // นับจำนวนออเดอร์ในรอบ
+    // =====================================================
+
+    const orderCount = await prisma.order.count({
+      where: {
+        orderRoundId: round.id,
+      },
+    });
+
+    // =====================================================
+    // ตรวจสอบจำนวนออเดอร์
+    // =====================================================
+
+    if (
+      hasOrderLimit === true &&
+      (!maxOrders || Number(maxOrders) <= 0)
+    ) {
+      return res.status(400).json({
+        message: "กรุณาระบุจำนวนออเดอร์สูงสุด",
+      });
+    }
+
+    // =====================================================
+    // ตรวจสอบ cutoff
+    // =====================================================
+
+    if (
+      cutoffMinutes !== undefined &&
+      Number(cutoffMinutes) < 0
+    ) {
+      return res.status(400).json({
+        message: "cutoffMinutes ไม่ถูกต้อง",
+      });
+    }
+
+    // =====================================================
+    // เช็กว่ามีการแก้เวลาไหม
+    // =====================================================
+
+    const changingTime =
+      startTime !== undefined ||
+      endTime !== undefined;
+
+    // =====================================================
+    // มีออเดอร์แล้ว
+    // ห้ามแก้เวลา
+    // =====================================================
+
+    if (changingTime && orderCount > 0) {
+      return res.status(400).json({
+        message:
+          "ไม่สามารถแก้ไขเวลาได้ เนื่องจากรอบนี้มีออเดอร์แล้ว แต่สามารถแก้ไขจำนวนออเดอร์ได้",
+      });
+    }
+
+    // =====================================================
+    // รอบกำลังเปิด
+    // ห้ามแก้เวลา
+    // =====================================================
+
+    if (
+      changingTime &&
+      round.status === "OPEN"
+    ) {
+      return res.status(400).json({
+        message:
+          "ไม่สามารถแก้ไขเวลาของรอบที่กำลังเปิดอยู่ได้",
+      });
+    }
+
+    // =====================================================
+    // ค่าเดิม
+    // =====================================================
+
+    let newStartTime = round.startTime;
+
+    let newEndTime = round.endTime;
+
+    let newDuration = round.durationMinutes;
+
+    // =====================================================
+    // ถ้ามีการแก้เวลา
+    // =====================================================
+
+    if (changingTime) {
+      if (!startTime || !endTime) {
+        return res.status(400).json({
+          message: "กรุณาระบุเวลาเริ่มและเวลาสิ้นสุด",
+        });
+      }
+
+      const start = timeToMinutes(startTime);
+
+      const end = timeToMinutes(endTime);
+
+      if (start >= end) {
+        return res.status(400).json({
+          message: "เวลาเริ่มต้องน้อยกว่าเวลาสิ้นสุด",
+        });
+      }
+
+      newStartTime = startTime;
+
+      newEndTime = endTime;
+
+      newDuration = end - start;
+
+      // ===================================================
+      // ตรวจสอบรอบอื่น
+      // รวมเวลาส่ง 20 นาที
+      // ===================================================
+
+      const otherRounds =
+        await prisma.orderRound.findMany({
+          where: {
+            storeId,
+
+            NOT: {
+              id: round.id,
+            },
+          },
+        });
+
+      for (const other of otherRounds) {
+        const otherStart = timeToMinutes(
+          other.startTime,
+        );
+
+        const otherEnd =
+          timeToMinutes(other.endTime) +
+          DELIVERY_BUFFER_MINUTES;
+
+        if (
+          start < otherEnd &&
+          end > otherStart
+        ) {
+          return res.status(400).json({
+            message: `เวลาที่แก้ไขทับกับรอบที่ ${other.roundNumber} หรือช่วงเวลาส่งอาหาร 20 นาที`,
+          });
+        }
+      }
+    }
+
+    // =====================================================
+    // ตรวจสอบ cutoff
+    // =====================================================
+
+    const newCutoff =
+      cutoffMinutes !== undefined
+        ? Number(cutoffMinutes)
+        : round.cutoffMinutes;
+
+    if (newCutoff >= newDuration) {
+      return res.status(400).json({
+        message:
+          "เวลาปิดรับออเดอร์ต้องน้อยกว่าระยะเวลาของรอบ",
+      });
+    }
+
+    // =====================================================
+    // อัปเดต
+    // =====================================================
+
+>>>>>>> origin/main
     const result = await prisma.orderRound.update({
       where: {
         id: round.id,
       },
+<<<<<<< HEAD
       data: {
         status,
       },
@@ -267,11 +706,51 @@ exports.updateOrderRound = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({
+=======
+
+      data: {
+        startTime: newStartTime,
+
+        endTime: newEndTime,
+
+        durationMinutes: newDuration,
+
+        // แก้ได้ทุกเมื่อ
+        hasOrderLimit:
+          hasOrderLimit !== undefined
+            ? hasOrderLimit
+            : round.hasOrderLimit,
+
+        // แก้ได้ทุกเมื่อ แม้มีออเดอร์แล้ว
+        maxOrders:
+          hasOrderLimit === false
+            ? null
+            : maxOrders !== undefined
+              ? Number(maxOrders)
+              : round.maxOrders,
+
+        cutoffMinutes: newCutoff,
+      },
+    });
+
+    return res.json({
+      message: "แก้ไขรอบรับออเดอร์สำเร็จ",
+
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+>>>>>>> origin/main
       message: "Server Error",
     });
   }
 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 exports.removeOrderRound = async (req, res) => {
   try {
     const { roundId } = req.params;
@@ -292,11 +771,19 @@ exports.removeOrderRound = async (req, res) => {
     }
 
     // ห้ามลบถ้ารอบกำลังเปิด
+<<<<<<< HEAD
     if (round.status === "OPEN") {
       return res.status(400).json({
         message: "ไม่สามารถลบรอบที่กำลังเปิดอยู่ได้",
       });
     }
+=======
+    // if (round.status === "OPEN") {
+    //   return res.status(400).json({
+    //     message: "ไม่สามารถลบรอบที่กำลังเปิดอยู่ได้",
+    //   });
+    // }
+>>>>>>> origin/main
 
     // เช็กว่ามีออเดอร์ในรอบหรือไม่
     const orderCount = await prisma.order.count({
@@ -329,6 +816,10 @@ exports.removeOrderRound = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 exports.changePattern = async (req, res) => {
   try {
     const { patternManual } = req.body;
@@ -379,3 +870,51 @@ exports.changeRoundStatus = (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+<<<<<<< HEAD
+=======
+
+exports.removeAllOrderRound = async (req, res) => {
+  try {
+    const storeId = req.store.id;
+
+    // =====================================================
+    // ตรวจสอบว่ามีออเดอร์ที่ผูกกับรอบหรือไม่
+    // =====================================================
+
+    const orderCount = await prisma.order.count({
+      where: {
+        orderRound: {
+          storeId,
+        },
+      },
+    });
+
+    if (orderCount > 0) {
+      return res.status(400).json({
+        message:
+          "ไม่สามารถลบรอบทั้งหมดได้ เนื่องจากมีออเดอร์ที่ผูกกับรอบอยู่",
+      });
+    }
+
+    // =====================================================
+    // ลบรอบทั้งหมด
+    // =====================================================
+
+    await prisma.orderRound.deleteMany({
+      where: {
+        storeId,
+      },
+    });
+
+    return res.json({
+      message: "ลบรอบทั้งหมดเรียบร้อย",
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+>>>>>>> origin/main
