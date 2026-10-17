@@ -5,32 +5,11 @@ exports.getMenu = async (req, res) => {
   try {
     const storeId = req.store.id;
 
-<<<<<<< HEAD
-    const menu = await prisma.menu.findMany({
-=======
     const menus = await prisma.menu.findMany({
->>>>>>> origin/main
       where: {
         storeId,
       },
       include: {
-<<<<<<< HEAD
-        options: { include: { choices: true } },
-      },
-    });
-
-    res.send(menu);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-exports.addMenu = async (req, res) => {
-  try {
-    const { menuItem, categoryId, description, price, imageUrl, options } =
-      req.body;
-=======
         images: true,
         options: {
           include: {
@@ -160,7 +139,6 @@ exports.addMenu = async (req, res) => {
       formatIds,
     } = req.body;
 
->>>>>>> origin/main
     const storeId = req.store.id;
 
     const category = await prisma.menuCategory.findFirst({
@@ -171,13 +149,6 @@ exports.addMenu = async (req, res) => {
     });
 
     if (!category) {
-<<<<<<< HEAD
-      return res.status(404).json({ message: "Category not found." });
-    }
-
-    if (!menuItem) {
-      return res.status(400).json({ messege: "name Menu is require!!!" });
-=======
       return res.status(404).json({
         message: "Category not found.",
       });
@@ -187,7 +158,6 @@ exports.addMenu = async (req, res) => {
       return res.status(400).json({
         message: "name Menu is require!!!",
       });
->>>>>>> origin/main
     }
 
     const existMenu = await prisma.menu.findFirst({
@@ -198,11 +168,6 @@ exports.addMenu = async (req, res) => {
     });
 
     if (existMenu) {
-<<<<<<< HEAD
-      return res.status(400).json({ message: "This Menu already exits!!" });
-    }
-
-=======
       return res.status(400).json({
         message: "This Menu already exits!!",
       });
@@ -238,7 +203,6 @@ exports.addMenu = async (req, res) => {
     // =========================
     // สร้าง Menu
     // =========================
->>>>>>> origin/main
     const menu = await prisma.menu.create({
       data: {
         storeId,
@@ -246,9 +210,6 @@ exports.addMenu = async (req, res) => {
         menuItem,
         price: parseFloat(price),
         description,
-<<<<<<< HEAD
-        imageUrl,
-=======
 
         // รูปภาพ
         images: {
@@ -263,43 +224,22 @@ exports.addMenu = async (req, res) => {
         // =========================
         // ระบบ Option เก่า
         // =========================
->>>>>>> origin/main
         options: {
           create:
             options?.map((opt) => ({
               label: opt.label,
               required: opt.required ?? false,
-<<<<<<< HEAD
-              maxRequire: opt.maxRequire,
-=======
               maxRequire: Number(opt.maxRequire || 1),
 
->>>>>>> origin/main
               choices: {
                 create:
                   opt.choices?.map((c) => ({
                     name: c.name,
-<<<<<<< HEAD
-                    extraPrice: parseFloat(c.extraPrice),
-=======
                     extraPrice: parseFloat(c.extraPrice || 0),
->>>>>>> origin/main
                   })) || [],
               },
             })) || [],
         },
-<<<<<<< HEAD
-      },
-      include: {
-        options: { include: { choices: true } },
-      },
-    });
-
-    res.send(menu);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
 
         // =========================
         // ระบบ Option Format ใหม่
@@ -344,18 +284,11 @@ exports.addMenu = async (req, res) => {
     return res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
 exports.updateMenu = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { menuItem, categoryId, description, price, imageUrl, options } =
-      req.body;
-    const storeId = req.store.id;
-
-=======
     const {
       menuItem,
       categoryId,
@@ -372,7 +305,6 @@ exports.updateMenu = async (req, res) => {
     // =========================
     // ตรวจสอบ Category
     // =========================
->>>>>>> origin/main
     const category = await prisma.menuCategory.findFirst({
       where: {
         id: Number(categoryId),
@@ -381,15 +313,6 @@ exports.updateMenu = async (req, res) => {
     });
 
     if (!category) {
-<<<<<<< HEAD
-      return res.status(404).json({ message: "Category not found." });
-    }
-
-    if (!menuItem) {
-      return res.status(400).json({ messege: "name Menu is require!!!" });
-    }
-
-=======
       return res.status(404).json({
         message: "Category not found.",
       });
@@ -407,51 +330,17 @@ exports.updateMenu = async (req, res) => {
     // =========================
     // ตรวจสอบเมนูซ้ำ
     // =========================
->>>>>>> origin/main
     const existMenu = await prisma.menu.findFirst({
       where: {
         storeId,
         menuItem,
         NOT: {
-<<<<<<< HEAD
-          id: Number(req.params.id),
-=======
           id: menuId,
->>>>>>> origin/main
         },
       },
     });
 
     if (existMenu) {
-<<<<<<< HEAD
-      return res.status(400).json({ message: "This Menu already exits!!" });
-    }
-
-    // ก่อนจะอัพเดต ลบอันเก่าก่อน
-    const oldOptions = await prisma.menuOption.findMany({
-      where: {
-        menuId: Number(req.params.id),
-      },
-    });
-    await prisma.optionChoice.deleteMany({
-      where: {
-        optionId: {
-          in: oldOptions.map((o) => o.id),
-        },
-      },
-    });
-    await prisma.menuOption.deleteMany({
-      where: {
-        menuId: Number(req.params.id),
-      },
-    });
-
-    const menu = await prisma.menu.update({
-      where: {
-        id: Number(req.params.id),
-        storeId,
-      },
-=======
       return res.status(400).json({
         message: "This Menu already exits!!",
       });
@@ -559,15 +448,11 @@ exports.updateMenu = async (req, res) => {
         id: menuId,
       },
 
->>>>>>> origin/main
       data: {
         categoryId: parseInt(categoryId),
         menuItem,
         price: parseFloat(price),
         description,
-<<<<<<< HEAD
-        imageUrl,
-=======
         images:
           Array.isArray(images) && images.length > 0
             ? {
@@ -580,43 +465,22 @@ exports.updateMenu = async (req, res) => {
             }
             : undefined,
         // ระบบ Option เก่า
->>>>>>> origin/main
         options: {
           create:
             options?.map((opt) => ({
               label: opt.label,
               required: opt.required ?? false,
-<<<<<<< HEAD
-              maxRequire: opt.maxRequire,
-=======
               maxRequire: Number(opt.maxRequire || 1),
 
->>>>>>> origin/main
               choices: {
                 create:
                   opt.choices?.map((c) => ({
                     name: c.name,
-<<<<<<< HEAD
-                    extraPrice: parseFloat(c.extraPrice),
-=======
                     extraPrice: parseFloat(c.extraPrice || 0),
->>>>>>> origin/main
                   })) || [],
               },
             })) || [],
         },
-<<<<<<< HEAD
-      },
-      include: {
-        options: { include: { choices: true } },
-      },
-    });
-
-    res.send(menu);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
 
         // ระบบ Format ใหม่
         menuOptionFormats: {
@@ -661,7 +525,6 @@ exports.updateMenu = async (req, res) => {
     return res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
@@ -694,25 +557,6 @@ exports.removeMenu = async (req, res) => {
 
 exports.changeAvailabilityStatus = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { isAvailable } = req.body;
-    const storeId = req.store.id;
-
-    const AvailabilityStatus = await prisma.menu.update({
-      where: {
-        id: Number(req.params.id),
-        storeId,
-      },
-      data: {
-        isAvailable,
-      },
-    });
-
-    res.send(AvailabilityStatus);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-=======
     const storeId = req.store.id;
     const menuId = Number(req.params.id);
 
@@ -756,7 +600,6 @@ exports.changeAvailabilityStatus = async (req, res) => {
     return res.status(500).json({
       message: "Server Error",
     });
->>>>>>> origin/main
   }
 };
 
@@ -777,8 +620,6 @@ exports.getSearchFilters = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-<<<<<<< HEAD
-=======
 
 
 // =========================
@@ -1009,4 +850,3 @@ exports.deleteOptionFormat = async (req, res) => {
     });
   }
 };
->>>>>>> origin/main
