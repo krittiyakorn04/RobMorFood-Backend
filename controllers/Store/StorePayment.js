@@ -1,8 +1,5 @@
 const prisma = require("../../config/prisma");
-<<<<<<< HEAD
-=======
 const { createNotification } = require("../notificationController");
->>>>>>> origin/main
 
 exports.rejectedPayment = (req, res) => {
   try {
@@ -15,15 +12,6 @@ exports.rejectedPayment = (req, res) => {
 
 exports.changeStatusPayment = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const { id, status } = req.body;
-    const storeId = req.store.id;
-
-    const payment = await prisma.payment.findFirst({
-      where: {
-        id: Number(id),
-        storeId: req.store.id,
-=======
     const paymentId = Number(req.params.id);
     const { status } = req.body;
     const storeId = req.store.id;
@@ -62,32 +50,11 @@ exports.changeStatusPayment = async (req, res) => {
             },
           },
         },
->>>>>>> origin/main
       },
     });
 
     if (!payment) {
       return res.status(404).json({
-<<<<<<< HEAD
-        message: "ไม่พบรายการชำระเงิน",
-      });
-    }
-
-    await prisma.payment.update({
-      where: {
-        id: payment.id,
-      },
-      data: {
-        status,
-      },
-    });
-    res.send("Hello change Status Payment");
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-=======
         message: "ไม่พบข้อมูลการชำระเงิน",
       });
     }
@@ -187,4 +154,3 @@ exports.changeStatusPayment = async (req, res) => {
     });
   }
 };
->>>>>>> origin/main
