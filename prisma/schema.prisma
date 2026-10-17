@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
+// RobMorFood Prisma schema
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,8 +7,6 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
-// ENUMS
 
 enum memberRole {
   CUSTOMER
@@ -26,54 +20,43 @@ enum customerStatus {
 }
 
 enum merchantStatus {
-  PENDING // รอ admin approve
-  ACTIVE // เปิดร้านได้
-  SUSPENDED // ถูก suspend
-  BANNED //โดนแบน 
+  PENDING
+  ACTIVE
+  SUSPENDED
+  BANNED
 }
 
 enum storeStatus {
   OPEN
   CLOSED
-  BUSY // ไม่รับออเดอร์ชั่วคราว
+  BUSY
   DELETED
 }
 
 enum deliveryType {
-  PICKUP // รับเอง
-  DELIVERY // ให้ร้านส่ง
+  PICKUP
+  DELIVERY
 }
 
 enum deliveryStatus {
-<<<<<<< HEAD
-  PENDING //พร้อมแล้ว (รอรับ/ส่ง)
-  DELIVERING // กำลังส่ง
-  COMPLETED // เสร็จสิ้น
-=======
-  PENDING // พร้อมจัดส่ง
-  DELIVERING // กำลังจัดส่ง
-  COMPLETED // รอบจัดส่งเสร็จสิ้น
->>>>>>> origin/main
+  PENDING
+  DELIVERING
+  COMPLETED
 }
 
 enum orderMode {
-  ROUND // รับเป็นรอบ
-  REALTIME // รับตลอดเวลา
+  ROUND
+  REALTIME
 }
 
 enum orderStatus {
-  PENDING // รอร้านยืนยัน
-<<<<<<< HEAD
-  CONFIRMED // ร้านยืนยันแล้ว
-  PREPARING // กำลังทำอาหาร
-=======
-  WAITING_PAYMENT // ร้านยืนยันแล้ว รอลูกค้าชำระเงิน
-  CONFIRMED // ชำระเงินแล้ว ร้านยืนยันการชำระเงิน
-  PREPARING // กำลังทำอาหาร
-  READY // ทำอาหารเสร็จ
->>>>>>> origin/main
-  COMPLETED // เสร็จสิ้น
-  CANCELLED // ยกเลิก
+  PENDING
+  WAITING_PAYMENT
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
 }
 
 enum PaymentMethod {
@@ -82,19 +65,18 @@ enum PaymentMethod {
 }
 
 enum paymentStatus {
-  PENDING // รอลูกค้าโอน
-  SLIP_UPLOADED // แนบสลิปแล้ว รอร้าน confirm
-  CONFIRMED // ร้าน confirm แล้ว
-  REJECTED // ร้านปฏิเสธสลิป
+  PENDING
+  SLIP_UPLOADED
+  CONFIRMED
+  REJECTED
 }
 
 enum roundStatus {
-  PENDING //ยังไม่ถึงเวลาเปิด
-  OPEN // กำลังรับออเดอร์
-  CLOSED // ปิดรับแล้ว
+  PENDING
+  OPEN
+  CLOSED
 }
 
-<<<<<<< HEAD
 enum deliveryZone {
   ThaKhonYang
   KhamRiang
@@ -103,8 +85,6 @@ enum deliveryZone {
   BanDonna
 }
 
-=======
->>>>>>> origin/main
 enum CategoryStore {
   BAKERY
   SOMTUM
@@ -115,19 +95,6 @@ enum OutOfStock {
   EXCHANGE
 }
 
-<<<<<<< HEAD
-// User
-
-model Customer {
-  id       Int            @id @default(autoincrement())
-  username String         @unique
-  email    String         @unique
-  phone    String         @unique
-  password String?
-  picture  String?
-  role     memberRole     @default(CUSTOMER)
-  status   customerStatus @default(ACTIVE)
-=======
 enum StoreStaffRole {
   DELIVERY
 }
@@ -148,632 +115,6 @@ enum chatSenderType {
   DELIVERY
 }
 
-model ChatRoom {
-  id Int @id @default(autoincrement())
-
-  type chatRoomType
-
-  customerId Int?
-  storeId    Int?
-  deliveryId Int?
->>>>>>> origin/main
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-<<<<<<< HEAD
-  addresses Address[]
-  orders    Order[]
-  reviews   Review[]
-  cart      Cart[]
-=======
-  customer Customer? @relation(fields: [customerId], references: [id])
-  store    Store?    @relation(fields: [storeId], references: [id])
-  delivery Delivery? @relation(fields: [deliveryId], references: [id])
-
-  messages ChatMessage[]
-
-  @@index([customerId])
-  @@index([storeId])
-  @@index([deliveryId])
-}
-
-model ChatMessage {
-  id Int @id @default(autoincrement())
-
-  roomId Int
-
-  senderType chatSenderType
-  senderId   Int
-
-  message String @db.Text
-
-  isRead Boolean @default(false)
-
-  createdAt DateTime @default(now())
-
-  room ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
-
-  @@index([roomId])
-  @@index([createdAt])
-}
-
-// User
-
-model Customer {
-  id       Int     @id @default(autoincrement())
-  username String  @unique
-  email    String  @unique
-  phone    String  @unique
-  password String?
-
-  role   memberRole     @default(CUSTOMER)
-  status customerStatus @default(ACTIVE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  addresses         Address[]
-  orders            Order[]
-  reviews           Review[]
-  cart              Cart[]
-  images            Image[]
-  notifications     Notification[]
-  chatRooms         ChatRoom[]
-  orderReports      OrderReport[]
-  pushSubscriptions PushSubscription[]
->>>>>>> origin/main
-}
-
-model Address {
-  id         Int      @id @default(autoincrement())
-  customerId Int
-  label      String // เช่น "หอพัก", "บ้าน"
-  address    String
-  lat        Float?
-  lng        Float?
-  isDefault  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-
-  customer Customer @relation(fields: [customerId], references: [id])
-}
-
-// STORE
-
-model Store {
-  id       Int     @id @default(autoincrement())
-  username String  @unique
-  email    String  @unique
-  phone    String  @unique
-  password String?
-<<<<<<< HEAD
-
-  picture    String? //
-  storeName  String        @unique
-  Notice     String?       @db.Text //ติดไว้ก่อน
-  imageStore String? //
-  category   CategoryStore
-  address    String
-  lat        Float? //
-  lng        Float? //
-=======
-  googleId String? @unique
-
-  storeName String  @unique
-  Notice    String? @db.Text //ติดไว้ก่อน
-
-  address     String
-  lat         Float? //
-  lng         Float? //
-  deliveryFee Float  @default(20)
-
-  facebookUrl  String? @db.VarChar(500)
-  instagramUrl String? @db.VarChar(500)
-  tiktokUrl    String? @db.VarChar(500)
-  lineUrl      String? @db.VarChar(500)
->>>>>>> origin/main
-
-  role          memberRole     @default(MERCHANT)
-  accountStatus merchantStatus @default(PENDING)
-  status        storeStatus    @default(CLOSED)
-  orderMode     orderMode      @default(REALTIME)
-
-  // วัน - เวลาเปิด/ปิด 
-  openAuto  Boolean @default(false)
-  dayOpen   String
-  timeOpen  String
-  timeClose String
-
-<<<<<<< HEAD
-  // Payment
-  promptpayNumber String?
-
-  bankName        String?
-  bankAccount     String?
-  bankAccountName String?
-
-=======
->>>>>>> origin/main
-  usernameChangedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-<<<<<<< HEAD
-  menuCategories MenuCategory[]
-  menus          Menu[]
-  orderRound     OrderRound[]
-  deliveryRounds Delivery[]
-  orders         Order[]
-  reviews        Review[]
-  carts          Cart[]
-  deliveryZone   DeliveryZone[]
-}
-
-model DeliveryZone {
-  id                  Int          @id @default(autoincrement())
-  storeId             Int
-  nameZone            deliveryZone // เช่น "ท่าขอนยาง", "ขามเรียง"
-  maxDistance         Float? // km — รัศมีสูงสุดของโซนนี้
-  fee                 Float        @default(0) // ค่าส่งของโซนนี้
-  rainSurcharge       Float        @default(0) // บวกเพิ่มตอนฝนตก
-  rainSurchargeActive Boolean      @default(false) //ร้านเปิดสวิตช์
-
-  store Store @relation(fields: [storeId], references: [id])
-=======
-  menuCategories    MenuCategory[]
-  menus             Menu[]
-  orderRound        OrderRound[]
-  deliveryRounds    Delivery[]
-  orders            Order[]
-  reviews           Review[]
-  carts             Cart[]
-  images            Image[]
-  storeCategories   StoreStoreCategory[]
-  notifications     Notification[]
-  storeStaffs       StoreStaff[]
-  chatRooms         ChatRoom[]
-  optionFormats     OptionFormat[]
-  orderReports      OrderReport[]
-  pushSubscriptions PushSubscription[]
-}
-
-model StoreCategory {
-  id      Int                  @id @default(autoincrement())
-  name    String               @unique
-  stores  StoreStoreCategory[]
-  admin   Admin?               @relation(fields: [adminId], references: [id])
-  adminId Int?
-}
-
-model StoreStoreCategory {
-  id             Int @id @default(autoincrement())
-  storeId        Int
-  storeCategoryId Int
-
-  store        Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  storeCategory StoreCategory @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
-
-  @@unique([storeId, storeCategoryId])
-  @@index([storeId])
-  @@index([storeCategoryId])
->>>>>>> origin/main
-}
-
-// MENU
-
-model MenuCategory {
-  id       Int    @id @default(autoincrement())
-  storeId  Int
-  nameCate String
-
-<<<<<<< HEAD
-  store Store  @relation(fields: [storeId], references: [id])
-  menus Menu[]
-}
-
-model Menu {
-  id          Int      @id @default(autoincrement())
-=======
-  store   Store  @relation(fields: [storeId], references: [id])
-  menus   Menu[]
-  admin   Admin? @relation(fields: [adminId], references: [id])
-  adminId Int?
-}
-
-model Menu {
-  id          Int     @id @default(autoincrement())
->>>>>>> origin/main
-  storeId     Int
-  categoryId  Int?
-  menuItem    String
-  description String?
-  price       Float
-<<<<<<< HEAD
-  imageUrl    String
-  isAvailable Boolean  @default(true)
-  sold        Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  category  MenuCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  store     Store         @relation(fields: [storeId], references: [id])
-  options   MenuOption[]
-  menuItems MenuOnCart[]
-  images    Image[]
-=======
-  isAvailable Boolean @default(true)
-  sold        Int     @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  category          MenuCategory?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  store             Store              @relation(fields: [storeId], references: [id])
-  options           MenuOption[]
-  menuItems         MenuOnCart[]
-  images            Image[]
-  menuOptionFormats MenuOptionFormat[]
->>>>>>> origin/main
-}
-
-model MenuOption {
-  id         Int     @id @default(autoincrement())
-  menuId     Int
-  label      String // เช่น "ความเผ็ด", "ไข่"
-  required   Boolean @default(false) //บังคับเลือกหรือไม่บังคับ
-  maxRequire Int
-
-  menu    Menu           @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  choices OptionChoice[]
-}
-
-model OptionChoice {
-  id         Int    @id @default(autoincrement())
-  optionId   Int
-  name       String // เช่น "ไม่เผ็ด", "เผ็ดมาก"
-  extraPrice Float  @default(0)
-
-  option MenuOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
-}
-
-// ORDER ROUND
-
-model OrderRound {
-  id            Int     @id @default(autoincrement())
-  storeId       Int
-  roundNumber   Int // รอบที่เท่าไหร่
-  startTime     String
-  endTime       String
-  patternManual Boolean @default(false)
-
-  durationMinutes Int
-  hasOrderLimit   Boolean @default(false)
-  maxOrders       Int?
-  currentOrders   Int     @default(0)
-  cutoffMinutes   Int     @default(20)
-
-<<<<<<< HEAD
-  status   roundStatus @default(OPEN)
-=======
-  status   roundStatus @default(PENDING)
->>>>>>> origin/main
-  isManual Boolean     @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  store    Store      @relation(fields: [storeId], references: [id])
-  delivery Delivery[]
-  orders   Order[]
-}
-
-model Order {
-<<<<<<< HEAD
-  id           Int          @id @default(autoincrement())
-=======
-  id           Int  @id @default(autoincrement())
->>>>>>> origin/main
-  customerId   Int
-  storeId      Int
-  orderRoundId Int? // เชื่อม OrderRound 
-  deliveryId   Int
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
-  deliveryType deliveryType @default(DELIVERY)
-  status       orderStatus  @default(PENDING)
-  totalPrice   Float
-  note         String?      @db.Text
-  outOfStock   OutOfStock   @default(INFORM)
-
-<<<<<<< HEAD
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  customer   Customer     @relation(fields: [customerId], references: [id])
-  store      Store        @relation(fields: [storeId], references: [id])
-  orderRound OrderRound?  @relation(fields: [orderRoundId], references: [id])
-  delivery   Delivery     @relation(fields: [deliveryId], references: [id])
-  payment    Payment?
-  review     Review?
-  menu       MenuOnCart[]
-}
-
-model Delivery {
-  id           Int            @id @default(autoincrement())
-  storeId      Int
-  orderRoundId Int?
-  status       deliveryStatus @default(PENDING)
-  createdAt    DateTime       @default(now())
-
-  store      Store       @relation(fields: [storeId], references: [id])
-  orderRound OrderRound? @relation(fields: [orderRoundId], references: [id])
-  orders     Order[]
-=======
-  customerReceived Boolean   @default(false)
-  receivedAt       DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  customer      Customer       @relation(fields: [customerId], references: [id])
-  store         Store          @relation(fields: [storeId], references: [id])
-  orderRound    OrderRound?    @relation(fields: [orderRoundId], references: [id])
-  delivery      Delivery       @relation(fields: [deliveryId], references: [id])
-  payment       Payment?
-  review        Review?
-  menu          MenuOnCart[]
-  notifications Notification[]
-  orderReports  OrderReport[]
-}
-
-model Delivery {
-  id              Int  @id @default(autoincrement())
-  storeId         Int
-  orderRoundId    Int?
-  deliveryStaffId Int?
-
-  status    deliveryStatus @default(PENDING)
-  createdAt DateTime       @default(now())
-
-  store         Store       @relation(fields: [storeId], references: [id])
-  orderRound    OrderRound? @relation(fields: [orderRoundId], references: [id])
-  deliveryStaff StoreStaff? @relation(fields: [deliveryStaffId], references: [id])
-  orders        Order[]
-  images        Image[]
-  chatRooms     ChatRoom[]
->>>>>>> origin/main
-}
-
-model Cart {
-  id        Int   @id @default(autoincrement())
-  orderById Int
-  storeId   Int
-  cartTotal Float
-
-  customer Customer     @relation(fields: [orderById], references: [id])
-  store    Store        @relation(fields: [storeId], references: [id])
-  menu     MenuOnCart[]
-<<<<<<< HEAD
-}
-
-model MenuOnCart {
-  id      Int    @id @default(autoincrement())
-  cartId  Int
-=======
-
-  @@unique([orderById, storeId])
-}
-
-model MenuOnCart {
-  id      Int     @id @default(autoincrement())
-  cartId  Int?
->>>>>>> origin/main
-  menuId  Int
-  orderId Int?
-  count   Int
-  price   Float
-<<<<<<< HEAD
-  options String @db.Text
-
-  cart  Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
-=======
-  options String  @db.Text
-  note    String? @db.Text
-
-  cart  Cart?  @relation(fields: [cartId], references: [id], onDelete: SetNull)
->>>>>>> origin/main
-  menu  Menu   @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  order Order? @relation(fields: [orderId], references: [id])
-}
-
-// PAYMENT
-
-model Payment {
-  id             Int           @id @default(autoincrement())
-  orderId        Int           @unique
-  method         PaymentMethod
-  status         paymentStatus @default(PENDING)
-  amount         Float
-<<<<<<< HEAD
-  slipImageUrl   String
-  confirmedAt    DateTime
-=======
-  // ตอนสร้าง Payment ยังไม่มีสลิป
-  slipImageUrl   String?       @db.VarChar(500)
-  // จะมีค่าเมื่อร้านยืนยันการชำระเงิน
-  confirmedAt    DateTime?
->>>>>>> origin/main
-  rejectedReason String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
-<<<<<<< HEAD
-  order Order @relation(fields: [orderId], references: [id])
-=======
-  order  Order   @relation(fields: [orderId], references: [id])
-  images Image[]
->>>>>>> origin/main
-}
-
-// REVIEW
-
-model Review {
-  id         Int      @id @default(autoincrement())
-  orderId    Int      @unique
-  customerId Int
-  storeId    Int
-  rating     Int // 1-5
-  comment    String?  @db.Text
-  createdAt  DateTime @default(now())
-
-  order    Order    @relation(fields: [orderId], references: [id])
-  customer Customer @relation(fields: [customerId], references: [id])
-  store    Store    @relation(fields: [storeId], references: [id])
-}
-
-model Admin {
-<<<<<<< HEAD
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  password  String
-  name      String
-  role      memberRole @default(ADMIN)
-  createdAt DateTime   @default(now())
-=======
-  id             Int             @id @default(autoincrement())
-  email          String          @unique
-  password       String
-  name           String
-  role           memberRole      @default(ADMIN)
-  createdAt      DateTime        @default(now())
-  menuCategories MenuCategory[]
-  StoreCategoies StoreCategory[]
->>>>>>> origin/main
-}
-
-model Image {
-  id         Int      @id @default(autoincrement())
-  asset_id   String
-  public_id  String
-  url        String
-  secure_url String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  menu   Menu? @relation(fields: [menuId], references: [id])
-  menuId Int?
-<<<<<<< HEAD
-=======
-
-  customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId Int?
-  store      Store?    @relation(fields: [storeId], references: [id])
-  storeId    Int?
-  payment    Payment?  @relation(fields: [paymentId], references: [id])
-  paymentId  Int?
-
-  delivery   Delivery? @relation(fields: [deliveryId], references: [id])
-  deliveryId Int?
-
-  proofType deliveryProofType?
-}
-
-model Notification {
-  id Int @id @default(autoincrement())
-
-  title   String
-  message String
-  type    String
-
-  isRead Boolean @default(false)
-
-  customerId      Int?
-  storeId         Int?
-  deliveryStaffId Int?
-  deliveryId      Int?
-  orderId         Int?
-
-  createdAt DateTime @default(now())
-
-  customer      Customer?   @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  store         Store?      @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  deliveryStaff StoreStaff? @relation(fields: [deliveryStaffId], references: [id], onDelete: Cascade)
-  order         Order?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  @@index([customerId])
-  @@index([storeId])
-  @@index([deliveryStaffId])
-  @@index([orderId])
-  @@index([isRead])
-}
-
-model StoreStaff {
-  id      Int @id @default(autoincrement())
-  storeId Int
-
-  username String @unique
-  password String
-
-  name  String
-  phone String?
-
-  role StoreStaffRole @default(DELIVERY)
-
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  store             Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  notifications     Notification[]
-  deliveries        Delivery[]
-  pushSubscriptions PushSubscription[]
-}
-
-model OptionFormat {
-  id         Int     @id @default(autoincrement())
-  storeId    Int
-  name       String
-  required   Boolean @default(false)
-  maxRequire Int     @default(1)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  store   Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  choices OptionFormatChoice[]
-  menus   MenuOptionFormat[]
-
-  @@index([storeId])
-}
-
-model OptionFormatChoice {
-  id         Int    @id @default(autoincrement())
-  formatId   Int
-  name       String
-  extraPrice Float  @default(0)
-  sortOrder  Int    @default(0)
-
-  format OptionFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
-
-  @@index([formatId])
-}
-
-model MenuOptionFormat {
-  id       Int @id @default(autoincrement())
-  menuId   Int
-  formatId Int
-
-  menu   Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  format OptionFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
-
-  @@unique([menuId, formatId])
-  @@index([formatId])
-}
-
 enum reportStatus {
   PENDING
   REVIEWING
@@ -789,25 +130,477 @@ enum reportType {
   OTHER
 }
 
-model OrderReport {
-  id Int @id @default(autoincrement())
+model Customer {
+  id                Int                @id @default(autoincrement())
+  username          String             @unique
+  email             String             @unique
+  phone             String             @unique
+  password          String?
+  picture           String?
+  role              memberRole         @default(CUSTOMER)
+  status            customerStatus     @default(ACTIVE)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  addresses         Address[]
+  orders            Order[]
+  reviews           Review[]
+  cart              Cart[]
+  images            Image[]
+  notifications     Notification[]
+  chatRooms         ChatRoom[]
+  orderReports      OrderReport[]
+  pushSubscriptions PushSubscription[]
+}
 
+model Address {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  label      String
+  address    String
+  lat        Float?
+  lng        Float?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  customer   Customer @relation(fields: [customerId], references: [id])
+}
+
+model Store {
+  id                Int                @id @default(autoincrement())
+  username          String             @unique
+  email             String             @unique
+  phone             String             @unique
+  password          String?
+  picture           String?
+  googleId          String?            @unique
+  storeName         String             @unique
+  Notice            String?            @db.Text
+  imageStore        String?
+  category          CategoryStore
+  address           String
+  lat               Float?
+  lng               Float?
+  deliveryFee       Float              @default(20)
+  facebookUrl       String?            @db.VarChar(500)
+  instagramUrl      String?            @db.VarChar(500)
+  tiktokUrl         String?            @db.VarChar(500)
+  lineUrl           String?            @db.VarChar(500)
+  role              memberRole         @default(MERCHANT)
+  accountStatus     merchantStatus     @default(PENDING)
+  status            storeStatus        @default(CLOSED)
+  orderMode         orderMode          @default(REALTIME)
+  openAuto          Boolean            @default(false)
+  dayOpen           String
+  timeOpen          String
+  timeClose         String
+  promptpayNumber   String?
+  bankName          String?
+  bankAccount       String?
+  bankAccountName   String?
+  usernameChangedAt DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  menuCategories    MenuCategory[]
+  menus             Menu[]
+  orderRound        OrderRound[]
+  deliveryRounds    Delivery[]
+  orders            Order[]
+  reviews           Review[]
+  carts             Cart[]
+  deliveryZone      DeliveryZone[]
+  images            Image[]
+  storeCategories   StoreStoreCategory[]
+  notifications     Notification[]
+  storeStaffs       StoreStaff[]
+  chatRooms         ChatRoom[]
+  optionFormats     OptionFormat[]
+  orderReports      OrderReport[]
+  pushSubscriptions PushSubscription[]
+}
+
+model DeliveryZone {
+  id                  Int          @id @default(autoincrement())
+  storeId             Int
+  nameZone            deliveryZone
+  maxDistance         Float?
+  fee                 Float        @default(0)
+  rainSurcharge       Float        @default(0)
+  rainSurchargeActive Boolean      @default(false)
+  store               Store        @relation(fields: [storeId], references: [id])
+
+  @@index([storeId])
+}
+
+model StoreCategory {
+  id      Int                  @id @default(autoincrement())
+  name    String               @unique
+  stores  StoreStoreCategory[]
+  admin   Admin?               @relation(fields: [adminId], references: [id])
+  adminId Int?
+}
+
+model StoreStoreCategory {
+  id              Int           @id @default(autoincrement())
+  storeId         Int
+  storeCategoryId Int
+  store            Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeCategory    StoreCategory @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, storeCategoryId])
+  @@index([storeId])
+  @@index([storeCategoryId])
+}
+
+model MenuCategory {
+  id       Int      @id @default(autoincrement())
+  storeId  Int
+  nameCate String
+  store    Store    @relation(fields: [storeId], references: [id])
+  menus    Menu[]
+  admin    Admin?   @relation(fields: [adminId], references: [id])
+  adminId  Int?
+}
+
+model Menu {
+  id                Int                @id @default(autoincrement())
+  storeId           Int
+  categoryId        Int?
+  menuItem          String
+  description       String?
+  price             Float
+  imageUrl          String
+  isAvailable       Boolean            @default(true)
+  sold              Int                @default(0)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  category          MenuCategory?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  store             Store              @relation(fields: [storeId], references: [id])
+  options           MenuOption[]
+  menuItems         MenuOnCart[]
+  images            Image[]
+  menuOptionFormats MenuOptionFormat[]
+}
+
+model MenuOption {
+  id         Int            @id @default(autoincrement())
+  menuId     Int
+  label      String
+  required   Boolean        @default(false)
+  maxRequire Int
+  menu       Menu           @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  choices    OptionChoice[]
+}
+
+model OptionChoice {
+  id         Int        @id @default(autoincrement())
+  optionId   Int
+  name       String
+  extraPrice Float      @default(0)
+  option     MenuOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+}
+
+model OrderRound {
+  id              Int         @id @default(autoincrement())
+  storeId         Int
+  roundNumber     Int
+  startTime       String
+  endTime         String
+  patternManual   Boolean     @default(false)
+  durationMinutes Int
+  hasOrderLimit   Boolean     @default(false)
+  maxOrders       Int?
+  currentOrders   Int         @default(0)
+  cutoffMinutes   Int         @default(20)
+  status          roundStatus @default(PENDING)
+  isManual        Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  store           Store       @relation(fields: [storeId], references: [id])
+  delivery        Delivery[]
+  orders          Order[]
+
+  @@index([storeId])
+}
+
+model Order {
+  id                Int          @id @default(autoincrement())
+  customerId        Int
+  storeId           Int
+  orderRoundId      Int?
+  deliveryId        Int
+  deliveryType      deliveryType @default(DELIVERY)
+  status            orderStatus  @default(PENDING)
+  totalPrice        Float
+  note              String?      @db.Text
+  outOfStock        OutOfStock   @default(INFORM)
+  customerReceived  Boolean      @default(false)
+  receivedAt        DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  customer          Customer     @relation(fields: [customerId], references: [id])
+  store             Store        @relation(fields: [storeId], references: [id])
+  orderRound        OrderRound?  @relation(fields: [orderRoundId], references: [id])
+  delivery          Delivery     @relation(fields: [deliveryId], references: [id])
+  payment           Payment?
+  review            Review?
+  menu              MenuOnCart[]
+  notifications     Notification[]
+  orderReports      OrderReport[]
+
+  @@index([customerId])
+  @@index([storeId])
+  @@index([orderRoundId])
+  @@index([deliveryId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Delivery {
+  id              Int            @id @default(autoincrement())
+  storeId         Int
+  orderRoundId    Int?
+  deliveryStaffId Int?
+  status          deliveryStatus @default(PENDING)
+  createdAt       DateTime       @default(now())
+  store           Store          @relation(fields: [storeId], references: [id])
+  orderRound      OrderRound?    @relation(fields: [orderRoundId], references: [id])
+  deliveryStaff   StoreStaff?    @relation(fields: [deliveryStaffId], references: [id])
+  orders          Order[]
+  images          Image[]
+  chatRooms       ChatRoom[]
+  notifications   Notification[]
+
+  @@index([storeId])
+  @@index([orderRoundId])
+  @@index([deliveryStaffId])
+}
+
+model Cart {
+  id        Int         @id @default(autoincrement())
+  orderById Int
+  storeId   Int
+  cartTotal Float
+  customer  Customer    @relation(fields: [orderById], references: [id])
+  store     Store       @relation(fields: [storeId], references: [id])
+  menu      MenuOnCart[]
+
+  @@unique([orderById, storeId])
+}
+
+model MenuOnCart {
+  id      Int     @id @default(autoincrement())
+  cartId  Int?
+  menuId  Int
+  orderId Int?
+  count   Int
+  price   Float
+  options String  @db.Text
+  note    String? @db.Text
+  cart    Cart?   @relation(fields: [cartId], references: [id], onDelete: SetNull)
+  menu    Menu    @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  @@index([cartId])
+  @@index([menuId])
+  @@index([orderId])
+}
+
+model Payment {
+  id             Int           @id @default(autoincrement())
+  orderId        Int           @unique
+  method         PaymentMethod
+  status         paymentStatus @default(PENDING)
+  amount         Float
+  slipImageUrl   String?       @db.VarChar(500)
+  confirmedAt    DateTime?
+  rejectedReason String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  order          Order         @relation(fields: [orderId], references: [id])
+  images         Image[]
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  orderId    Int      @unique
+  customerId Int
+  storeId    Int
+  rating     Int
+  comment    String?  @db.Text
+  createdAt  DateTime @default(now())
+  order      Order    @relation(fields: [orderId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id])
+  store      Store    @relation(fields: [storeId], references: [id])
+
+  @@index([customerId])
+  @@index([storeId])
+}
+
+model Admin {
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  password       String
+  name           String
+  role           memberRole      @default(ADMIN)
+  createdAt      DateTime        @default(now())
+  menuCategories MenuCategory[]
+  storeCategories StoreCategory[]
+}
+
+model Image {
+  id         Int               @id @default(autoincrement())
+  asset_id   String
+  public_id  String
+  url        String
+  secure_url String
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  menu       Menu?             @relation(fields: [menuId], references: [id])
+  menuId     Int?
+  customer   Customer?         @relation(fields: [customerId], references: [id])
+  customerId Int?
+  store      Store?            @relation(fields: [storeId], references: [id])
+  storeId    Int?
+  payment    Payment?          @relation(fields: [paymentId], references: [id])
+  paymentId  Int?
+  delivery   Delivery?         @relation(fields: [deliveryId], references: [id])
+  deliveryId Int?
+  proofType  deliveryProofType?
+
+  @@index([menuId])
+  @@index([customerId])
+  @@index([storeId])
+  @@index([paymentId])
+  @@index([deliveryId])
+}
+
+model Notification {
+  id              Int         @id @default(autoincrement())
+  title           String
+  message         String
+  type            String
+  isRead          Boolean     @default(false)
+  customerId      Int?
+  storeId         Int?
+  deliveryStaffId Int?
+  deliveryId      Int?
+  orderId         Int?
+  createdAt       DateTime    @default(now())
+  customer        Customer?   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  store           Store?      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  deliveryStaff   StoreStaff? @relation(fields: [deliveryStaffId], references: [id], onDelete: Cascade)
+  delivery        Delivery?   @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  order           Order?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([storeId])
+  @@index([deliveryStaffId])
+  @@index([deliveryId])
+  @@index([orderId])
+  @@index([isRead])
+}
+
+model StoreStaff {
+  id                Int                @id @default(autoincrement())
+  storeId           Int
+  username          String             @unique
+  password          String
+  name              String
+  phone             String?
+  role              StoreStaffRole     @default(DELIVERY)
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  store             Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  notifications     Notification[]
+  deliveries        Delivery[]
+  pushSubscriptions PushSubscription[]
+
+  @@index([storeId])
+}
+
+model ChatRoom {
+  id         Int          @id @default(autoincrement())
+  type       chatRoomType
+  customerId Int?
+  storeId    Int?
+  deliveryId Int?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  customer   Customer?    @relation(fields: [customerId], references: [id])
+  store      Store?       @relation(fields: [storeId], references: [id])
+  delivery   Delivery?    @relation(fields: [deliveryId], references: [id])
+  messages   ChatMessage[]
+
+  @@index([customerId])
+  @@index([storeId])
+  @@index([deliveryId])
+}
+
+model ChatMessage {
+  id         Int            @id @default(autoincrement())
+  roomId     Int
+  senderType chatSenderType
+  senderId   Int
+  message    String         @db.Text
+  isRead     Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+  room       ChatRoom       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([createdAt])
+}
+
+model OptionFormat {
+  id         Int                  @id @default(autoincrement())
+  storeId    Int
+  name       String
+  required   Boolean              @default(false)
+  maxRequire Int                  @default(1)
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  store      Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  choices    OptionFormatChoice[]
+  menus      MenuOptionFormat[]
+
+  @@index([storeId])
+}
+
+model OptionFormatChoice {
+  id         Int          @id @default(autoincrement())
+  formatId   Int
+  name       String
+  extraPrice Float        @default(0)
+  sortOrder  Int          @default(0)
+  format     OptionFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
+
+  @@index([formatId])
+}
+
+model MenuOptionFormat {
+  id       Int          @id @default(autoincrement())
+  menuId   Int
+  formatId Int
+  menu     Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  format   OptionFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
+
+  @@unique([menuId, formatId])
+  @@index([formatId])
+}
+
+model OrderReport {
+  id         Int          @id @default(autoincrement())
   orderId    Int
   customerId Int
   storeId    Int
-
-  type   reportType
-  detail String?      @db.Text
-  status reportStatus @default(PENDING)
-
-  adminNote String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  order    Order    @relation(fields: [orderId], references: [id])
-  customer Customer @relation(fields: [customerId], references: [id])
-  store    Store    @relation(fields: [storeId], references: [id])
+  type       reportType
+  detail     String?      @db.Text
+  status     reportStatus @default(PENDING)
+  adminNote  String?      @db.Text
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  order      Order        @relation(fields: [orderId], references: [id])
+  customer   Customer     @relation(fields: [customerId], references: [id])
+  store      Store        @relation(fields: [storeId], references: [id])
 
   @@index([orderId])
   @@index([customerId])
@@ -816,25 +609,20 @@ model OrderReport {
 }
 
 model PushSubscription {
-  id Int @id @default(autoincrement())
-
-  endpoint String @db.Text
-  p256dh   String @db.Text
-  auth     String @db.Text
-
+  id              Int         @id @default(autoincrement())
+  endpoint        String      @db.Text
+  p256dh          String      @db.Text
+  auth             String      @db.Text
   customerId      Int?
   storeId         Int?
   deliveryStaffId Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  customer      Customer?   @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  store         Store?      @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  deliveryStaff StoreStaff? @relation(fields: [deliveryStaffId], references: [id], onDelete: Cascade)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  customer        Customer?   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  store           Store?      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  deliveryStaff   StoreStaff? @relation(fields: [deliveryStaffId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([storeId])
   @@index([deliveryStaffId])
->>>>>>> origin/main
 }
