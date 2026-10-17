@@ -1,3 +1,4 @@
+
 {
   "name": "fooddeliverymsu",
   "version": "1.0.0",
@@ -5,13 +6,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-<<<<<<< HEAD
-    "dev": "nodemon server"
-=======
     "dev": "nodemon server",
     "start": "node server",
     "postinstall": "prisma generate && prisma migrate deploy"
->>>>>>> origin/main
   },
   "keywords": [],
   "author": "",
@@ -20,13 +17,6 @@
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
-<<<<<<< HEAD
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.11.0",
-    "nodemon": "^3.1.14"
-=======
     "cloudinary": "^2.10.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
@@ -36,7 +26,6 @@
     "nodemon": "^3.1.14",
     "socket.io": "^4.8.4",
     "web-push": "^3.6.7"
->>>>>>> origin/main
   },
   "devDependencies": {
     "prisma": "^6.19.3"
