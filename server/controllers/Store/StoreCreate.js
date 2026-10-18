@@ -437,6 +437,7 @@ exports.updateStore = async (req, res) => {
   try {
     const {
       username,
+      email,
       Notice,
       phone,
       storeName,
@@ -576,6 +577,7 @@ exports.updateStore = async (req, res) => {
       }
     }
 
+
     // =========================================================
     // เตรียมข้อมูลที่จะอัปเดต
     // =========================================================
@@ -595,6 +597,40 @@ exports.updateStore = async (req, res) => {
       lineUrl,
 
     };
+
+    // ตรวจ Email ซ้ำ
+    const normalizedEmail =
+      typeof email === "string"
+        ? email.trim().toLowerCase()
+        : email;
+
+    if (
+      normalizedEmail !== undefined &&
+      normalizedEmail !== currentStore.email
+    ) {
+      if (normalizedEmail) {
+        const duplicateEmail = await prisma.store.findFirst({
+          where: {
+            email: normalizedEmail,
+            NOT: {
+              id: storeId,
+            },
+          },
+        });
+
+        if (duplicateEmail) {
+          return res.status(400).json({
+            message: "Email นี้มีผู้ใช้งานแล้ว",
+            field: "email",
+          });
+        }
+
+        updateData.email = normalizedEmail;
+      } else {
+        // อนุญาตให้ลบ Email เป็นค่าว่าง
+        updateData.email = null;
+      }
+    }
 
     // =========================================================
     // Username

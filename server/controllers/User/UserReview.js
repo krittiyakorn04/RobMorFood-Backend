@@ -120,11 +120,6 @@ exports.createReview = async (req, res) => {
 
         const { rating, comment } = req.body || {};
 
-        console.log("CREATE REVIEW");
-        console.log("orderId =", orderId);
-        console.log("customerId =", customerId);
-        console.log("body =", req.body);
-
         // =========================
         // CHECK ORDER ID
         // =========================

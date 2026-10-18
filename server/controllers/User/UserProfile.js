@@ -27,13 +27,15 @@ exports.updateProfileUser = async (req, res) => {
     const { username, email, phone } = req.body;
     const userId = req.user.id;
 
-    // ==========================================
-    // ตรวจสอบข้อมูล
-    // ==========================================
+    // ตรวจสอบและจัดรูปแบบข้อมูล
+    const newUsername =
+      typeof username === "string" ? username.trim() : "";
 
-    const newUsername = username?.trim();
-    const newEmail = email?.trim();
-    const newPhone = phone?.trim();
+    const newEmail =
+      typeof email === "string" ? email.trim().toLowerCase() : "";
+
+    const newPhone =
+      typeof phone === "string" ? phone.trim() : "";
 
     if (!newUsername) {
       return res.status(400).json({
@@ -41,26 +43,26 @@ exports.updateProfileUser = async (req, res) => {
       });
     }
 
-    if (!newEmail) {
+    if (!/^0\d{9}$/.test(newPhone)) {
       return res.status(400).json({
-        message: "กรุณากรอก Email",
+        message: "กรุณากรอกเบอร์โทรศัพท์ 10 หลัก และขึ้นต้นด้วย 0",
       });
     }
 
-    if (!newPhone) {
+    // ตรวจสอบรูปแบบ Email เฉพาะเมื่อกรอกมา
+    if (
+      newEmail &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)
+    ) {
       return res.status(400).json({
-        message: "กรุณากรอกเบอร์โทรศัพท์",
+        message: "รูปแบบ Email ไม่ถูกต้อง",
+        field: "email",
       });
     }
 
-    // ==========================================
-    // ตรวจสอบ User ปัจจุบัน
-    // ==========================================
-
+    // ตรวจสอบผู้ใช้ปัจจุบัน
     const currentUser = await prisma.customer.findUnique({
-      where: {
-        id: userId,
-      },
+      where: { id: userId },
     });
 
     if (!currentUser) {
@@ -69,17 +71,12 @@ exports.updateProfileUser = async (req, res) => {
       });
     }
 
-    // ==========================================
     // ตรวจสอบ Username ซ้ำ
-    // ==========================================
-
     if (newUsername !== currentUser.username) {
       const checkUsername = await prisma.customer.findFirst({
         where: {
           username: newUsername,
-          NOT: {
-            id: userId,
-          },
+          NOT: { id: userId },
         },
       });
 
@@ -91,38 +88,46 @@ exports.updateProfileUser = async (req, res) => {
     }
 
     // ==========================================
-    // ตรวจสอบ Email ซ้ำ
+    // ตรวจสอบ Email ซ้ำทั้ง Customer และ Store
+    // ตรวจเฉพาะเมื่อกรอก Email
     // ==========================================
 
-    if (newEmail !== currentUser.email) {
-      const checkEmail = await prisma.customer.findFirst({
-        where: {
-          email: newEmail,
-          NOT: {
-            id: userId,
-          },
-        },
-      });
+    if (newEmail && newEmail !== currentUser.email) {
+      const [checkCustomerEmail, checkStoreEmail] =
+        await Promise.all([
+          prisma.customer.findFirst({
+            where: {
+              email: newEmail,
+              NOT: {
+                id: userId,
+              },
+            },
+            select: { id: true },
+          }),
 
-      if (checkEmail) {
+          prisma.store.findFirst({
+            where: {
+              email: newEmail,
+            },
+            select: { id: true },
+          }),
+        ]);
+
+      if (checkCustomerEmail || checkStoreEmail) {
         return res.status(400).json({
           message: "Email นี้ถูกใช้งานแล้ว",
+          field: "email",
         });
       }
     }
 
-    // ==========================================
     // อัปเดตข้อมูล
-    // ==========================================
-
     const user = await prisma.customer.update({
-      where: {
-        id: userId,
-      },
+      where: { id: userId },
       data: {
         username: newUsername,
-        email: newEmail,
         phone: newPhone,
+        email: newEmail || null,
       },
       select: {
         id: true,
@@ -137,7 +142,7 @@ exports.updateProfileUser = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.log("updateProfileUser error:", error);
+    console.error("updateProfileUser error:", error);
 
     return res.status(500).json({
       message: "Server Error",
@@ -149,7 +154,6 @@ exports.readMenu = async (req, res) => {
   try {
     const menuId = Number(req.params.id);
 
-    console.log("USER MENU ID =", menuId);
 
     if (!menuId || Number.isNaN(menuId)) {
       return res.status(400).json({

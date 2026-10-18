@@ -150,7 +150,6 @@ exports.authStaff = async (req, res, next) => {
     }
 
     if (!staff.isActive) {
-      console.log("❌ STAFF ถูกปิดใช้งาน");
 
       return res.status(403).json({
         message: "บัญชีคนส่งถูกปิดใช้งาน",

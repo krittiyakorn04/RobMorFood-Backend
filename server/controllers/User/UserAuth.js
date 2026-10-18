@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
-    const { password, username, phone, email } = req.body;
+    const { password, username, phone } = req.body;
 
     // =========================
     // ตรวจข้อมูลพื้นฐาน
@@ -15,9 +15,6 @@ exports.register = async (req, res) => {
 
     const cleanUsername =
       typeof username === "string" ? username.trim() : "";
-
-    const cleanEmail =
-      typeof email === "string" ? email.trim().toLowerCase() : "";
 
     if (!cleanUsername) {
       return res.status(400).json({
@@ -85,18 +82,6 @@ exports.register = async (req, res) => {
       });
     }
 
-    // =========================
-    // ตรวจสอบอีเมล
-    // =========================
-
-    if (
-      !cleanEmail ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
-    ) {
-      return res.status(400).json({
-        message: "กรุณากรอกอีเมลให้ถูกต้อง",
-      });
-    }
 
     // =========================
     // ตรวจสอบข้อมูลซ้ำในร้านค้า
@@ -107,7 +92,6 @@ exports.register = async (req, res) => {
         OR: [
           { username: cleanUsername },
           { phone },
-          { email: cleanEmail },
         ],
       },
     });
@@ -115,7 +99,7 @@ exports.register = async (req, res) => {
     if (store) {
       return res.status(400).json({
         message:
-          "ชื่อผู้ใช้ เบอร์โทรศัพท์ หรืออีเมลนี้ถูกใช้งานแล้ว",
+          "ชื่อผู้ใช้หรือเบอร์โทรศัพท์นี้ถูกใช้งานแล้ว",
       });
     }
 
@@ -128,7 +112,6 @@ exports.register = async (req, res) => {
         OR: [
           { username: cleanUsername },
           { phone },
-          { email: cleanEmail },
         ],
       },
     });
@@ -136,7 +119,7 @@ exports.register = async (req, res) => {
     if (user) {
       return res.status(400).json({
         message:
-          "ชื่อผู้ใช้ เบอร์โทรศัพท์ หรืออีเมลนี้ถูกใช้งานแล้ว",
+          "ชื่อผู้ใช้หรือเบอร์โทรศัพท์นี้ถูกใช้งานแล้ว",
       });
     }
 
@@ -155,7 +138,6 @@ exports.register = async (req, res) => {
         username: cleanUsername,
         password: hashPassword,
         phone,
-        email: cleanEmail,
       },
     });
 

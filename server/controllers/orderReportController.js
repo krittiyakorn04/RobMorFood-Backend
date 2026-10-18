@@ -79,10 +79,7 @@ const createOrderReport = async (req, res) => {
             },
         });
 
-        console.log("ORDER REPORT NOTIFICATION =", {
-            orderId: order.id,
-            orderStoreId: order.storeId,
-        });
+       
 
         await createNotification({
             title: "มีการแจ้งปัญหาออเดอร์",

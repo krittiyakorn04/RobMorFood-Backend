@@ -31,11 +31,6 @@ const createAdmin = async () => {
             },
         });
 
-        console.log("================================");
-        console.log("สร้าง Admin สำเร็จ");
-        console.log("Email:", admin.email);
-        console.log("Password:", password);
-        console.log("================================");
     } catch (error) {
         console.log("Create Admin Error =", error);
     } finally {

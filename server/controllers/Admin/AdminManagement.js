@@ -5,7 +5,16 @@ exports.getAllStores = async (req, res) => {
   try {
     const stores = await prisma.store.findMany({
       include: {
-        storeCategories: true,
+        storeCategories: {
+          include: {
+            storeCategory: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
 
         menuCategories: true,
 

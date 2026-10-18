@@ -241,23 +241,7 @@ exports.createOrder = async (req, res) => {
         },
       });
 
-      console.log("========== CREATE ORDER ==========");
-      console.log("Store ID:", cart.store.id);
-      console.log("Order mode:", cart.store.orderMode);
-      console.log("เวลาไทย:", thaiTime);
-      console.log("นาทีปัจจุบัน:", currentMinutes);
-      console.log(
-        "รอบที่มีในฐานข้อมูล:",
-        rounds.map((round) => ({
-          id: round.id,
-          roundNumber: round.roundNumber,
-          startTime: round.startTime,
-          endTime: round.endTime,
-          status: round.status,
-          startMinutes: timeToMinutes(round.startTime),
-          endMinutes: timeToMinutes(round.endTime),
-        }))
-      );
+      
 
       const currentRound = rounds.find((round) => {
         const start = timeToMinutes(round.startTime);

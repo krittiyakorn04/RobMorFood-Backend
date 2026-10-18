@@ -1237,12 +1237,6 @@ exports.sendStaffDeliveryMessage = async (req, res) => {
         const roomId = Number(req.params.roomId);
         const { message } = req.body;
 
-        console.log(
-            "========== STAFF SEND DELIVERY CHAT =========="
-        );
-        console.log("staffId =", staffId);
-        console.log("roomId =", roomId);
-        console.log("message =", message);
 
         if (!staffId) {
             return res.status(401).json({
@@ -1277,7 +1271,6 @@ exports.sendStaffDeliveryMessage = async (req, res) => {
             },
         });
 
-        console.log("room =", room);
 
         if (!room) {
             return res.status(403).json({
@@ -1321,10 +1314,6 @@ exports.sendStaffDeliveryMessage = async (req, res) => {
                 },
             });
 
-        console.log(
-            "newMessage =",
-            newMessage
-        );
 
         // =====================================================
         // อัปเดตเวลาห้อง

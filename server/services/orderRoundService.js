@@ -56,9 +56,7 @@ const updateOrderRoundStatus = async () => {
   try {
     const now = getBangkokTime();
 
-    console.log(
-      `[OrderRound] เวลาไทย ${now.date} ${now.time} (Asia/Bangkok)`
-    );
+    
 
     const rounds = await prisma.orderRound.findMany({
       where: {
@@ -73,13 +71,7 @@ const updateOrderRoundStatus = async () => {
       const end = timeToMinutes(round.endTime);
 
       if (start === null || end === null) {
-        console.log(
-          `[OrderRound #${round.id}] เวลาไม่ถูกต้อง`,
-          {
-            startTime: round.startTime,
-            endTime: round.endTime,
-          }
-        );
+        
         continue;
       }
 
@@ -93,16 +85,7 @@ const updateOrderRoundStatus = async () => {
         ? current >= start || current < end
         : current >= start && current < end;
 
-      console.log(
-        `[OrderRound #${round.id}] รอบ ${round.roundNumber}`,
-        {
-          startTime: round.startTime,
-          endTime: round.endTime,
-          status: round.status,
-          currentTimeThailand: now.time,
-          isInRound,
-        }
-      );
+      
 
       if (isInRound && round.status === "PENDING") {
         await prisma.orderRound.update({
@@ -110,9 +93,7 @@ const updateOrderRoundStatus = async () => {
           data: { status: "OPEN" },
         });
 
-        console.log(
-          `OrderRound #${round.id} รอบ ${round.roundNumber} → OPEN`
-        );
+       
 
         continue;
       }
@@ -128,9 +109,7 @@ const updateOrderRoundStatus = async () => {
           data: { status: "CLOSED" },
         });
 
-        console.log(
-          `OrderRound #${round.id} รอบ ${round.roundNumber} → CLOSED`
-        );
+        
       }
     }
   } catch (error) {
