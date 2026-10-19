@@ -12,6 +12,8 @@ import {
   ShoppingBag,
   ArrowLeft,
   CreditCard,
+  Download,
+  Maximize2,
 } from "lucide-react";
 
 import Swal from "sweetalert2";
@@ -43,6 +45,9 @@ const UserPayment = () => {
   const [order, setOrder] = useState(null);
 
   const [loading, setLoading] = useState(true);
+
+  const [qrOpen, setQrOpen] = useState(false);
+  const [downloadingQR, setDownloadingQR] = useState(false);
 
   // รูปสลิปที่ผู้ใช้กำลังเลือก
   const [slip, setSlip] = useState(null);
@@ -410,6 +415,53 @@ const UserPayment = () => {
   };
 
   // =========================
+  // DOWNLOAD QR CODE
+  // =========================
+
+  const handleDownloadQR = async () => {
+    if (!paymentImageUrl || downloadingQR) return;
+
+    try {
+      setDownloadingQR(true);
+
+      const response = await fetch(paymentImageUrl);
+
+      if (!response.ok) {
+        throw new Error("ไม่สามารถโหลดรูป QR Code ได้");
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `RobMorFood-QR-${storeId || "Store"}.jpg`;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 1500);
+    } catch (error) {
+      console.error("Download QR Error =", error);
+
+      // เปิดรูปต้นฉบับให้ผู้ใช้บันทึกเองได้
+      window.open(paymentImageUrl, "_blank", "noopener,noreferrer");
+
+      Swal.fire({
+        icon: "info",
+        title: "เปิดรูป QR Code แล้ว",
+        text: "หากดาวน์โหลดอัตโนมัติไม่ได้ ให้กดค้างที่รูปบนโทรศัพท์ หรือคลิกขวาที่รูปบนคอมพิวเตอร์เพื่อบันทึก",
+        confirmButtonColor: "#f97316",
+      });
+    } finally {
+      setDownloadingQR(false);
+    }
+  };
+
+  // =========================
   // GO TO ORDER DETAIL
   // =========================
 
@@ -433,10 +485,6 @@ const UserPayment = () => {
       }
     };
   }, [slipPreview]);
-
-  // =========================
-  // LOADING
-  // =========================
 
   // =========================
   // LOADING
@@ -1018,76 +1066,101 @@ const UserPayment = () => {
                 </div>
               </div>
 
-              {/* QR */}
+              {/* QR CODE */}
 
               {paymentImageUrl ? (
-                <div
-                  className="
-                flex
-                flex-col
-                items-center
-              "
-                >
-                  <div
+                <div className="flex flex-col items-center">
+                  <button
+                    type="button"
+                    onClick={() => setQrOpen(true)}
                     className="
-                  w-full
-                  max-w-[400px]
-                  rounded-2xl
-                  bg-gray-50
-                  border
-                  p-4
-                "
+        group relative
+        w-full max-w-[400px]
+        overflow-hidden rounded-2xl
+        border border-orange-100
+        bg-white p-3
+        shadow-sm
+        transition
+        hover:border-orange-400
+        hover:shadow-lg
+        focus:outline-none
+        focus:ring-2 focus:ring-orange-400
+      "
+                    aria-label="ขยายรูป QR Code"
                   >
                     <img
                       src={paymentImageUrl}
                       alt="QR Code ร้านค้า"
                       className="
-                    w-full
-                    max-h-[400px]
-                    object-contain
-                    rounded-xl
-                  "
+          w-full max-h-[400px]
+          rounded-xl object-contain
+        "
                     />
-                  </div>
 
-                  <p
-                    className="
-                  mt-4
-                  text-gray-500
-                  text-center
-                "
-                  >
-                    สแกน QR Code
-                    <br />
-                    เพื่อชำระเงินให้ร้านค้า
+                    <div
+                      className="
+        absolute inset-0
+        flex items-center justify-center
+        bg-black/0 transition
+        group-hover:bg-black/35
+      "
+                    >
+                      <span
+                        className="
+          flex items-center gap-2
+          rounded-full bg-white
+          px-4 py-2
+          text-sm font-semibold text-gray-800
+          opacity-0 shadow-lg transition
+          group-hover:opacity-100
+        "
+                      >
+                        <Maximize2 size={17} />
+                        กดเพื่อขยายรูป
+                      </span>
+                    </div>
+                  </button>
+
+                  <p className="mt-4 text-center text-gray-500">
+                    สแกน QR Code เพื่อชำระเงินให้ร้านค้า
                   </p>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadQR}
+                    disabled={downloadingQR}
+                    className="
+        mt-4 flex items-center justify-center gap-2
+        rounded-xl border border-orange-200
+        bg-orange-50 px-5 py-3
+        font-semibold text-orange-700
+        transition hover:bg-orange-100
+        disabled:cursor-not-allowed disabled:opacity-60
+      "
+                  >
+                    {downloadingQR ? (
+                      <Loader2 size={19} className="animate-spin" />
+                    ) : (
+                      <Download size={19} />
+                    )}
+
+                    {downloadingQR ? "กำลังบันทึกรูป..." : "บันทึกรูป QR Code"}
+                  </button>
                 </div>
               ) : (
                 <div
                   className="
-                rounded-2xl
-                border-2
-                border-dashed
-                border-gray-200
-                bg-gray-50
-                p-10
-                text-center
-              "
+    rounded-2xl border-2 border-dashed
+    border-gray-200 bg-gray-50 p-10 text-center
+  "
                 >
                   <ImageIcon size={35} className="mx-auto text-gray-400" />
 
-                  <p
-                    className="
-                  mt-4
-                  font-semibold
-                  text-gray-500
-                "
-                  >
+                  <p className="mt-4 font-semibold text-gray-500">
                     ร้านนี้ยังไม่ได้เพิ่ม QR Code
                   </p>
                 </div>
               )}
-
               {/* =========================
               CURRENT SLIP
           ========================= */}
@@ -1444,6 +1517,103 @@ const UserPayment = () => {
           </div>
         )}
       </div>
+      {/* =========================
+    QR CODE FULLSCREEN MODAL
+========================= */}
+
+      {qrOpen && paymentImageUrl && (
+        <div
+          className="
+      fixed inset-0 z-[100]
+      flex items-center justify-center
+      bg-black/80 p-4
+      backdrop-blur-sm
+    "
+          onClick={() => setQrOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="QR Code สำหรับชำระเงิน"
+            className="
+        relative flex w-full max-w-lg
+        max-h-[92dvh] flex-col
+        overflow-hidden rounded-3xl
+        bg-white p-4 shadow-2xl
+        sm:p-6
+      "
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold text-[#2A1B12]">
+                  QR Code สำหรับชำระเงิน
+                </h2>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  กดค้างที่รูปบนโทรศัพท์เพื่อบันทึกได้
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setQrOpen(false)}
+                className="
+            flex h-10 w-10 shrink-0
+            items-center justify-center
+            rounded-full bg-gray-100
+            text-gray-600 transition
+            hover:bg-red-50 hover:text-red-500
+          "
+                aria-label="ปิดรูป QR Code"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            <div
+              className="
+        flex min-h-0 flex-1
+        items-center justify-center
+        overflow-auto rounded-2xl
+        bg-white
+      "
+            >
+              <img
+                src={paymentImageUrl}
+                alt="QR Code ร้านค้าแบบขยาย"
+                className="
+            block h-auto w-auto
+            max-h-[calc(92dvh-180px)]
+            max-w-full object-contain
+          "
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleDownloadQR}
+              disabled={downloadingQR}
+              className="
+          mt-4 flex w-full items-center
+          justify-center gap-2 rounded-xl
+          bg-[#FF6B35] px-4 py-3.5
+          font-bold text-white transition
+          hover:bg-[#E8491D]
+          disabled:cursor-not-allowed disabled:opacity-60
+        "
+            >
+              {downloadingQR ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : (
+                <Download size={20} />
+              )}
+
+              {downloadingQR ? "กำลังบันทึกรูป..." : "บันทึกรูป QR Code"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

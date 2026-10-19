@@ -5,6 +5,7 @@ const webpush = require("../config/webpush");
 // สร้าง Notification + ส่ง Web Push
 // =====================================================
 
+
 exports.createNotification = async ({
   title,
   message,
@@ -14,12 +15,9 @@ exports.createNotification = async ({
   deliveryStaffId = null,
   deliveryId = null,
   orderId = null,
+  roomId = null,
 }) => {
   try {
-    // =====================================================
-    // 1. บันทึก Notification ลง Database
-    // =====================================================
-
     const notification = await prisma.notification.create({
       data: {
         title,
@@ -33,35 +31,21 @@ exports.createNotification = async ({
       },
     });
 
-    // =====================================================
-    // 2. หา Push Subscription ของผู้รับ
-    // =====================================================
-
     let subscriptions = [];
 
-    if (customerId) {
+    if (customerId != null) {
       subscriptions = await prisma.pushSubscription.findMany({
-        where: {
-          customerId: Number(customerId),
-        },
+        where: { customerId: Number(customerId) },
       });
-    } else if (storeId) {
+    } else if (storeId != null) {
       subscriptions = await prisma.pushSubscription.findMany({
-        where: {
-          storeId: Number(storeId),
-        },
+        where: { storeId: Number(storeId) },
       });
-    } else if (deliveryStaffId) {
+    } else if (deliveryStaffId != null) {
       subscriptions = await prisma.pushSubscription.findMany({
-        where: {
-          deliveryStaffId: Number(deliveryStaffId),
-        },
+        where: { deliveryStaffId: Number(deliveryStaffId) },
       });
     }
-
-    // =====================================================
-    // 3. ถ้ามีอุปกรณ์ ให้ส่ง Push Notification
-    // =====================================================
 
     if (subscriptions.length > 0) {
       const payload = JSON.stringify({
@@ -69,8 +53,12 @@ exports.createNotification = async ({
         message,
         type,
         notificationId: notification.id,
+        customerId,
+        storeId,
+        deliveryStaffId,
         deliveryId,
         orderId,
+        roomId,
       });
 
       await Promise.all(
@@ -84,34 +72,27 @@ exports.createNotification = async ({
                   auth: item.auth,
                 },
               },
-              payload,
+              payload
             );
           } catch (error) {
             console.error(
               "sendPushNotification Error =",
               error.statusCode,
-              error.message,
+              error.message
             );
 
-            // Subscription หมดอายุหรือใช้งานไม่ได้
             if (
               error.statusCode === 404 ||
               error.statusCode === 410
             ) {
-              await prisma.pushSubscription.delete({
-                where: {
-                  id: item.id,
-                },
+              await prisma.pushSubscription.deleteMany({
+                where: { id: item.id },
               });
             }
           }
-        }),
+        })
       );
     }
-
-    // =====================================================
-    // 4. คืน Notification
-    // =====================================================
 
     return notification;
   } catch (error) {
@@ -119,6 +100,7 @@ exports.createNotification = async ({
     return null;
   }
 };
+
 // =====================================================
 // ดึงแจ้งเตือน
 // =====================================================

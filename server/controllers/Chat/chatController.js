@@ -222,6 +222,7 @@ exports.sendCustomerMessage = async (req, res) => {
                 message: `${room.customer?.username || "ลูกค้า"} ส่งข้อความใหม่ถึงร้าน`,
                 type: "CHAT_MESSAGE",
                 storeId: room.storeId,
+                roomId: room.id,
             });
         }
 
@@ -412,6 +413,8 @@ exports.sendStoreMessage = async (req, res) => {
                 message: "ร้านส่งข้อความใหม่ถึงคุณ",
                 type: "CHAT_MESSAGE",
                 customerId: room.customerId,
+                storeId,
+                roomId: room.id,
             });
         }
 

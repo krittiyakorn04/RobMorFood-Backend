@@ -86,54 +86,6 @@ const MainNav = () => {
     loadAddress();
   }, [token]);
 
-  useEffect(() => {
-    if (!token) {
-      setNotifications([]);
-      setUnreadCount(0);
-      return;
-    }
-
-    let mounted = true;
-    let loading = false;
-
-    const fetchNotifications = async () => {
-      if (loading) return;
-
-      loading = true;
-
-      try {
-        const res = await axios.get(`${API}/user/notification`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!mounted) return;
-
-        setNotifications(res.data.notifications || []);
-        setUnreadCount(res.data.unreadCount || 0);
-      } catch (error) {
-        console.log(
-          "โหลด Notification ไม่สำเร็จ =",
-          error?.response?.data || error,
-        );
-      } finally {
-        loading = false;
-      }
-    };
-
-    fetchNotifications();
-
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 3000);
-
-    return () => {
-      mounted = false;
-      clearInterval(interval);
-    };
-  }, [token]);
-
   // =========================
   // ดึง Notification
   // =========================
@@ -177,7 +129,7 @@ const MainNav = () => {
 
     const interval = setInterval(() => {
       loadNotifications();
-    }, 15000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [token]);
@@ -328,12 +280,7 @@ const MainNav = () => {
 
         setNotifications((prev) =>
           prev.map((item) =>
-            item.id === notification.id
-              ? {
-                  ...item,
-                  isRead: true,
-                }
-              : item,
+            item.id === notification.id ? { ...item, isRead: true } : item,
           ),
         );
 
@@ -343,23 +290,32 @@ const MainNav = () => {
       setNotificationOpen(false);
 
       if (notification.type === "CHAT_MESSAGE") {
+        // แชทจัดส่ง: ใช้ deliveryId
         if (notification.deliveryId) {
           navigate(`/user/deliveryChat/${notification.deliveryId}`);
           return;
         }
 
+        // แชทลูกค้า-ร้าน: ใช้ storeId
+        // หน้าแชทต้องเรียก API getOrCreateStoreChat
         if (notification.storeId) {
           navigate(`/user/chat/store/${notification.storeId}`);
           return;
         }
+
+        console.warn(
+          "Notification แชทไม่มี deliveryId หรือ storeId",
+          notification,
+        );
+        return;
       }
 
       if (notification.orderId) {
         navigate(`/user/orderDetail/${notification.orderId}`);
       }
     } catch (error) {
-      console.log(
-        "อ่าน Notification ไม่สำเร็จ =",
+      console.error(
+        "จัดการ Notification ไม่สำเร็จ =",
         error?.response?.data || error,
       );
     }
