@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://robmorfood-backend.onrender.com/api";
+const API = "https://robmorfood-backend-new.onrender.com/api";
 
 export const getStoreProfile = async (token) => {
   return axios.get(`${API}/store/profile`, {

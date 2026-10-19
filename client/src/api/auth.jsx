@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://robmorfood-backend.onrender.com/api";
+const API_URL = "https://robmorfood-backend-new.onrender.com/api";
 
 export const currentUser = async (token) =>
   await axios.post(

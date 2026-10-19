@@ -15,14 +15,13 @@ import {
   ShoppingBag,
   MessageCircle,
   Zap,
-  Clock3 
+  Clock3,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import { toggleStoreStatus } from "../../api/createStore";
 import { getMyStoreReviews } from "../../api/StoreOrder";
 import Swal from "sweetalert2";
-
 
 /* =====================================================
 ส่วนประกอบย่อยสำหรับดีไซน์ (ไม่มีลอจิก)
@@ -87,8 +86,6 @@ const FormProfileStore = () => {
         await getStore(token);
 
         const reviewRes = await getMyStoreReviews(token);
-
-        console.log("ข้อมูลรีวิวร้าน =", reviewRes.data);
 
         setReviewData({
           totalReviews: Number(reviewRes.data?.totalReviews || 0),
@@ -442,10 +439,10 @@ const FormProfileStore = () => {
                 </div>
               </div>
 
-              <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-[#FBF8F4] p-4 ring-1 ring-[#F0E8E0]">
-                <div className="flex items-center gap-3">
+              <div className="mt-5 flex flex-col gap-4 rounded-2xl bg-[#FBF8F4] p-4 ring-1 ring-[#F0E8E0] sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-center gap-3">
                   <div
-                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
                       isOpen
                         ? "bg-emerald-100 text-emerald-600"
                         : "bg-red-100 text-red-500"
@@ -453,9 +450,10 @@ const FormProfileStore = () => {
                   >
                     <Power size={21} />
                   </div>
-                  <div>
+
+                  <div className="min-w-0">
                     <p className="font-semibold text-[#2A1B12]">สถานะร้าน</p>
-                    <p className="text-sm text-[#8A6A54]">
+                    <p className="text-sm leading-relaxed text-[#8A6A54]">
                       {isOpen ? "ร้านกำลังเปิดรับออเดอร์" : "ร้านปิดอยู่"}
                     </p>
                   </div>
@@ -464,7 +462,7 @@ const FormProfileStore = () => {
                 <button
                   type="button"
                   onClick={handleToggleStatus}
-                  className={`rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-sm transition active:scale-95 ${
+                  className={`w-full shrink-0 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-sm transition active:scale-95 sm:w-auto ${
                     isOpen
                       ? "bg-red-500 hover:bg-red-600"
                       : "bg-emerald-500 hover:bg-emerald-600"
@@ -574,12 +572,12 @@ const FormProfileStore = () => {
                   {verifyImages.map((image) => (
                     <div
                       key={image.id}
-                      className="overflow-hidden rounded-2xl bg-[#FBF8F4] ring-1 ring-[#F0E8E0]"
+                      className="flex min-w-0 items-center justify-center overflow-hidden rounded-2xl bg-[#FBF8F4] p-2 ring-1 ring-[#F0E8E0]"
                     >
                       <img
                         src={image.url}
                         alt="รูปยืนยันตัวตน"
-                        className="h-52 w-full object-cover"
+                        className="block h-auto max-h-80 w-full object-contain"
                       />
                     </div>
                   ))}

@@ -91,7 +91,6 @@ const StoreReport = () => {
 
       const res = await getStoreReport(token, params);
 
-      console.log("STORE REPORT =", res.data);
 
       setReport(res.data);
 

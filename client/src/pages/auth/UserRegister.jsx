@@ -25,7 +25,6 @@ const PASSWORD_RULES = [
   { id: "space", label: "ไม่มีช่องว่าง", test: (p) => p.length > 0 && !/\s/.test(p) },
 ];
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^0\d{9}$/;
 
 const validate = (form) => {
@@ -33,7 +32,6 @@ const validate = (form) => {
 
   if (!form.username.trim()) errors.username = "กรุณากรอกชื่อผู้ใช้";
 
-  if (!EMAIL_REGEX.test(form.email.trim())) errors.email = "กรุณากรอกอีเมลให้ถูกต้อง";
 
   if (!PHONE_REGEX.test(form.phone))
     errors.phone = "กรอกเบอร์โทร 10 หลัก และขึ้นต้นด้วย 0";
@@ -143,7 +141,6 @@ const UserRegister = () => {
 
   const [form, setForm] = useState({
     username: "",
-    email: "",
     phone: "",
     password: "",
     confirmPassword: "",
@@ -192,11 +189,10 @@ const UserRegister = () => {
     setLoading(true);
     try {
       // ไม่ส่ง confirmPassword ไป Backend
-      const { username, email, phone, password } = form;
+      const { username, phone, password } = form;
 
       const res = await actionRegisterUser({
         username: username.trim(),
-        email: email.trim().toLowerCase(),
         phone,
         password,
       });
@@ -292,22 +288,6 @@ const UserRegister = () => {
                 </Field>
               </div>
 
-              {/* Email */}
-              <Field id="email" label="อีเมล" error={showError("email")}>
-                <input
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleOnChange}
-                  onBlur={handleBlur}
-                  placeholder="example@email.com"
-                  autoComplete="email"
-                  aria-invalid={!!showError("email")}
-                  aria-describedby={showError("email") ? "email-error" : undefined}
-                  className={`${inputBase} ${showError("email") ? inputErr : inputOk}`}
-                />
-              </Field>
 
               {/* Password */}
               <Field id="password" label="รหัสผ่าน" error={showError("password")}>

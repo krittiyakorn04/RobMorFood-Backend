@@ -169,7 +169,6 @@ const StoreOrders = () => {
     try {
       const res = await getStoreOrders(token);
 
-      console.log("REFRESH STORE ORDERS =", JSON.stringify(res.data, null, 2));
 
       const allOrders = Array.isArray(res.data) ? res.data : [];
 

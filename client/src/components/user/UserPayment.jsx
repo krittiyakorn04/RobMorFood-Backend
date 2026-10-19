@@ -129,10 +129,6 @@ const UserPayment = () => {
     try {
       const res = await getOrderDetail(token, orderId);
 
-      console.log("Order Payment =", res.data);
-
-      console.log("Payment Status =", res.data?.payment?.status);
-
       setOrder(res.data);
     } catch (error) {
       console.log("โหลดข้อมูล Order ไม่สำเร็จ =", error);
@@ -165,8 +161,6 @@ const UserPayment = () => {
         setLoading(true);
 
         const res = await getStoreClient(token, storeId);
-
-        console.log("Store Payment =", res.data);
 
         setStore(res.data);
       } catch (error) {
@@ -385,15 +379,7 @@ const UserPayment = () => {
 
       const data = await resizeImage(slip);
 
-      console.log("กำลังอัปโหลดสลิป...");
-
-      console.log("Order ID =", orderId);
-
-      console.log("Payment Status =", paymentStatus);
-
       const res = await uploadSlip(token, orderId, data);
-
-      console.log("อัปโหลดสลิปสำเร็จ =", res.data);
 
       await Swal.fire({
         icon: "success",
@@ -452,101 +438,129 @@ const UserPayment = () => {
   // LOADING
   // =========================
 
-if (loading) {
-  return (
-    <div className="min-h-screen animate-pulse bg-[#FFF8F0]">
-      {/* Navbar */}
-      <div className="border-b border-[#F1E5D9] bg-white px-4 py-4 sm:px-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="h-7 w-32 rounded-lg bg-[#EADFD4]" />
-          <div className="h-9 w-24 rounded-xl bg-[#F0E6DC]" />
-        </div>
-      </div>
+  // =========================
+  // LOADING
+  // =========================
 
-      {/* Main content */}
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
-        {/* Page title */}
-        <div className="mb-8 rounded-2xl border border-[#F1E5D9] bg-[#FFFCF8] p-6">
-          <div className="mb-3 h-8 w-36 rounded-lg bg-[#EADFD4]" />
-          <div className="h-4 w-64 max-w-full rounded-md bg-[#F0E6DC]" />
-        </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full bg-[#FFF8F0] pb-10">
+        <div className="mx-auto w-full max-w-6xl px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-12 animate-pulse">
+          {/* HEADER — โครงเดียวกับหน้าจริง */}
+          <div className="mb-6 rounded-2xl border border-[#F1E5D9] bg-[#FFFCF8] px-6 py-5">
+            <div className="mb-3 h-9 w-36 rounded-lg bg-[#EADFD4]" />
+            <div className="h-4 w-64 max-w-full rounded-md bg-[#F0E6DC]" />
+            <div className="mt-4 h-1 w-10 rounded-full bg-[#F5D2B8]" />
+          </div>
 
-        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-5">
-          {/* Payment details */}
-          <div className="space-y-5 lg:col-span-3">
-            {/* Order summary */}
-            <div className="rounded-2xl border border-[#F1E5D9] bg-white p-5 sm:p-6">
-              <div className="mb-5 h-6 w-40 rounded-md bg-[#EADFD4]" />
+          {/* PAYMENT STATUS */}
+          <div className="mb-6 rounded-2xl border border-yellow-200 bg-yellow-50 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 shrink-0 rounded-xl bg-yellow-100" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-32 rounded-md bg-[#EADFD4]" />
+                <div className="h-4 w-40 rounded-md bg-[#EADFD4]" />
+                <div className="h-3 w-56 max-w-full rounded-md bg-[#F0E6DC]" />
+              </div>
+            </div>
+          </div>
 
-              {[1, 2, 3].map((item) => (
-                <div
-                  key={item}
-                  className="flex items-center gap-4 border-b border-[#F5EDE5] py-4 last:border-0"
-                >
-                  <div className="h-16 w-16 shrink-0 rounded-xl bg-[#F0E6DC]" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-2/3 rounded-md bg-[#EADFD4]" />
-                    <div className="h-3 w-1/3 rounded-md bg-[#F0E6DC]" />
-                  </div>
-                  <div className="h-4 w-14 rounded-md bg-[#EADFD4]" />
-                </div>
-              ))}
+          {/* STORE */}
+          <div className="mb-5 overflow-hidden rounded-3xl border border-orange-100 bg-white shadow-sm">
+            <div className="flex items-center gap-4 p-5">
+              <div className="h-14 w-14 shrink-0 rounded-2xl bg-[#F0E6DC]" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="h-5 w-40 max-w-full rounded-md bg-[#EADFD4]" />
+                <div className="h-3 w-36 max-w-full rounded-md bg-[#F0E6DC]" />
+              </div>
+              <div className="h-7 w-20 shrink-0 rounded-full bg-[#F0E6DC]" />
+            </div>
+          </div>
 
-              <div className="mt-5 space-y-3">
-                <div className="flex justify-between">
-                  <div className="h-4 w-24 rounded-md bg-[#F0E6DC]" />
-                  <div className="h-4 w-20 rounded-md bg-[#F0E6DC]" />
-                </div>
-                <div className="flex justify-between">
-                  <div className="h-4 w-20 rounded-md bg-[#F0E6DC]" />
-                  <div className="h-4 w-16 rounded-md bg-[#F0E6DC]" />
-                </div>
-                <div className="flex justify-between border-t border-[#F1E5D9] pt-4">
-                  <div className="h-5 w-24 rounded-md bg-[#EADFD4]" />
-                  <div className="h-6 w-28 rounded-md bg-[#F5D2B8]" />
-                </div>
+          {/* ORDER ITEMS */}
+          <div className="mb-6 rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-[#F0E6DC]" />
+              <div className="space-y-2">
+                <div className="h-5 w-32 rounded-md bg-[#EADFD4]" />
+                <div className="h-3 w-28 rounded-md bg-[#F0E6DC]" />
               </div>
             </div>
 
-            {/* Payment method */}
-            <div className="rounded-2xl border border-[#F1E5D9] bg-white p-5 sm:p-6">
-              <div className="mb-5 h-6 w-36 rounded-md bg-[#EADFD4]" />
-              <div className="mb-4 h-14 rounded-xl bg-[#F5EDE5]" />
-              <div className="h-14 rounded-xl bg-[#F5EDE5]" />
+            <div className="space-y-4">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="flex gap-3 border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+                >
+                  <div className="h-20 w-20 shrink-0 rounded-xl bg-[#F0E6DC]" />
+                  <div className="min-w-0 flex-1 space-y-3 pt-1">
+                    <div className="h-4 w-36 max-w-full rounded-md bg-[#EADFD4]" />
+                    <div className="h-3 w-24 rounded-md bg-[#F0E6DC]" />
+                  </div>
+                  <div className="h-4 w-16 shrink-0 rounded-md bg-[#EADFD4]" />
+                </div>
+              ))}
+            </div>
+
+            {/* PRICE SUMMARY */}
+            <div className="mt-5 space-y-3 border-t border-gray-100 pt-4">
+              <div className="flex justify-between">
+                <div className="h-4 w-20 rounded-md bg-[#F0E6DC]" />
+                <div className="h-4 w-16 rounded-md bg-[#F0E6DC]" />
+              </div>
+              <div className="flex justify-between">
+                <div className="h-4 w-20 rounded-md bg-[#F0E6DC]" />
+                <div className="h-4 w-16 rounded-md bg-[#F0E6DC]" />
+              </div>
+              <div className="flex items-center justify-between border-t border-gray-100 pt-4">
+                <div className="h-5 w-28 rounded-md bg-[#EADFD4]" />
+                <div className="h-7 w-28 rounded-md bg-[#F5D2B8]" />
+              </div>
             </div>
           </div>
 
-          {/* Payment sidebar */}
-          <div className="lg:col-span-2">
-            <div className="rounded-2xl border border-[#F1E5D9] bg-white p-5 sm:p-6">
-              <div className="mb-5 h-6 w-32 rounded-md bg-[#EADFD4]" />
-              <div className="mx-auto mb-5 aspect-square w-full max-w-[220px] rounded-2xl bg-[#F0E6DC]" />
-              <div className="mx-auto mb-3 h-4 w-40 rounded-md bg-[#EADFD4]" />
-              <div className="mx-auto mb-6 h-4 w-28 rounded-md bg-[#F0E6DC]" />
-              <div className="h-12 rounded-xl bg-[#F5D2B8]" />
-              <div className="mx-auto mt-4 h-3 w-36 rounded-md bg-[#F0E6DC]" />
+          {/* PAYMENT — QR + SLIP + BUTTON */}
+          <div className="mb-6 rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-[#F0E6DC]" />
+              <div className="space-y-2">
+                <div className="h-5 w-44 rounded-md bg-[#EADFD4]" />
+                <div className="h-3 w-36 rounded-md bg-[#F0E6DC]" />
+              </div>
+            </div>
+
+            {/* QR CODE */}
+            <div className="flex flex-col items-center">
+              <div className="aspect-square w-full max-w-[400px] rounded-2xl border border-gray-100 bg-[#F0E6DC] p-4" />
+              <div className="mt-4 h-4 w-32 rounded-md bg-[#EADFD4]" />
+              <div className="mt-2 h-3 w-40 rounded-md bg-[#F0E6DC]" />
+            </div>
+
+            {/* SLIP UPLOAD */}
+            <div className="mt-8 space-y-3">
+              <div className="h-5 w-40 rounded-md bg-[#EADFD4]" />
+              <div className="h-36 rounded-xl border-2 border-dashed border-gray-200 bg-[#FFFCF8]" />
+              <div className="h-14 rounded-xl bg-[#F5D2B8]" />
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+
   // =========================
   // RENDER
   // =========================
 
+  const merchantStatus =
+    order?.store?.merchantStatus ?? store?.merchantStatus ?? null;
+
+  const isStoreBlocked = ["BANNED", "SUSPENDED"].includes(merchantStatus);
+
   return (
-    <div className="min-h-screen bg-[#FFF8F0]">
-      <div
-        className="
-          max-w-6xl
-          mx-auto
-          p-4
-          sm:p-6
-          pb-32
-        "
-      >
+    <div className="min-h-screen w-full bg-[#FFF8F0] pb-10">
+      <div className="mx-auto w-full max-w-6xl px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-12">
         {/* =========================
             HEADER
         ========================= */}
@@ -627,7 +641,9 @@ if (loading) {
             <div className="min-w-0 flex-1">
               <p className="mb-1 text-xs font-medium text-gray-400"></p>
               <h2 className="truncate text-lg font-bold text-[#2A1B12]">
-                {order.store?.storeName || "ไม่พบชื่อร้าน"}
+                {order?.store?.storeName ||
+                  store?.storeName ||
+                  "กำลังโหลดข้อมูลร้าน..."}
               </h2>
               <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
                 <span className="h-2 w-2 rounded-full bg-[#F07836]" />
@@ -955,9 +971,10 @@ if (loading) {
         {/* =========================
             PAYMENT
         ========================= */}
-
-        <div
-          className="
+        {!isStoreBlocked ? (
+          <div>
+            <div
+              className="
             bg-white
             rounded-2xl
             shadow-sm
@@ -966,19 +983,19 @@ if (loading) {
             p-5
             mb-6
           "
-        >
-          {/* TITLE */}
+            >
+              {/* TITLE */}
 
-          <div
-            className="
+              <div
+                className="
               flex
               items-center
               gap-3
               mb-5
             "
-          >
-            <div
-              className="
+              >
+                <div
+                  className="
                 w-11
                 h-11
                 rounded-xl
@@ -988,29 +1005,31 @@ if (loading) {
                 items-center
                 justify-center
               "
-            >
-              <QrCode size={22} />
-            </div>
+                >
+                  <QrCode size={22} />
+                </div>
 
-            <div>
-              <h2 className="font-bold text-lg">ชำระเงินผ่าน PromptPay</h2>
+                <div>
+                  <h2 className="font-bold text-lg">ชำระเงินผ่าน PromptPay</h2>
 
-              <p className="text-sm text-gray-400">สแกน QR Code ของร้านค้า</p>
-            </div>
-          </div>
+                  <p className="text-sm text-gray-400">
+                    สแกน QR Code ของร้านค้า
+                  </p>
+                </div>
+              </div>
 
-          {/* QR */}
+              {/* QR */}
 
-          {paymentImageUrl ? (
-            <div
-              className="
+              {paymentImageUrl ? (
+                <div
+                  className="
                 flex
                 flex-col
                 items-center
               "
-            >
-              <div
-                className="
+                >
+                  <div
+                    className="
                   w-full
                   max-w-[400px]
                   rounded-2xl
@@ -1018,34 +1037,34 @@ if (loading) {
                   border
                   p-4
                 "
-              >
-                <img
-                  src={paymentImageUrl}
-                  alt="QR Code ร้านค้า"
-                  className="
+                  >
+                    <img
+                      src={paymentImageUrl}
+                      alt="QR Code ร้านค้า"
+                      className="
                     w-full
                     max-h-[400px]
                     object-contain
                     rounded-xl
                   "
-                />
-              </div>
+                    />
+                  </div>
 
-              <p
-                className="
+                  <p
+                    className="
                   mt-4
                   text-gray-500
                   text-center
                 "
-              >
-                สแกน QR Code
-                <br />
-                เพื่อชำระเงินให้ร้านค้า
-              </p>
-            </div>
-          ) : (
-            <div
-              className="
+                  >
+                    สแกน QR Code
+                    <br />
+                    เพื่อชำระเงินให้ร้านค้า
+                  </p>
+                </div>
+              ) : (
+                <div
+                  className="
                 rounded-2xl
                 border-2
                 border-dashed
@@ -1054,39 +1073,41 @@ if (loading) {
                 p-10
                 text-center
               "
-            >
-              <ImageIcon size={35} className="mx-auto text-gray-400" />
+                >
+                  <ImageIcon size={35} className="mx-auto text-gray-400" />
 
-              <p
-                className="
+                  <p
+                    className="
                   mt-4
                   font-semibold
                   text-gray-500
                 "
-              >
-                ร้านนี้ยังไม่ได้เพิ่ม QR Code
-              </p>
-            </div>
-          )}
+                  >
+                    ร้านนี้ยังไม่ได้เพิ่ม QR Code
+                  </p>
+                </div>
+              )}
 
-          {/* =========================
+              {/* =========================
               CURRENT SLIP
           ========================= */}
 
-          {currentSlipUrl && paymentStatus !== "PENDING" && (
-            <div className="mt-8">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="font-bold text-gray-800">สลิปการชำระเงิน</h3>
+              {currentSlipUrl && paymentStatus !== "PENDING" && (
+                <div className="mt-8">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-bold text-gray-800">
+                        สลิปการชำระเงิน
+                      </h3>
 
-                  <p className="text-sm text-gray-400 mt-1">
-                    หลักฐานการชำระเงินที่ส่งให้ร้าน
-                  </p>
-                </div>
+                      <p className="text-sm text-gray-400 mt-1">
+                        หลักฐานการชำระเงินที่ส่งให้ร้าน
+                      </p>
+                    </div>
 
-                {paymentStatus === "SLIP_UPLOADED" && (
-                  <span
-                    className="
+                    {paymentStatus === "SLIP_UPLOADED" && (
+                      <span
+                        className="
                         rounded-full
                         bg-blue-50
                         px-3
@@ -1095,14 +1116,14 @@ if (loading) {
                         font-semibold
                         text-blue-600
                       "
-                  >
-                    รอตรวจสอบ
-                  </span>
-                )}
+                      >
+                        รอตรวจสอบ
+                      </span>
+                    )}
 
-                {paymentStatus === "REJECTED" && (
-                  <span
-                    className="
+                    {paymentStatus === "REJECTED" && (
+                      <span
+                        className="
                         rounded-full
                         bg-red-50
                         px-3
@@ -1111,14 +1132,14 @@ if (loading) {
                         font-semibold
                         text-red-600
                       "
-                  >
-                    ถูกปฏิเสธ
-                  </span>
-                )}
+                      >
+                        ถูกปฏิเสธ
+                      </span>
+                    )}
 
-                {paymentStatus === "CONFIRMED" && (
-                  <span
-                    className="
+                    {paymentStatus === "CONFIRMED" && (
+                      <span
+                        className="
                         rounded-full
                         bg-green-50
                         px-3
@@ -1127,14 +1148,14 @@ if (loading) {
                         font-semibold
                         text-green-600
                       "
-                  >
-                    ยืนยันแล้ว
-                  </span>
-                )}
-              </div>
+                      >
+                        ยืนยันแล้ว
+                      </span>
+                    )}
+                  </div>
 
-              <div
-                className="
+                  <div
+                    className="
                     max-w-md
                     mx-auto
                     overflow-hidden
@@ -1142,27 +1163,27 @@ if (loading) {
                     border
                     bg-gray-50
                   "
-              >
-                <img
-                  src={currentSlipUrl}
-                  alt="สลิปการชำระเงิน"
-                  className="
+                  >
+                    <img
+                      src={currentSlipUrl}
+                      alt="สลิปการชำระเงิน"
+                      className="
                       w-full
                       max-h-[600px]
                       object-contain
                     "
-                />
-              </div>
-            </div>
-          )}
+                    />
+                  </div>
+                </div>
+              )}
 
-          {/* =========================
+              {/* =========================
               PAYMENT CONFIRMED
           ========================= */}
 
-          {paymentStatus === "CONFIRMED" && (
-            <div
-              className="
+              {paymentStatus === "CONFIRMED" && (
+                <div
+                  className="
                 mt-8
                 rounded-xl
                 bg-green-50
@@ -1171,76 +1192,76 @@ if (loading) {
                 p-5
                 text-center
               "
-            >
-              <p
-                className="
+                >
+                  <p
+                    className="
                   font-bold
                   text-green-700
                 "
-              >
-                ร้านยืนยันการชำระเงินแล้ว
-              </p>
+                  >
+                    ร้านยืนยันการชำระเงินแล้ว
+                  </p>
 
-              {order?.payment?.confirmedAt && (
-                <p
-                  className="
+                  {order?.payment?.confirmedAt && (
+                    <p
+                      className="
                     text-sm
                     text-green-600
                     mt-1
                   "
-                >
-                  ยืนยันการชำระเงินเรียบร้อย
-                </p>
+                    >
+                      ยืนยันการชำระเงินเรียบร้อย
+                    </p>
+                  )}
+                </div>
               )}
-            </div>
-          )}
 
-          {/* =========================
+              {/* =========================
               UPLOAD SLIP
           ========================= */}
 
-          {canUploadSlip && (
-            <div className="mt-8">
-              <div className="mb-3">
-                <label className="block font-semibold">
-                  {paymentStatus === "REJECTED"
-                    ? "อัปโหลดสลิปใหม่"
-                    : "อัปโหลดสลิปการโอนเงิน"}
-                </label>
+              {canUploadSlip && (
+                <div className="mt-8">
+                  <div className="mb-3">
+                    <label className="block font-semibold">
+                      {paymentStatus === "REJECTED"
+                        ? "อัปโหลดสลิปใหม่"
+                        : "อัปโหลดสลิปการโอนเงิน"}
+                    </label>
 
-                {paymentStatus === "REJECTED" && (
-                  <p className="mt-1 text-sm text-red-500">
-                    กรุณาตรวจสอบเหตุผลที่ร้านปฏิเสธ และอัปโหลดสลิปใหม่
-                  </p>
-                )}
-              </div>
+                    {paymentStatus === "REJECTED" && (
+                      <p className="mt-1 text-sm text-red-500">
+                        กรุณาตรวจสอบเหตุผลที่ร้านปฏิเสธ และอัปโหลดสลิปใหม่
+                      </p>
+                    )}
+                  </div>
 
-              {/* NEW SLIP PREVIEW */}
+                  {/* NEW SLIP PREVIEW */}
 
-              {slipPreview ? (
-                <div
-                  className="
+                  {slipPreview ? (
+                    <div
+                      className="
                     relative
                     mt-3
                     max-w-md
                     mx-auto
                   "
-                >
-                  <img
-                    src={slipPreview}
-                    alt="Slip Preview"
-                    className="
+                    >
+                      <img
+                        src={slipPreview}
+                        alt="Slip Preview"
+                        className="
                       w-full
                       rounded-2xl
                       border
                     "
-                  />
+                      />
 
-                  <button
-                    type="button"
-                    onClick={handleRemoveSlip}
-                    disabled={uploading}
-                    className="
+                      <button
+                        type="button"
+                        onClick={handleRemoveSlip}
+                        disabled={uploading}
+                        className="
                       absolute
                       top-3
                       right-3
@@ -1254,14 +1275,14 @@ if (loading) {
                       items-center
                       justify-center
                     "
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              ) : (
-                <label
-                  htmlFor="slip"
-                  className="
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor="slip"
+                      className="
                     border-2
                     border-dashed
                     border-gray-300
@@ -1275,37 +1296,39 @@ if (loading) {
                     hover:border-orange-500
                     transition
                   "
-                >
-                  <Upload size={40} className="text-gray-400" />
+                    >
+                      <Upload size={40} className="text-gray-400" />
 
-                  <p className="mt-3 text-gray-500">
-                    {paymentStatus === "REJECTED"
-                      ? "คลิกเพื่อเลือกสลิปใหม่"
-                      : "คลิกเพื่อเลือกรูปสลิป"}
-                  </p>
+                      <p className="mt-3 text-gray-500">
+                        {paymentStatus === "REJECTED"
+                          ? "คลิกเพื่อเลือกสลิปใหม่"
+                          : "คลิกเพื่อเลือกรูปสลิป"}
+                      </p>
 
-                  <p className="text-xs text-gray-400 mt-1">รองรับไฟล์รูปภาพ</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        รองรับไฟล์รูปภาพ
+                      </p>
 
-                  <input
-                    id="slip"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    disabled={uploading}
-                    onChange={handleSlipChange}
-                  />
-                </label>
-              )}
+                      <input
+                        id="slip"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploading}
+                        onChange={handleSlipChange}
+                      />
+                    </label>
+                  )}
 
-              {/* =====================
+                  {/* =====================
                   UPLOAD BUTTON
               ===================== */}
 
-              <button
-                type="button"
-                onClick={handleUploadSlip}
-                disabled={uploading || !slip || !paymentImageUrl}
-                className="
+                  <button
+                    type="button"
+                    onClick={handleUploadSlip}
+                    disabled={uploading || !slip || !paymentImageUrl}
+                    className="
                   w-full
                   mt-6
                   bg-green-600
@@ -1323,28 +1346,28 @@ if (loading) {
                   justify-center
                   gap-2
                 "
-              >
-                {uploading ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin" />
-                    กำลังอัปโหลดสลิป...
-                  </>
-                ) : paymentStatus === "REJECTED" ? (
-                  "ส่งสลิปใหม่"
-                ) : (
-                  "ยืนยันการชำระเงิน"
-                )}
-              </button>
-            </div>
-          )}
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 size={20} className="animate-spin" />
+                        กำลังอัปโหลดสลิป...
+                      </>
+                    ) : paymentStatus === "REJECTED" ? (
+                      "ส่งสลิปใหม่"
+                    ) : (
+                      "ยืนยันการชำระเงิน"
+                    )}
+                  </button>
+                </div>
+              )}
 
-          {/* =========================
+              {/* =========================
               WAITING STORE
           ========================= */}
 
-          {paymentStatus === "SLIP_UPLOADED" && (
-            <div
-              className="
+              {paymentStatus === "SLIP_UPLOADED" && (
+                <div
+                  className="
                 mt-8
                 rounded-xl
                 bg-blue-50
@@ -1353,38 +1376,38 @@ if (loading) {
                 p-5
                 text-center
               "
-            >
-              <p
-                className="
+                >
+                  <p
+                    className="
                   font-bold
                   text-blue-700
                 "
-              >
-                กำลังรอร้านตรวจสอบสลิป
-              </p>
+                  >
+                    กำลังรอร้านตรวจสอบสลิป
+                  </p>
 
-              <p
-                className="
+                  <p
+                    className="
                   text-sm
                   text-blue-600
                   mt-1
                 "
-              >
-                ระบบได้รับหลักฐานการชำระเงินแล้ว กรุณารอร้านตรวจสอบ
-              </p>
-            </div>
-          )}
+                  >
+                    ระบบได้รับหลักฐานการชำระเงินแล้ว กรุณารอร้านตรวจสอบ
+                  </p>
+                </div>
+              )}
 
-          {/* =========================
+              {/* =========================
               BACK TO ORDER
           ========================= */}
 
-          {(paymentStatus === "SLIP_UPLOADED" ||
-            paymentStatus === "CONFIRMED") && (
-            <button
-              type="button"
-              onClick={handleBackToOrder}
-              className="
+              {(paymentStatus === "SLIP_UPLOADED" ||
+                paymentStatus === "CONFIRMED") && (
+                <button
+                  type="button"
+                  onClick={handleBackToOrder}
+                  className="
                 w-full
                 mt-5
                 bg-[#FF6B35]
@@ -1400,12 +1423,26 @@ if (loading) {
                 justify-center
                 gap-2
               "
-            >
-              <ArrowLeft size={20} />
-              กลับหน้ารายละเอียดออเดอร์
-            </button>
-          )}
-        </div>
+                >
+                  <ArrowLeft size={20} />
+                  กลับหน้ารายละเอียดออเดอร์
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-center">
+            <CreditCard size={36} className="mx-auto mb-3 text-red-500" />
+
+            <h2 className="font-bold text-red-700">
+              ร้านนี้ถูกระงับหรือถูกแบน
+            </h2>
+
+            <p className="mt-2 text-sm text-red-600">
+              ไม่สามารถชำระเงินหรืออัปโหลดสลิปได้ในขณะนี้
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

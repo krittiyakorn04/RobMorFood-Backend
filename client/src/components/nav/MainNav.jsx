@@ -22,7 +22,7 @@ import axios from "axios";
 import usefoodDelivery from "../../globalState/fooddeliveryStore";
 import { getAddress } from "../../api/UserProfile";
 
-const API = "https://robmorfood-backend.onrender.com/api";
+const API = "https://robmorfood-backend-new.onrender.com/api";
 
 const MainNav = () => {
   const [open, setOpen] = useState(false);
@@ -347,6 +347,11 @@ const MainNav = () => {
           navigate(`/user/deliveryChat/${notification.deliveryId}`);
           return;
         }
+
+        if (notification.chatStoreId) {
+          navigate(`/user/chat/store/${notification.chatStoreId}`);
+          return;
+        }
       }
 
       if (notification.orderId) {
@@ -475,7 +480,7 @@ const MainNav = () => {
             ========================== */}
 
             {token && (
-              <div ref={notificationRef} className="relative">
+              <div ref={notificationRef} className="relative flex items-center">
                 <button
                   type="button"
                   onClick={() => setNotificationOpen((prev) => !prev)}
@@ -520,35 +525,23 @@ const MainNav = () => {
                 {notificationOpen && (
                   <div
                     className="
-      fixed
-      right-3
-      top-[68px]
-      z-[60]
-      w-[calc(100vw-24px)]
-      max-w-[360px]
-      overflow-hidden
-      rounded-2xl
-      border
-      border-orange-100
-      bg-white
-      shadow-xl
-      shadow-orange-100/40
-      sm:right-6
-    "
+    fixed
+    right-3
+    top-[68px]
+    z-[60]
+    w-[calc(100vw-24px)]
+    max-w-[360px]
+    overflow-hidden
+    rounded-2xl
+    border
+    border-orange-100
+    bg-white
+    shadow-xl
+    shadow-orange-100/40
+  "
                   >
                     {/* Header */}
-
-                    <div
-                      className="
-                        flex
-                        items-center
-                        justify-between
-                        border-b
-                        border-gray-100
-                        px-4
-                        py-3
-                      "
-                    >
+                    <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
                       <div>
                         <p className="text-sm font-bold text-[#2A1B12]">
                           การแจ้งเตือน
@@ -565,13 +558,7 @@ const MainNav = () => {
                         <button
                           type="button"
                           onClick={handleReadAll}
-                          className="
-                            text-xs
-                            font-semibold
-                            text-orange-500
-                            transition
-                            hover:text-orange-600
-                          "
+                          className="text-xs font-semibold text-orange-500 hover:text-orange-600"
                         >
                           อ่านทั้งหมด
                         </button>
@@ -579,12 +566,10 @@ const MainNav = () => {
                     </div>
 
                     {/* List */}
-
-                    <div className="max-h-[420px] overflow-y-auto">
+                    <div className="max-h-[min(420px,calc(100dvh-100px))] overflow-y-auto overscroll-contain">
                       {notifications.length === 0 ? (
                         <div className="px-4 py-10 text-center">
                           <Bell className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-
                           <p className="text-sm text-gray-400">
                             ยังไม่มีการแจ้งเตือน
                           </p>
@@ -597,37 +582,22 @@ const MainNav = () => {
                             onClick={() =>
                               handleNotificationClick(notification)
                             }
-                            className={`
-                                flex
-                                w-full
-                                gap-3
-                                border-b
-                                border-gray-50
-                                px-4
-                                py-3
-                                text-left
-                                transition
-                                hover:bg-orange-50
-                                ${
-                                  notification.isRead
-                                    ? "bg-white"
-                                    : "bg-orange-50/60"
-                                }
-                              `}
+                            className={`flex w-full gap-3 border-b border-gray-50 px-4 py-3 text-left transition hover:bg-orange-50 ${
+                              notification.isRead
+                                ? "bg-white"
+                                : "bg-orange-50/60"
+                            }`}
                           >
                             {getNotificationIcon(notification.type)}
 
                             <div className="min-w-0 flex-1">
                               <div className="flex items-start justify-between gap-2">
                                 <p
-                                  className={`
-                                      text-sm
-                                      ${
-                                        notification.isRead
-                                          ? "font-medium text-gray-700"
-                                          : "font-bold text-gray-800"
-                                      }
-                                    `}
+                                  className={`break-words text-sm ${
+                                    notification.isRead
+                                      ? "font-medium text-gray-700"
+                                      : "font-bold text-gray-800"
+                                  }`}
                                 >
                                   {notification.title}
                                 </p>
@@ -637,7 +607,7 @@ const MainNav = () => {
                                 )}
                               </div>
 
-                              <p className="mt-1 line-clamp-2 text-xs leading-5 text-gray-500">
+                              <p className="mt-1 break-words text-xs leading-5 text-gray-500">
                                 {notification.message}
                               </p>
 

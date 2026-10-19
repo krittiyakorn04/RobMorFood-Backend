@@ -5,7 +5,8 @@ import {
   Store,
   CreditCard,
   ChevronRight,
-  Package 
+  Package,
+  Mail,
 } from "lucide-react";
 
 const UserSetting = () => {
@@ -36,37 +37,53 @@ const UserSetting = () => {
       icon: Clock3,
       path: "/user/orderReports",
     },
-
+    {
+      title: "ติดต่อแอดมิน",
+      description: "สอบถาม แจ้งปัญหา หรือขอความช่วยเหลือเกี่ยวกับร้านอาหาร",
+      icon: Mail,
+      path: "mailto:robmorfooddelivery@gmail.com?subject=ติดต่อแอดมิน%20RobMorFood",
+      external: true,
+    },
   ];
 
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
       <div className="max-w-6xl mx-auto px-5 py-8">
-
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#2A1B12]">
-            ตั้งค่า
-          </h1>
+          <h1 className="text-2xl font-bold text-[#2A1B12]">ตั้งค่า</h1>
 
-          <p className="text-sm text-[#8A6A54] mt-1">
-            จัดการการตั้งค่าผู้ใช้
-          </p>
+          <p className="text-sm text-[#8A6A54] mt-1">จัดการการตั้งค่าผู้ใช้</p>
         </div>
 
         {/* Section */}
         <div>
-          
-
           <div className="bg-white rounded-2xl border border-orange-100 overflow-hidden shadow-sm">
-
             {menuItems.map((item, index) => {
               const Icon = item.icon;
 
               return (
                 <button
                   key={item.title}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => {
+                    if (item.external) {
+                      const isMobile = /Android|iPhone|iPad|iPod/i.test(
+                        navigator.userAgent,
+                      );
+
+                      if (isMobile) {
+                        window.location.href = item.path;
+                      } else {
+                        window.open(
+                          "https://mail.google.com/mail/?view=cm&fs=1&to=robmorfood%40gmail.com&su=ติดต่อแอดมิน%20RobMorFood",
+                          "_blank",
+                          "noopener,noreferrer",
+                        );
+                      }
+                    } else {
+                      navigate(item.path);
+                    }
+                  }}
                   className={`
                     w-full
                     flex
@@ -85,13 +102,9 @@ const UserSetting = () => {
                     }
                   `}
                 >
-
                   {/* Icon */}
                   <div className="w-10 h-10 rounded-xl bg-[#FFF3E4] flex items-center justify-center shrink-0">
-                    <Icon
-                      size={20}
-                      className="text-[#FF6B35]"
-                    />
+                    <Icon size={20} className="text-[#FF6B35]" />
                   </div>
 
                   {/* Text */}
@@ -106,18 +119,12 @@ const UserSetting = () => {
                   </div>
 
                   {/* Arrow */}
-                  <ChevronRight
-                    size={19}
-                    className="text-[#B7A390]"
-                  />
-
+                  <ChevronRight size={19} className="text-[#B7A390]" />
                 </button>
               );
             })}
-
           </div>
         </div>
-
       </div>
     </div>
   );

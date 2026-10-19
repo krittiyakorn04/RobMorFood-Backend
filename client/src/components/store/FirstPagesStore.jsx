@@ -244,7 +244,6 @@ const FirstPagesStore = () => {
       try {
         const res = await getMyStoreReviews(token);
 
-        console.log("STORE REVIEW SUMMARY =", res.data);
 
         setReviewSummary({
           totalReviews: Number(res.data?.totalReviews || 0),

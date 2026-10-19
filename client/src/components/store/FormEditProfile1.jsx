@@ -8,7 +8,8 @@ import {
   AlertCircle,
   ShieldCheck,
   Bike,
-  LockKeyhole
+  LockKeyhole,
+  Mail,
 } from "lucide-react";
 
 const StoreSetting = () => {
@@ -63,6 +64,13 @@ const StoreSetting = () => {
       icon: Bike,
       path: "/store/StoreStaff",
     },
+    {
+      title: "ติดต่อแอดมิน",
+      description: "สอบถาม แจ้งปัญหา หรือขอความช่วยเหลือเกี่ยวกับร้านอาหาร",
+      icon: Mail,
+      path: "mailto:robmorfooddelivery@gmail.com?subject=ติดต่อแอดมิน%20RobMorFood",
+      external: true,
+    },
   ];
 
   return (
@@ -87,7 +95,25 @@ const StoreSetting = () => {
             return (
               <button
                 key={item.path}
-                onClick={() => navigate(item.path)}
+                onClick={() => {
+                  if (item.external) {
+                    const isMobile = /Android|iPhone|iPad|iPod/i.test(
+                      navigator.userAgent,
+                    );
+
+                    if (isMobile) {
+                      window.location.href = item.path;
+                    } else {
+                      window.open(
+                        "https://mail.google.com/mail/?view=cm&fs=1&to=robmorfood%40gmail.com&su=ติดต่อแอดมิน%20RobMorFood",
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
+                    }
+                  } else {
+                    navigate(item.path);
+                  }
+                }}
                 className={`
                   w-full
                   flex
@@ -99,18 +125,16 @@ const StoreSetting = () => {
                   hover:bg-[#FFF8F0]
                   active:bg-orange-50
                   transition
-                  ${index !== menuItems.length - 1
-                    ? "border-b border-orange-50"
-                    : ""}
+                  ${
+                    index !== menuItems.length - 1
+                      ? "border-b border-orange-50"
+                      : ""
+                  }
                 `}
               >
                 {/* Icon */}
                 <div className="w-11 h-11 rounded-xl bg-[#FFF3E4] flex items-center justify-center shrink-0">
-                  <Icon
-                    size={21}
-                    strokeWidth={2}
-                    className="text-[#FF6B35]"
-                  />
+                  <Icon size={21} strokeWidth={2} className="text-[#FF6B35]" />
                 </div>
 
                 {/* Text */}
@@ -125,10 +149,7 @@ const StoreSetting = () => {
                 </div>
 
                 {/* Arrow */}
-                <ChevronRight
-                  size={19}
-                  className="text-[#B7A390] shrink-0"
-                />
+                <ChevronRight size={19} className="text-[#B7A390] shrink-0" />
               </button>
             );
           })}

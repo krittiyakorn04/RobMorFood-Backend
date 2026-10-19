@@ -479,7 +479,7 @@ export default function FormAddAddress() {
   // ===================================================
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0] px-4 py-6 pb-12 sm:px-6">
+    <div className="min-h-screen bg-[#FFF8F0] px-4 py-6 pb-12 bp-10 sm:px-6 ">
       <div className="mx-auto max-w-5xl">
         {/* Page header */}
         <header className="mb-6">

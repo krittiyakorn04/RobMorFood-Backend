@@ -177,7 +177,6 @@ const StoreOrderDetail = () => {
 
         const res = await readOrder(token, id);
 
-        console.log("READ ORDER DETAIL =", res.data);
 
         setOrder(res.data);
       } catch (error) {
@@ -210,7 +209,6 @@ const StoreOrderDetail = () => {
     try {
       const res = await readOrder(token, id);
 
-      console.log("REFRESH ORDER DETAIL =", res.data);
 
       setOrder(res.data);
     } catch (error) {
@@ -294,7 +292,6 @@ const StoreOrderDetail = () => {
 
       const res = await changeStatusPayment(token, paymentId, "CONFIRMED");
 
-      console.log("ยืนยันเริ่มทำอาหารสำเร็จ =", res.data);
 
       // =====================================================
       // ดึงข้อมูลล่าสุดจาก Backend
@@ -387,7 +384,6 @@ const StoreOrderDetail = () => {
 
       const res = await changeStatusOrder(token, order.id, nextStatus);
 
-      console.log("เปลี่ยนสถานะออเดอร์สำเร็จ =", res.data);
 
       // =====================================================
       // สำคัญ

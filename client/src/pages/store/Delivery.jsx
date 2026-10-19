@@ -317,8 +317,6 @@ const DeliveryPage = () => {
     try {
       const res = await getStoreDelivery(token);
 
-      console.log("Store Delivery =", JSON.stringify(res.data, null, 2));
-
       const data = Array.isArray(res.data) ? res.data : [];
 
       setDeliveries(data);
@@ -1049,7 +1047,7 @@ const DeliveryPage = () => {
   color: var(--charcoal);
 
   /* เผื่อพื้นที่ด้านล่างให้แถบนำทาง */
-  padding: 24px 16px calc(100px + env(safe-area-inset-bottom));
+  padding: 24px 16px calc(120px + env(safe-area-inset-bottom));
 
   box-sizing: border-box;
   overflow: visible;
@@ -1630,8 +1628,8 @@ const DeliveryPage = () => {
 
         @media (max-width: 480px) {
           .dv-root {
-            padding: 18px 12px 50px;
-          }
+  padding: 18px 12px calc(120px + env(safe-area-inset-bottom));
+}
 
           .dv-card {
             padding: 16px;
@@ -1888,7 +1886,7 @@ const DeliveryPage = () => {
                             </span>
 
                             <span className="dv-assigned-info">
-                              มีผู้ส่งแล้ว:{" "}
+                              มีผู้ส่งแล้ว:
                               <strong>{rider?.name || "ไม่ทราบชื่อ"}</strong>
                               {rider?.phone ? ` • ${rider.phone}` : ""}
                             </span>
@@ -1911,7 +1909,7 @@ const DeliveryPage = () => {
                       ) : riderCount === 1 ? (
                         <div className="dv-self-delivery">
                           <Users size={17} />
-                          <span>ระบบกำลังจัดการผู้ส่ง</span>
+                          <span>เลือกผู้ส่งหรือจัดส่งเอง</span>
                         </div>
                       ) : (
                         <label

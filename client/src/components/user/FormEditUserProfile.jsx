@@ -4,7 +4,6 @@ import { User, Phone, Mail, ArrowLeft, Save, Circle, CheckCircle } from "lucide-
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { updateUserProfile } from "../../api/UserProfile";
-import { updateUserPassword } from "../../api/UserProfile";
 
 const FormEditUserProfile = () => {
   const navigate = useNavigate();

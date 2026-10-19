@@ -113,13 +113,19 @@ const StoreClient = () => {
       try {
         const res = await getStoreClient(token, id);
 
-        console.log("ข้อมูลร้านลูกค้า =", res.data);
-        console.log("รูปภาพร้าน =", res.data?.images);
-        console.log("หมวดหมู่เมนู =", res.data?.menuCategories);
+
 
         setStore(res.data);
 
-        await reloadCart();
+        // ร้านถูกระงับ/แบน ไม่ต้องโหลดตะกร้าของร้านนี้
+        if (
+          res.data?.merchantStatus !== "SUSPENDED" &&
+          res.data?.merchantStatus !== "BANNED"
+        ) {
+          await reloadCart();
+        } else {
+          setCart(null);
+        }
       } catch (error) {
         console.log("โหลดข้อมูลร้านไม่สำเร็จ =", error);
       }
@@ -137,7 +143,6 @@ const StoreClient = () => {
       try {
         const res = await getStoreReviews(token, id);
 
-        console.log("ข้อมูลคะแนนร้าน =", res.data);
 
         setReviews({
           totalReviews: Number(res.data?.totalReviews || 0),
@@ -164,7 +169,7 @@ const StoreClient = () => {
     try {
       const res = await getCart(token, id);
 
-      console.log("ตะกร้า =", res.data);
+
 
       setCart(res.data);
     } catch (error) {
@@ -538,6 +543,60 @@ const StoreClient = () => {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // แจ้งเตือนร้านที่ถูกระงับหรือแบน
+  // =========================================================
+
+  if (
+    store.merchantStatus === "SUSPENDED" ||
+    store.merchantStatus === "BANNED"
+  ) {
+    const isBanned = store.merchantStatus === "BANNED";
+
+    return (
+      <div className="min-h-screen bg-[#FFF8F0] font-kanit flex items-center justify-center p-4">
+        <div className="w-full max-w-lg rounded-3xl border border-orange-100 bg-white p-7 sm:p-10 text-center shadow-xl">
+          <div
+            className={`mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full text-4xl ${
+              isBanned ? "bg-red-100" : "bg-amber-100"
+            }`}
+            aria-hidden="true"
+          >
+            {isBanned ? "🚫" : "⏸️"}
+          </div>
+
+          <h1
+            className={`text-2xl sm:text-3xl font-bold ${
+              isBanned ? "text-red-600" : "text-amber-600"
+            }`}
+          >
+            {isBanned
+              ? "ร้านนี้ถูกแบน"
+              : "ร้านนี้ถูกระงับการให้บริการ"}
+          </h1>
+
+          <p className="mt-3 text-lg font-semibold text-[#2A1B12]">
+            {store.storeName || "ร้านอาหาร"}
+          </p>
+
+          <p className="mt-3 leading-relaxed text-gray-600">
+            {isBanned
+              ? "ขออภัย ร้านค้านี้ถูกแบนและไม่สามารถสั่งอาหารได้ในขณะนี้"
+              : "ขออภัย ร้านค้านี้ถูกระงับการให้บริการชั่วคราว กรุณาลองใหม่ภายหลัง"}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => navigate("/user/store")}
+            className="mt-7 w-full rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white transition hover:bg-orange-600 sm:w-auto"
+          >
+            กลับไปหน้าร้านอาหาร
+          </button>
         </div>
       </div>
     );

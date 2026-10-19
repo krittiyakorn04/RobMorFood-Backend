@@ -154,7 +154,6 @@ const CheckoutPage = () => {
 
         const res = await getAddress(token);
 
-        console.log("Address Checkout =", res.data);
 
         const addressList = Array.isArray(res.data) ? res.data : [];
 
@@ -298,8 +297,6 @@ const CheckoutPage = () => {
     try {
       setLoading(true);
 
-      console.log("EDIT ITEM =", item);
-      console.log("MENU ID =", item.menuId);
 
       // ==========================================
       // โหลดข้อมูลร้านใหม่
@@ -307,7 +304,6 @@ const CheckoutPage = () => {
 
       const res = await getStoreClient(token, storeId);
 
-      console.log("STORE CLIENT RESPONSE =", res.data);
 
       const storeData = res.data;
 
@@ -319,7 +315,6 @@ const CheckoutPage = () => {
 
       const storeMenus = categories.flatMap((category) => category.menus || []);
 
-      console.log("STORE MENUS =", storeMenus);
 
       // ==========================================
       // หาเมนูที่ตรงกับ cart item
@@ -329,8 +324,7 @@ const CheckoutPage = () => {
         (menu) => Number(menu.id) === Number(item.menuId),
       );
 
-      console.log("SELECTED MENU =", selectedMenu);
-      console.log("SELECTED MENU OPTIONS =", selectedMenu?.options);
+      
 
       if (!selectedMenu) {
         Swal.fire({
@@ -350,7 +344,6 @@ const CheckoutPage = () => {
 
       const currentOptions = parseOptions(item.options);
 
-      console.log("CURRENT CART OPTIONS =", currentOptions);
 
       // ==========================================
       // แปลงเป็น
@@ -383,9 +376,7 @@ const CheckoutPage = () => {
         menu: selectedMenu,
       };
 
-      console.log("FINAL EDIT ITEM =", editItem);
-      console.log("FINAL MENU OPTIONS =", editItem.menu?.options);
-      console.log("OLD SELECTED OPTIONS =", selected);
+  
 
       setEditingItem(editItem);
       setEditCount(Number(item.count || 1));
@@ -641,7 +632,6 @@ const CheckoutPage = () => {
 
       const optionsChanged = isOptionsChanged();
 
-      console.log("Options เปลี่ยนหรือไม่ =", optionsChanged);
 
       // ==========================================
       // ข้อมูลที่จะส่ง
@@ -721,11 +711,7 @@ const CheckoutPage = () => {
       // LOG
       // ==========================================
 
-      console.log("========== UPDATE CART ==========");
 
-      console.log("แก้ Options =", optionsChanged);
-
-      console.log("ข้อมูลที่ส่ง Backend =", data);
 
       // ==========================================
       // UPDATE BACKEND
@@ -733,7 +719,6 @@ const CheckoutPage = () => {
 
       const updateRes = await updateCart(token, editingItem.id, data);
 
-      console.log("Update Cart Response =", updateRes.data);
 
       // ==========================================
       // LOAD CART ใหม่
@@ -741,7 +726,6 @@ const CheckoutPage = () => {
 
       const res = await getCart(token, storeId);
 
-      console.log("Cart หลังแก้ไข =", res.data);
 
       // ==========================================
       // หาข้อมูล Option ที่ต้องแสดง
@@ -821,7 +805,6 @@ const CheckoutPage = () => {
         }),
       };
 
-      console.log("Cart ที่แสดงหลังแก้ไข =", updatedCart);
 
       setCart(updatedCart);
 

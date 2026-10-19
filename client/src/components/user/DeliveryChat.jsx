@@ -109,7 +109,6 @@ const DeliveryChat = () => {
     const currentDeliveryId = Number(deliveryId);
 
     const handleNewMessage = (newMessage) => {
-      console.log("📩 Customer ได้ข้อความใหม่ =", newMessage);
 
       if (Number(newMessage?.roomId) !== currentRoomId) {
         return;
@@ -174,7 +173,6 @@ const DeliveryChat = () => {
 
       const res = await sendCustomerDeliveryMessage(token, room.id, text);
 
-      console.log("📤 Customer ส่งสำเร็จ =", res.data);
 
       const newMessage = res.data?.data;
 

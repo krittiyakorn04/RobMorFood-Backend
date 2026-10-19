@@ -20,7 +20,7 @@ import axios from "axios";
 import usefoodDelivery from "../../globalState/fooddeliveryStore";
 import { getStoreProfile } from "../../api/createStore";
 
-const API = "https://robmorfood-backend.onrender.com/api";
+const API = "https://robmorfood-backend-new.onrender.com/api";
 
 const StoreNav = () => {
   const navigate = useNavigate();

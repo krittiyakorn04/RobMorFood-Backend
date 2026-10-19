@@ -34,9 +34,6 @@ const MenuDetail = () => {
 
         const response = await getUserMenu(token, id);
 
-        console.log("MENU ID =", id);
-        console.log("USER MENU DATA =", response);
-
         // รองรับทั้งกรณี API ส่ง data ตรง ๆ
         // และกรณี axios response
         const data = response?.data || response;
@@ -235,11 +232,6 @@ const MenuDetail = () => {
         options,
       };
 
-      console.log("========== ADD TO CART ==========");
-      console.log("MENU ID =", menu.id);
-      console.log("COUNT =", count);
-      console.log("OPTIONS =", options);
-      console.log("DATA =", value);
 
       // =========================
       // ADD CART API
@@ -247,7 +239,6 @@ const MenuDetail = () => {
 
       const response = await addToCart(token, value);
 
-      console.log("ADD CART RESPONSE =", response?.data);
 
       // =========================
       // SUCCESS

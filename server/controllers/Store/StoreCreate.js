@@ -78,7 +78,6 @@ exports.getAllStore = async (req, res) => {
   }
 };
 
-
 exports.getProfile = async (req, res) => {
   try {
     const storeId = Number(req.params.id);
@@ -93,26 +92,30 @@ exports.getProfile = async (req, res) => {
       where: {
         id: storeId,
       },
+
       include: {
         images: true,
-
+        // ประเภทร้าน เช่น Bakery / Somtum
         storeCategories: {
           include: {
             storeCategory: true,
           },
         },
 
+        // รอบรับออเดอร์
         orderRound: {
           orderBy: {
             roundNumber: "asc",
           },
         },
 
+        // หมวดหมู่เมนู
         menuCategories: {
           include: {
             menus: {
               include: {
                 images: true,
+
                 options: {
                   include: {
                     choices: true,
@@ -123,14 +126,17 @@ exports.getProfile = async (req, res) => {
           },
         },
 
+        // เมนูทั้งหมด
         menus: {
           include: {
             images: true,
+
             options: {
               include: {
                 choices: true,
               },
             },
+
             category: true,
           },
         },
@@ -142,21 +148,17 @@ exports.getProfile = async (req, res) => {
         message: "Store not found",
       });
     }
+    
 
-    // ส่งข้อมูลร้านทั้งหมด รวม merchantStatus
-    return res.status(200).json({
-      ...store,
-      merchantStatus: store.merchantStatus,
-    });
+    res.status(200).json(store);
   } catch (error) {
-    console.error("getProfile error =", error);
+    console.log("getProfile error =", error);
 
-    return res.status(500).json({
+    res.status(500).json({
       message: "Server Error",
     });
   }
 };
-
 
 
 

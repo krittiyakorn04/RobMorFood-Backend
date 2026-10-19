@@ -121,7 +121,6 @@ const AdminStoreStatus = () => {
 
       const res = await getAllStores(token);
 
-      console.log("GET ALL STORES =", res.data);
 
       setStores(Array.isArray(res.data) ? res.data : res.data?.stores || []);
     } catch (error) {
@@ -1013,24 +1012,42 @@ const StoreDetailModal = ({
               label="ที่อยู่ร้าน"
               value={store.address || "ไม่ระบุ"}
             />
-
             <InfoRow
               icon={<UtensilsCrossed size={17} />}
               label="ประเภทของร้าน"
               value={
-                store.storeCategories?.length
+                store.storeCategories?.length > 0
                   ? store.storeCategories
-                      .map((category) => category?.storeCategory?.name)
+                      .map((item) => item.storeCategory?.name)
                       .filter(Boolean)
                       .join(", ") || "ไม่ระบุ"
                   : "ไม่ระบุ"
               }
             />
-
             <InfoRow
               icon={<Clock3 size={17} />}
               label="วันเปิดร้าน"
-              value={store.dayOpen || "ไม่ระบุ"}
+              value={
+                store.dayOpen
+                  ? store.dayOpen
+                      .split(",")
+                      .filter(Boolean)
+                      .map((day) => {
+                        const days = {
+                          MON: "จันทร์",
+                          TUE: "อังคาร",
+                          WED: "พุธ",
+                          THU: "พฤหัสบดี",
+                          FRI: "ศุกร์",
+                          SAT: "เสาร์",
+                          SUN: "อาทิตย์",
+                        };
+
+                        return days[day.trim()] || day.trim();
+                      })
+                      .join(", ")
+                  : "ไม่ระบุ"
+              }
             />
 
             <InfoRow

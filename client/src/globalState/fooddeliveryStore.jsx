@@ -11,7 +11,7 @@ import {
 import { getOrderRound } from "../api/OrderRound";
 import { getUserProfile } from "../api/UserProfile";
 
-const API = "https://robmorfood-backend.onrender.com/api";
+const API = "https://robmorfood-backend-new.onrender.com/api";
 
 const foodDelivery = (set) => ({
   user: null,
@@ -28,7 +28,6 @@ const foodDelivery = (set) => ({
   actionRegisterStore: async (form) => {
     const res = await axios.post(`${API}/store/register`, form);
 
-    console.log(res.data.token);
 
     set({
       user: res.data.payload,
@@ -41,7 +40,6 @@ const foodDelivery = (set) => ({
   actionLoginStore: async (form) => {
     const res = await axios.post(`${API}/store/login`, form);
 
-    console.log(res.data.token);
 
     set({
       user: res.data.payload,
@@ -54,7 +52,6 @@ const foodDelivery = (set) => ({
   actionRegisterUser: async (form) => {
     const res = await axios.post(`${API}/user/register`, form);
 
-    console.log(res.data.token);
 
     set({
       user: res.data.payload,
@@ -67,7 +64,6 @@ const foodDelivery = (set) => ({
   actionLoginUser: async (form) => {
     const res = await axios.post(`${API}/user/login`, form);
 
-    console.log(res.data.token);
 
     set({
       user: res.data.payload,

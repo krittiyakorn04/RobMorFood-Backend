@@ -3,15 +3,14 @@ import Swal from "sweetalert2";
 import usefoodDelivery from "../../globalState/fooddeliveryStore";
 import { useLocation, useNavigate } from "react-router-dom";
 import { enablePushNotification } from "../../utils/pushNotification";
+import { Eye, EyeOff } from "lucide-react";
 
 const UserLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const actionLoginUser = usefoodDelivery((state) => state.actionLoginUser);
-  const user = usefoodDelivery((state) => state.user);
-
-  console.log("user from zustand", user);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [form, setform] = useState({
     password: "",
@@ -34,17 +33,12 @@ const UserLogin = () => {
       const role = res.data.payload.role;
       const token = res.data.token;
 
-      console.log("role", role);
-      console.log("token", token);
-
       // Login ต้องไปต่อก่อน
       roldRediract(role);
 
       // Push ทำงานเบื้องหลัง ไม่ขวาง Login
 
       if (token && role === "CUSTOMER") {
-        console.log("กำลังเรียก enablePushNotification...");
-
         enablePushNotification(token)
           .then((success) => {
             console.log("Customer Push Notification =", success);
@@ -240,21 +234,34 @@ const UserLogin = () => {
                 className="w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
               />
             </div>
+
             {/* Password */}
             <div className="mb-4">
               <label className="text-sm text-gray-600 mb-2 block">
                 รหัสผ่าน
               </label>
 
-              <input
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleOnChacng}
-                placeholder="********"
-                className="w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={form.password}
+                  onChange={handleOnChacng}
+                  placeholder="********"
+                  className="w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 pr-12 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+                  className="absolute inset-y-0 right-0 flex items-center justify-center px-4 text-gray-400 transition hover:text-orange-500"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
+
             <button
               type="submit"
               className="w-full rounded-xl bg-orange-500 py-3 text-white font-semibold hover:bg-orange-600 transition touch-manipulation"

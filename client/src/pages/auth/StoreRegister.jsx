@@ -54,7 +54,6 @@ const INITIAL_CATEGORY_LIMIT = 6;
 
 const BRAND = "#f97316";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^0\d{9}$/;
 
 const inputBase =
@@ -93,8 +92,6 @@ const validateAccount = (form) => {
 
   if (!form.username.trim()) errors.username = "กรุณากรอกชื่อผู้ใช้งาน";
 
-  if (!EMAIL_REGEX.test(form.email.trim()))
-    errors.email = "กรุณากรอกอีเมลให้ถูกต้อง";
 
   if (!PASSWORD_RULES.every((r) => r.test(form.password)))
     errors.password = "รหัสผ่านยังไม่ตรงตามเงื่อนไขด้านล่าง";
@@ -288,7 +285,6 @@ const StoreRegister = () => {
 
   const [form, setForm] = useState({
     username: "",
-    email: "",
     password: "",
     confirmPassword: "",
     storeName: "",
@@ -462,7 +458,6 @@ const StoreRegister = () => {
 
     const data = {
       username: form.username.trim(),
-      email: form.email.trim().toLowerCase(),
       password: form.password,
       phone: form.phone,
       storeName: form.storeName.trim(),
@@ -579,22 +574,6 @@ const StoreRegister = () => {
                   aria-invalid={!!accountError("username")}
                   aria-describedby={accountError("username") ? "username-error" : undefined}
                   className={inputClass(accountError("username"))}
-                />
-              </Field>
-
-              <Field id="email" label="อีเมล" error={accountError("email")}>
-                <input
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleOnChange}
-                  onBlur={handleBlur}
-                  placeholder="example@email.com"
-                  autoComplete="email"
-                  aria-invalid={!!accountError("email")}
-                  aria-describedby={accountError("email") ? "email-error" : undefined}
-                  className={inputClass(accountError("email"))}
                 />
               </Field>
 

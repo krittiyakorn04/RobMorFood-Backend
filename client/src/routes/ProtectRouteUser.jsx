@@ -6,7 +6,6 @@ import { currentUser } from "../api/auth"
 const ProtectRouteUser = ({element}) => {
   const [ok,setOk]= useState(false)
   const user = usefoodDelivery((state)=> state.user)
-  console.log(user)
   const token = usefoodDelivery((state)=> state.token)
 
   useEffect(()=>{

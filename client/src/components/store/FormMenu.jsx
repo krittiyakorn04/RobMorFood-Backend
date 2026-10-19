@@ -17,6 +17,7 @@ import {
   Plus,
   FileText,
   ArrowLeft,
+  Soup,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import Resizer from "react-image-file-resizer";
@@ -966,7 +967,9 @@ const FormMenu = () => {
 
         {menus.length === 0 ? (
           <div className="rounded-2xl border border-[#F1E5D9] bg-white px-4 py-12 text-center">
-            <div className="mb-3 text-5xl">🍜</div>
+            <div className="mb-3 flex justify-center">
+              <Soup size={56} strokeWidth={1.8} className="text-[#FF6B35]" />
+            </div>
             <h3 className="font-semibold text-[#2A1B12]">ยังไม่มีเมนูอาหาร</h3>
             <p className="mt-1 text-sm text-[#8B8179]">
               เพิ่มเมนูแรกของร้านได้จากแบบฟอร์มด้านบน

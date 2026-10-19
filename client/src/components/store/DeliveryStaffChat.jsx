@@ -136,7 +136,6 @@ const DeliveryStaffChat = () => {
     const currentDeliveryId = Number(deliveryId);
 
     const handleNewMessage = (newMessage) => {
-      console.log("📩 Staff ได้ข้อความใหม่ =", newMessage);
 
       if (Number(newMessage?.roomId) !== currentRoomId) {
         return;
@@ -208,7 +207,7 @@ const DeliveryStaffChat = () => {
 
       const res = await sendStaffDeliveryMessage(token, room.id, text);
 
-      console.log("📤 Staff ส่งสำเร็จ =", res.data);
+
 
       const newMessage = res.data?.data;
 

@@ -104,7 +104,6 @@ const StoreDeliveryChat = () => {
     const currentDeliveryId = Number(deliveryId);
 
     const handleNewMessage = (newMessage) => {
-      console.log("📩 Store ได้ข้อความใหม่ =", newMessage);
 
       if (Number(newMessage?.roomId) !== currentRoomId) {
         return;
@@ -169,7 +168,6 @@ const StoreDeliveryChat = () => {
 
       const res = await sendStoreDeliveryMessage(token, room.id, text);
 
-      console.log("📤 Store ส่งสำเร็จ =", res.data);
 
       // เพิ่มข้อความทันที
       // ป้องกันกรณี socket ไม่ echo กลับมาที่ตัวเอง

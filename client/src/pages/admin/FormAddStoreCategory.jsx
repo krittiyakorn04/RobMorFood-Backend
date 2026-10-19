@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
 import AdminNavbar from "../../components/nav/AdminNavbar";
 
 const API_URL =
-  "https://robmorfood-backend.onrender.com/api/admin/store-category";
+  "https://robmorfood-backend-new.onrender.com/api/admin/store-category";
 
 const FormAddStoreCategory = () => {
   const navigate = useNavigate();

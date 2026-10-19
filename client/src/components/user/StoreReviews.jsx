@@ -39,7 +39,6 @@ const StoreReviews = () => {
 
         const res = await getStoreReviews(token, id);
 
-        console.log("ข้อมูลรีวิวร้าน =", res.data);
 
         setData({
           totalReviews: Number(res.data?.totalReviews || 0),

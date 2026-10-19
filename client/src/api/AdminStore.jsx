@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://robmorfood-backend.onrender.com/api";
+const API_URL = "https://robmorfood-backend-new.onrender.com/api";
 
 export const getAllStores = (token) => {
   return axios.get(`${API_URL}/admin/stores`, {

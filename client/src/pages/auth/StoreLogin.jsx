@@ -3,13 +3,13 @@ import Swal from "sweetalert2";
 import usefoodDelivery from "../../globalState/fooddeliveryStore";
 import { useNavigate } from "react-router-dom";
 import { enablePushNotification } from "../../utils/pushNotification";
+import { Eye, EyeOff } from "lucide-react";
 
 const StoreLogin = () => {
   const navigate = useNavigate();
 
   const actionLoginStore = usefoodDelivery((state) => state.actionLoginStore);
-
-  const user = usefoodDelivery((state) => state.user);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
     password: "",
@@ -22,7 +22,6 @@ const StoreLogin = () => {
       [e.target.name]: e.target.value,
     });
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,7 +31,6 @@ const StoreLogin = () => {
 
       const role = res.data.payload.role;
       const token = res.data.token;
-
 
       // เปิด Push Notification สำหรับร้านและพนักงานส่ง
       if (token && (role === "MERCHANT" || role === "DELIVERY")) {
@@ -70,10 +68,9 @@ const StoreLogin = () => {
     navigate("/");
   };
 
-
-return (
-  <div className="fd-register">
-    <style>{`
+  return (
+    <div className="fd-register">
+      <style>{`
       .fd-register {
         --cream: #FFF8F0;
         --orange: #FF6B35;
@@ -100,92 +97,101 @@ return (
       }
     `}</style>
 
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
-    />
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+      />
 
-    <div className="w-full max-w-4xl">
-      <form onSubmit={handleSubmit}>
-        <div className="w-full bg-white rounded-3xl border border-orange-100 shadow-[0_20px_50px_-20px_rgba(42,27,18,0.25)] p-8 sm:p-10 md:p-12">
-          <h1 className="text-3xl font-bold text-gray-800">
-            เข้าสู่ระบบ
-          </h1>
+      <div className="w-full max-w-4xl">
+        <form onSubmit={handleSubmit}>
+          <div className="w-full bg-white rounded-3xl border border-orange-100 shadow-[0_20px_50px_-20px_rgba(42,27,18,0.25)] p-8 sm:p-10 md:p-12">
+            <h1 className="text-3xl font-bold text-gray-800">เข้าสู่ระบบ</h1>
 
-          <p className="text-gray-500 mt-2 mb-6">
-            เข้าสู่ระบบร้านค้าของคุณเพื่อจัดการร้านอาหาร
-          </p>
+            <p className="text-gray-500 mt-2 mb-6">
+              เข้าสู่ระบบร้านค้าของคุณเพื่อจัดการร้านอาหาร
+            </p>
 
-          {/* Username */}
-          <div className="mb-4">
-            <label className="text-sm text-gray-600 mb-2 block">
-              ชื่อผู้ใช้
-            </label>
+            {/* Username */}
+            <div className="mb-4">
+              <label className="text-sm text-gray-600 mb-2 block">
+                ชื่อผู้ใช้
+              </label>
 
-            <input
-              type="text"
-              name="username"
-              value={form.username}
-              onChange={handleOnChange}
-              placeholder="username"
-              required
-              autoComplete="username"
-              className="w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            />
-          </div>
+              <input
+                type="text"
+                name="username"
+                value={form.username}
+                onChange={handleOnChange}
+                placeholder="username"
+                required
+                autoComplete="username"
+                className="w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              />
+            </div>
 
-          {/* Password */}
-          <div className="mb-4">
-            <label className="text-sm text-gray-600 mb-2 block">
-              รหัสผ่าน
-            </label>
+            {/* Password */}
+            <div className="mb-4">
+              <label className="text-sm text-gray-600 mb-2 block">
+                รหัสผ่าน
+              </label>
 
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleOnChange}
-              placeholder="********"
-              required
-              autoComplete="current-password"
-              className="w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            />
-          </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={form.password}
+                  onChange={handleOnChange}
+                  placeholder="********"
+                  required
+                  autoComplete="current-password"
+                  className="w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 pr-12 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                />
 
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-orange-500 py-3 text-white font-semibold hover:bg-orange-600 transition touch-manipulation"
-          >
-            เข้าสู่ระบบ
-          </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+                  className="absolute inset-y-0 right-0 flex items-center justify-center px-4 text-gray-400 transition hover:text-orange-500"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-6">
-            <div className="h-px bg-gray-200 flex-1" />
-            <span className="text-gray-400 text-sm">or</span>
-            <div className="h-px bg-gray-200 flex-1" />
-          </div>
-
-          {/* Register */}
-          <p className="text-center mt-6 text-gray-500">
-            คุณยังไม่มีบัญชีใช่ไหม?{" "}
             <button
-              type="button"
-              onClick={() => navigate("/StoreRegister")}
-              className="text-orange-500 font-semibold"
+              type="submit"
+              className="w-full rounded-xl bg-orange-500 py-3 text-white font-semibold hover:bg-orange-600 transition touch-manipulation"
             >
-              สมัครสมาชิก
+              เข้าสู่ระบบ
             </button>
-          </p>
-        </div>
-      </form>
 
-      <p className="text-center text-xs text-gray-400 mt-5">
-        © 2026 RobMorFood
-      </p>
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-6">
+              <div className="h-px bg-gray-200 flex-1" />
+              <span className="text-gray-400 text-sm">or</span>
+              <div className="h-px bg-gray-200 flex-1" />
+            </div>
+
+            {/* Register */}
+            <p className="text-center mt-6 text-gray-500">
+              คุณยังไม่มีบัญชีใช่ไหม?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/StoreRegister")}
+                className="text-orange-500 font-semibold"
+              >
+                สมัครสมาชิก
+              </button>
+            </p>
+          </div>
+        </form>
+
+        <p className="text-center text-xs text-gray-400 mt-5">
+          © 2026 RobMorFood
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default StoreLogin;

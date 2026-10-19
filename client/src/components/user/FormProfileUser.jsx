@@ -37,7 +37,6 @@ const FormProfileUser = () => {
 
       const res = await getAddress(token);
 
-      console.log("ที่อยู่ =", res.data);
 
       setAddresses(res.data);
     } catch (error) {

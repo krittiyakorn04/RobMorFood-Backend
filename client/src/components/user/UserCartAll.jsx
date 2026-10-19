@@ -37,7 +37,6 @@ const UserCartAll = () => {
 
         const res = await getUserCart(token);
 
-        console.log("USER ALL CART =", res.data);
 
         setCarts(Array.isArray(res.data) ? res.data : []);
       } catch (error) {

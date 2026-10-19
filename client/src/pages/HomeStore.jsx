@@ -39,7 +39,6 @@ export default function HomeStore() {
       // โหลดหมวดหมู่ร้านทั้งหมด
       const res = await getCategoryStore();
 
-      console.log("Store Categories =", res.data);
 
       // รองรับ API หลายรูปแบบ
       const categoryData = Array.isArray(res.data)

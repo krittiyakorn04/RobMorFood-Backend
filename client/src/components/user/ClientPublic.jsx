@@ -65,10 +65,6 @@ const ClientPublic = () => {
       try {
         const res = await getStoreClientPublic(id);
 
-        console.log("ข้อมูลร้านลูกค้า =", res.data);
-        console.log("รูปภาพร้าน =", res.data?.images);
-        console.log("หมวดหมู่เมนู =", res.data?.menuCategories);
-
         setStore(res.data);
 
         // โหลดตะกร้าเฉพาะคนที่ Login
@@ -100,7 +96,6 @@ const ClientPublic = () => {
     try {
       const res = await getCart(token, id);
 
-      console.log("ตะกร้า =", res.data);
 
       setCart(res.data);
     } catch (error) {

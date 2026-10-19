@@ -9,7 +9,6 @@ const ProtectRouteStore = ({ element }) => {
   const user = usefoodDelivery((state) => state.user);
   const token = usefoodDelivery((state) => state.token);
 
-  console.log("ProtectRouteStore user =", user);
 
   useEffect(() => {
     if (!user || !token) {

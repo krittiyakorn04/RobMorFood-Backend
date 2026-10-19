@@ -1924,39 +1924,41 @@ CHAT DELIVERY
 
         {/* ===================== STORE ===================== */}
         <div className="mb-5 overflow-hidden rounded-3xl border border-orange-100 bg-white shadow-sm">
-          <div className="flex items-center gap-4 p-5">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-[#F07836]">
+          <div className="flex items-start gap-3 p-4 sm:items-center sm:gap-4 sm:p-5">
+            {/* STORE ICON */}
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-[#F07836] sm:h-14 sm:w-14">
               <Store size={26} strokeWidth={1.8} />
             </div>
 
+            {/* STORE INFO */}
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/user/storeRead/${order.storeId}`)}
-                  className="text-left text-lg font-bold text-[#2A1B12] transition hover:text-[#F07836]"
-                >
-                  {order.store?.storeName || "ไม่พบชื่อร้าน"}
-                </button>
+              {/* ชื่อร้านอยู่คนละบรรทัดกับเบอร์โทรบนมือถือ */}
+              <button
+                type="button"
+                onClick={() => navigate(`/user/storeRead/${order.storeId}`)}
+                className="block w-fit max-w-full text-left text-lg font-bold leading-snug text-[#2A1B12] transition hover:text-[#F07836] [overflow-wrap:anywhere]"
+              >
+                {order.store?.storeName || "ไม่พบชื่อร้าน"}
+              </button>
 
-                {order.store?.phone && (
-                  <a
-                    href={`tel:${order.store.phone}`}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#F07836] transition hover:text-[#E8491D]"
-                  >
-                    <Phone size={15} />
-                    <span>{order.store.phone}</span>
-                  </a>
-                )}
-              </div>
+              {order.store?.phone && (
+                <a
+                  href={`tel:${order.store.phone}`}
+                  className="mt-1 inline-flex max-w-full items-center gap-1.5 text-sm font-medium text-[#F07836] transition hover:text-[#E8491D]"
+                >
+                  <Phone size={15} className="shrink-0" />
+                  <span className="break-all">{order.store.phone}</span>
+                </a>
+              )}
 
               <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
-                <span className="h-2 w-2 rounded-full bg-[#F07836]" />
+                <span className="h-2 w-2 shrink-0 rounded-full bg-[#F07836]" />
                 ร้านค้าที่คุณสั่งอาหาร
               </div>
             </div>
 
-            <div className="shrink-0 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-[#E8491D]">
+            {/* STORE BADGE */}
+            <div className="hidden shrink-0 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-[#E8491D] sm:block">
               <Store size={13} className="mr-1 inline" />
               ร้านอาหาร
             </div>

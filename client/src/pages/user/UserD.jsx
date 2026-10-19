@@ -141,13 +141,13 @@ const getStatusMeta = (order) => {
     };
   }
 
-if (displayStatus === "PENDING") {
-  return {
-    label: "รอร้านยืนยัน",
-    icon: Hourglass,
-    className: "bg-orange-50 text-orange-700 border-orange-200",
-  };
-}
+  if (displayStatus === "PENDING") {
+    return {
+      label: "รอร้านยืนยัน",
+      icon: Hourglass,
+      className: "bg-orange-50 text-orange-700 border-orange-200",
+    };
+  }
 
   if (displayStatus === "WAITING_PAYMENT") {
     return {
@@ -427,8 +427,6 @@ const OrderUser = () => {
             ))}
           </div>
 
-
-
           {/* =====================================================
             ORDER CARDS
         ===================================================== */}
@@ -448,28 +446,23 @@ const OrderUser = () => {
                 {/* =================================================
                   ORDER HEADER
               ================================================= */}
-                <div className="p-5 sm:p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    {/* ร้าน / Order */}
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className="
-                        w-12
-                        h-12
-                        rounded-2xl
-                        bg-orange-100
-                        shrink-0
-                      "
-                      />
 
-                      <div className="space-y-2">
-                        <div className="h-5 w-36 rounded-lg bg-gray-200" />
-                        <div className="h-3 w-28 rounded-lg bg-gray-100" />
+                {/* ORDER HEADER - SKELETON */}
+
+                <div className="p-4 sm:p-6">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                    {/* โครงชื่อร้านและเลขออเดอร์ */}
+                    <div className="flex min-w-0 items-start gap-3">
+                      <div className="h-12 w-12 shrink-0 rounded-2xl bg-orange-100" />
+
+                      <div className="min-w-0 flex-1 space-y-2 pt-1">
+                        <div className="h-5 w-36 max-w-full rounded-lg bg-gray-200" />
+                        <div className="h-3 w-28 max-w-full rounded-lg bg-gray-100" />
                       </div>
                     </div>
 
-                    {/* วันที่ */}
-                    <div className="h-7 w-28 rounded-xl bg-gray-100 shrink-0" />
+                    {/* โครงวันที่ */}
+                    <div className="h-7 w-36 max-w-full rounded-xl bg-gray-100 sm:ml-auto" />
                   </div>
                 </div>
 
@@ -663,9 +656,6 @@ const OrderUser = () => {
           </div>
         )}
 
-
-
-
         {/* ===================================================
             NO ORDER AT ALL
         ==================================================== */}
@@ -793,70 +783,50 @@ const OrderUser = () => {
                     overflow-hidden
                   "
                 >
-                  {/* =================================================
-                      ORDER HEADER
-                  ================================================= */}
+                  {/* ORDER HEADER */}
 
-                  <div className="p-5 sm:p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      {/* STORE */}
-
-                      <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-4 sm:p-6">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                      {/* STORE + ORDER NUMBER */}
+                      <div className="flex min-w-0 flex-1 items-start gap-3">
                         <div
                           className="
-                            w-12
-                            h-12
-                            rounded-2xl
-                            bg-gradient-to-br
-                            from-orange-50
-                            to-orange-100
-                            flex
-                            items-center
-                            justify-center
-                            shrink-0
-                            border
-                            border-orange-100
-                          "
+          flex h-12 w-12 shrink-0 items-center justify-center
+          rounded-2xl border border-orange-100
+          bg-gradient-to-br from-orange-50 to-orange-100
+        "
                         >
                           <Store size={22} className="text-orange-500" />
                         </div>
 
-                        <div className="min-w-0">
-                          <h2 className="font-bold text-lg text-[#2A1B12]">
+                        <div className="min-w-0 flex-1">
+                          <h2 className="break-words [overflow-wrap:anywhere] text-base font-bold leading-snug text-[#2A1B12] sm:text-lg">
                             {order.store?.storeName || "ไม่พบชื่อร้าน"}
                           </h2>
 
-                          <p className="text-xs text-gray-400 mt-1 truncate">
-                            ออเดอร์
-                            <span className="ml-1 text-orange-500">
-                              #ORD
-                              {String(order.id).padStart(4, "0")}
+                          <p className="mt-1 break-words text-xs leading-relaxed text-gray-400">
+                            ออเดอร์{" "}
+                            <span className="text-orange-500">
+                              #ORD{String(order.id).padStart(4, "0")}
                             </span>
                           </p>
                         </div>
                       </div>
 
                       {/* DATE */}
-
                       <div
                         className="
-                          flex
-                          items-center
-                          gap-1.5
-                          bg-gray-50
-                          border
-                          border-gray-100
-                          rounded-xl
-                          px-2.5
-                          py-1.5
-                          text-xs
-                          text-gray-400
-                          shrink-0
-                        "
+        flex w-fit max-w-full min-w-0 items-start gap-1.5
+        rounded-xl border border-gray-100 bg-gray-50
+        px-2.5 py-1.5 text-xs leading-relaxed text-gray-500
+        sm:ml-4 sm:shrink-0
+      "
                       >
-                        <Clock size={13} />
+                        <Clock size={13} className="mt-0.5 shrink-0" />
 
-                        <span>{formatDate(order.createdAt)}</span>
+                        <span className="min-w-0 break-words">
+                          {formatDate(order.createdAt)}
+                        </span>
                       </div>
                     </div>
                   </div>

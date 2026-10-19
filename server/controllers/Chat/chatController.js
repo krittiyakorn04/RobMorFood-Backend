@@ -412,6 +412,7 @@ exports.sendStoreMessage = async (req, res) => {
                 message: "ร้านส่งข้อความใหม่ถึงคุณ",
                 type: "CHAT_MESSAGE",
                 customerId: room.customerId,
+                chatStoreId: room.storeId,
             });
         }
 
@@ -1174,7 +1175,7 @@ exports.sendStoreDeliveryMessage = async (req, res) => {
 
                 for (const customerId of customerIds) {
                     await createNotification({
-                        title: "💬 ข้อความใหม่จากร้าน",
+                        title: "ข้อความใหม่จากร้าน",
                         message: "ร้านส่งข้อความใหม่ในแชทจัดส่ง",
                         type: "CHAT_MESSAGE",
                         customerId: customerId,
@@ -1185,7 +1186,7 @@ exports.sendStoreDeliveryMessage = async (req, res) => {
                 // แจ้งพนักงานส่ง
                 if (deliveryInfo.deliveryStaffId) {
                     await createNotification({
-                        title: "ข้อความใหม่จากร้าน",
+                        title: "ข้อความใหม่จากพนักงานส่ง",
                         message: "ร้านส่งข้อความใหม่ในแชทจัดส่ง",
                         type: "CHAT_MESSAGE",
                         deliveryStaffId: deliveryInfo.deliveryStaffId,
@@ -1369,7 +1370,7 @@ exports.sendStaffDeliveryMessage = async (req, res) => {
                     });
                 }
 
-            
+
             }
         }
 

@@ -117,9 +117,6 @@ const MenuDetail = () => {
         })),
     );
 
-    console.log("MENU ID =", menu.id);
-    console.log("COUNT =", count);
-    console.log("OPTIONS =", options);
 
     // ตรงนี้ค่อยเชื่อม API addToCart ของคุณ
     // await addToCart(token, {

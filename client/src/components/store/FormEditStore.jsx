@@ -39,7 +39,7 @@ const FormEditStore = () => {
   const getStore = usefoodDelivery((state) => state.getStore);
   const stores = usefoodDelivery((state) => state.stores);
 
-  console.log(menus);
+
 
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("ทั้งหมด");

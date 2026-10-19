@@ -271,8 +271,6 @@ const FormEditProfile = () => {
   useEffect(() => {
     if (!stores) return;
 
-    console.log("STORE DATA =", stores);
-    console.log("STORE CATEGORIES =", stores.storeCategories);
 
     const categoryIds =
       stores.storeCategories
@@ -404,10 +402,7 @@ const FormEditProfile = () => {
 
         const lng = Number(position.coords.longitude.toFixed(7));
 
-        console.log("CURRENT LOCATION =", {
-          lat,
-          lng,
-        });
+        
 
         setMarkerPosition([lat, lng]);
 
@@ -473,10 +468,6 @@ const FormEditProfile = () => {
 
     const lng = Number(position.lng.toFixed(7));
 
-    console.log("NEW STORE LOCATION =", {
-      lat,
-      lng,
-    });
 
     setMarkerPosition([lat, lng]);
 
@@ -498,9 +489,6 @@ const FormEditProfile = () => {
   // Submit
   // =========================================================
 
-  // =========================================================
-  // Submit
-  // =========================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -578,6 +566,8 @@ const FormEditProfile = () => {
       const data = {
         ...editForm,
 
+        email: editForm.email.trim().toLowerCase(),
+
         storeCategoryIds: editForm.storeCategoryIds.map(Number),
         deliveryFee: Number(editForm.deliveryFee),
 
@@ -585,7 +575,6 @@ const FormEditProfile = () => {
         lng: Number(editForm.lng),
       };
 
-      console.log("UPDATE STORE DATA =", data);
 
       await updateStoreProfile(token, data);
 
@@ -752,7 +741,6 @@ const FormEditProfile = () => {
 
           const uploadRes = await uploadFiles(token, data);
 
-          console.log("UPLOAD PROFILE =", uploadRes.data);
 
           // ==========================================
           // 2. ลบรูปเก่า
@@ -842,7 +830,6 @@ const FormEditProfile = () => {
 
           const uploadRes = await uploadFilesBanner(token, data);
 
-          console.log("UPLOAD BANNER =", uploadRes.data);
 
           // ==========================================
           // 2. ลบ Banner เก่า
@@ -1329,33 +1316,7 @@ const FormEditProfile = () => {
                 )}
               </div>
 
-              {/* Delivery Fee */}
-              <div className="mb-5">
-                <label className="mb-2 block text-sm font-medium text-gray-600">
-                  ค่าจัดส่ง
-                </label>
-
-                <div className="relative">
-                  <input
-                    type="number"
-                    name="deliveryFee"
-                    min="0"
-                    step="1"
-                    value={editForm.deliveryFee}
-                    onChange={handleOnChange}
-                    placeholder="0"
-                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 pr-16 text-sm text-gray-700 outline-none transition focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100"
-                  />
-
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">
-                    บาท
-                  </span>
-                </div>
-
-                <p className="mt-1 text-xs text-gray-400">
-                  กำหนดค่าจัดส่งที่ลูกค้าต้องชำระ
-                </p>
-              </div>
+     
 
               {/* Address */}
               <div>

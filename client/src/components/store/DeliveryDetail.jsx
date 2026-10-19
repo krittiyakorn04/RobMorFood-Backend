@@ -195,7 +195,6 @@ const getOrderStatus = (status) => {
   }
 };
 
-
 // ======================================================
 // COMPONENT
 // ======================================================
@@ -244,13 +243,6 @@ const DeliveryDetail = () => {
       setLoading(true);
 
       const res = await getDeliveryDetail(token, id);
-
-      console.log("=================================");
-      console.log("DELIVERY DETAIL =", res.data);
-      console.log("ORDERS =", res.data?.orders);
-      console.log("DELIVERY STAFF =", res.data?.deliveryStaff);
-      console.log("DELIVERY STAFFS =", res.data?.deliveryStaffs);
-      console.log("=================================");
 
       setDelivery(res.data);
 
@@ -498,7 +490,8 @@ const DeliveryDetail = () => {
       // ================================================
       // SUCCESS
       // ================================================
-
+      await loadDelivery();
+      
       await Swal.fire({
         icon: "success",
         title: "บันทึกหลักฐานสำเร็จ",
@@ -516,7 +509,6 @@ const DeliveryDetail = () => {
         PRIMARY: null,
         ADDITIONAL: null,
       });
-
 
       return true;
     } catch (error) {

@@ -332,7 +332,6 @@ const StoreStaff = () => {
       });
     } catch (error) {
       console.error("handleDeleteStaff Error =", error);
-      
 
       Swal.fire({
         icon: "error",
@@ -498,33 +497,35 @@ const StoreStaff = () => {
                   </div>
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="mt-5 grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => openEditModal(item)}
-                    className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-orange-50 px-3 py-3 text-sm font-semibold text-[#E8491D] transition hover:bg-orange-100"
+                    className="flex min-w-0 items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-orange-50 px-2 py-3 text-sm font-semibold text-[#E8491D] transition hover:bg-orange-100"
                   >
-                    <Pencil size={17} />
-                    แก้ไข
+                    <Pencil size={17} className="shrink-0" />
+                    <span>แก้ไข</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleChangeStatus(item)}
-                    className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-semibold transition ${
+                    className={`flex min-w-0 items-center justify-center gap-1.5 rounded-2xl px-2 py-3 text-sm font-semibold transition ${
                       item.isActive
                         ? "bg-red-50 text-red-600 hover:bg-red-100"
                         : "bg-green-50 text-green-600 hover:bg-green-100"
                     }`}
                   >
-                    <Power size={17} />
-                    {item.isActive ? "ปิดใช้งาน" : "เปิดใช้งาน"}
+                    <Power size={17} className="shrink-0" />
+                    <span className="whitespace-nowrap">
+                      {item.isActive ? "ปิดใช้งาน" : "เปิดใช้งาน"}
+                    </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleDeleteStaff(item)}
-                    className="flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+                    className="col-span-2 flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
                   >
                     <Trash2 size={17} />
                     ลบ

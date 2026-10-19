@@ -198,7 +198,6 @@ export default function DeliveryJobs() {
 
       const res = await getDeliveryJobs(token);
 
-      console.log("DELIVERY JOBS =", res.data);
 
       const jobs = Array.isArray(res.data?.deliveries)
         ? res.data.deliveries
