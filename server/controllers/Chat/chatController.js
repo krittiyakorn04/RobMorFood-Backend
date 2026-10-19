@@ -412,7 +412,6 @@ exports.sendStoreMessage = async (req, res) => {
                 message: "ร้านส่งข้อความใหม่ถึงคุณ",
                 type: "CHAT_MESSAGE",
                 customerId: room.customerId,
-                chatStoreId: room.storeId,
             });
         }
 

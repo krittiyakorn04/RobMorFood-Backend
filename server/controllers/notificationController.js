@@ -14,7 +14,6 @@ exports.createNotification = async ({
   deliveryStaffId = null,
   deliveryId = null,
   orderId = null,
-  chatStoreId = null,
 }) => {
   try {
     // =====================================================
@@ -31,7 +30,6 @@ exports.createNotification = async ({
         deliveryStaffId,
         deliveryId,
         orderId,
-        chatStoreId,
       },
     });
 

@@ -348,8 +348,8 @@ const MainNav = () => {
           return;
         }
 
-        if (notification.chatStoreId) {
-          navigate(`/user/chat/store/${notification.chatStoreId}`);
+        if (notification.storeId) {
+          navigate(`/user/chat/store/${notification.storeId}`);
           return;
         }
       }
