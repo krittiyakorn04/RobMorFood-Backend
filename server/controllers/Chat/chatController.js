@@ -407,14 +407,23 @@ exports.sendStoreMessage = async (req, res) => {
         // แจ้งเตือนลูกค้า
         // ===============================
 
+        // แจ้งเตือนลูกค้า พร้อมชื่อร้าน
         if (room.customerId) {
+            const store = await prisma.store.findUnique({
+                where: { id: storeId },
+                select: {
+                    storeName: true,
+                },
+            });
+
             await createNotification({
                 title: "ข้อความใหม่จากร้าน",
-                message: "ร้านส่งข้อความใหม่ถึงคุณ",
+                message: `${store?.storeName || "ร้านอาหาร"} ส่งข้อความใหม่ถึงคุณ`,
                 type: "CHAT_MESSAGE",
                 customerId: room.customerId,
                 storeId,
-                roomId: room.id,
+                deliveryId: null,
+                orderId: null,
             });
         }
 
