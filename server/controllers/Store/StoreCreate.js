@@ -149,6 +149,25 @@ exports.getProfile = async (req, res) => {
       });
     }
 
+    if (!store) {
+      return res.status(404).json({
+        message: "Store not found",
+      });
+    }
+
+    // ตรวจสอบสถานะร้าน
+    if (
+      store.merchantStatus === "SUSPENDED" ||
+      store.merchantStatus === "BANNED"
+    ) {
+      return res.status(200).json({
+        merchantStatus: store.merchantStatus,
+        storeName: store.storeName,
+      });
+    }
+
+    return res.status(200).json(store);
+
     res.status(200).json(store);
   } catch (error) {
     console.log("getProfile error =", error);
