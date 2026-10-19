@@ -78,6 +78,7 @@ exports.getAllStore = async (req, res) => {
   }
 };
 
+
 exports.getProfile = async (req, res) => {
   try {
     const storeId = Number(req.params.id);
@@ -92,30 +93,26 @@ exports.getProfile = async (req, res) => {
       where: {
         id: storeId,
       },
-
       include: {
         images: true,
-        // ประเภทร้าน เช่น Bakery / Somtum
+
         storeCategories: {
           include: {
             storeCategory: true,
           },
         },
 
-        // รอบรับออเดอร์
         orderRound: {
           orderBy: {
             roundNumber: "asc",
           },
         },
 
-        // หมวดหมู่เมนู
         menuCategories: {
           include: {
             menus: {
               include: {
                 images: true,
-
                 options: {
                   include: {
                     choices: true,
@@ -126,17 +123,14 @@ exports.getProfile = async (req, res) => {
           },
         },
 
-        // เมนูทั้งหมด
         menus: {
           include: {
             images: true,
-
             options: {
               include: {
                 choices: true,
               },
             },
-
             category: true,
           },
         },
@@ -149,34 +143,20 @@ exports.getProfile = async (req, res) => {
       });
     }
 
-    if (!store) {
-      return res.status(404).json({
-        message: "Store not found",
-      });
-    }
-
-    // ตรวจสอบสถานะร้าน
-    if (
-      store.merchantStatus === "SUSPENDED" ||
-      store.merchantStatus === "BANNED"
-    ) {
-      return res.status(200).json({
-        merchantStatus: store.merchantStatus,
-        storeName: store.storeName,
-      });
-    }
-
-    return res.status(200).json(store);
-
-    res.status(200).json(store);
+    // ส่งข้อมูลร้านทั้งหมด รวม merchantStatus
+    return res.status(200).json({
+      ...store,
+      merchantStatus: store.merchantStatus,
+    });
   } catch (error) {
-    console.log("getProfile error =", error);
+    console.error("getProfile error =", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server Error",
     });
   }
 };
+
 
 
 
